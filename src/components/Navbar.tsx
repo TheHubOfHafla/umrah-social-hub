@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { NavigationMenu, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, navigationMenuTriggerStyle } from "@/components/ui/navigation-menu";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Bell, Calendar, ChevronDown, LogIn, Menu, Search, User, UserPlus, X, Plus } from "lucide-react";
+import { Bell, Calendar, ChevronDown, LogIn, Menu, Search, User, UserPlus, X, Plus, UserRound } from "lucide-react";
 import UserAvatar from "./UserAvatar";
 import { currentUser } from "@/lib/data";
 
@@ -86,7 +86,7 @@ const Navbar = ({ isAuthenticated = true }: { isAuthenticated?: boolean }) => {
             <Search className="h-5 w-5" />
           </Button>
           
-          {/* Create Event Button (Added) */}
+          {/* Create Event Button */}
           <Link to="/events/create">
             <Button className="flex items-center gap-2 bg-primary hover:bg-primary/90 transition-all duration-200 hover:scale-105">
               <Plus className="h-4 w-4" />
@@ -99,6 +99,14 @@ const Navbar = ({ isAuthenticated = true }: { isAuthenticated?: boolean }) => {
               <Button variant="ghost" size="icon" className="hover:bg-primary/10 hover:text-primary transition-all duration-200">
                 <Bell className="h-5 w-5" />
               </Button>
+              
+              {/* My Profile Button */}
+              <Link to="/dashboard/profile">
+                <Button variant="outline" className="flex items-center gap-2 hover:bg-primary/10 hover:text-primary transition-all duration-200">
+                  <UserRound className="h-4 w-4" />
+                  My Profile
+                </Button>
+              </Link>
               
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -167,7 +175,7 @@ const Navbar = ({ isAuthenticated = true }: { isAuthenticated?: boolean }) => {
                 {item.label}
               </Link>)}
             
-            {/* Create Event Button for Mobile (Added) */}
+            {/* Create Event Button for Mobile */}
             <Link to="/events/create" className="px-4 py-3 text-lg bg-primary text-white rounded-md hover:bg-primary/90 transition-all duration-200 flex items-center">
               <Plus className="mr-2 h-5 w-5" />
               Create Event
@@ -177,6 +185,11 @@ const Navbar = ({ isAuthenticated = true }: { isAuthenticated?: boolean }) => {
             
             {isAuthenticated ? (
               <>
+                {/* Updated to show My Profile link in mobile menu */}
+                <Link to="/dashboard/profile" className="px-4 py-3 text-lg rounded-md hover:bg-primary/10 hover:text-primary transition-all duration-200 flex items-center">
+                  <UserRound className="mr-2 h-5 w-5" />
+                  My Profile
+                </Link>
                 <Link to="/dashboard" className="px-4 py-3 text-lg rounded-md hover:bg-primary/10 hover:text-primary transition-all duration-200 flex items-center">
                   <User className="mr-2 h-5 w-5" />
                   Dashboard

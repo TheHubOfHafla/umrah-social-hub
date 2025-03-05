@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { z } from "zod";
@@ -25,7 +26,8 @@ const formSchema = z.object({
 
 type FormValues = z.infer<typeof formSchema>;
 
-const Login = () => {
+// Add onLoginSuccess prop
+const Login = ({ onLoginSuccess }: { onLoginSuccess?: () => void }) => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
@@ -54,6 +56,11 @@ const Login = () => {
         description: "You have successfully signed in.",
       });
       
+      // Call the onLoginSuccess callback if provided
+      if (onLoginSuccess) {
+        onLoginSuccess();
+      }
+      
       navigate("/");
     } catch (error) {
       console.error("Login error:", error);
@@ -76,6 +83,11 @@ const Login = () => {
         title: "Welcome!",
         description: "You have successfully signed in with Google.",
       });
+      
+      // Call the onLoginSuccess callback if provided
+      if (onLoginSuccess) {
+        onLoginSuccess();
+      }
       
       navigate("/");
     } catch (error) {

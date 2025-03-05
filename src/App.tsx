@@ -27,39 +27,58 @@ import UserProfile from "./pages/dashboard/UserProfile";
 import OrganizerProfile from "./pages/dashboard/OrganizerProfile";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
-
-// Added isAuthenticated simulation
-const isAuthenticated = false;
+import { useState, useEffect } from "react";
 
 const queryClient = new QueryClient();
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Navbar isAuthenticated={isAuthenticated} />
-        <Routes>
-          <Route path="/" element={<Index isAuthenticated={isAuthenticated} />} />
-          <Route path="/events" element={<EventsPage />} />
-          <Route path="/events/:eventId" element={<EventDetailPage />} />
-          <Route path="/events/create" element={<CreateEventPage />} />
-          <Route path="/events/:eventId/register" element={<RegisterPage />} />
-          <Route path="/organizers" element={<OrganizersPage />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/dashboard/events" element={<UserEvents />} />
-          <Route path="/dashboard/profile" element={<UserProfile />} />
-          <Route path="/organizer" element={<OrganizerDashboard />} />
-          <Route path="/organizer/events" element={<OrganizerEvents />} />
-          <Route path="/organizer/profile" element={<OrganizerProfile />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+const App = () => {
+  // Add state to track authentication status
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  
+  // Check if user is authenticated on initial load
+  useEffect(() => {
+    // Check if we have some indicator of authentication in localStorage
+    const token = localStorage.getItem('auth_token');
+    if (token) {
+      setIsAuthenticated(true);
+    }
+  }, []);
+
+  // Function to handle successful login
+  const handleLogin = () => {
+    // Set auth token in localStorage
+    localStorage.setItem('auth_token', 'user-is-logged-in');
+    setIsAuthenticated(true);
+  };
+  
+  return (
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Navbar isAuthenticated={isAuthenticated} />
+          <Routes>
+            <Route path="/" element={<Index isAuthenticated={isAuthenticated} />} />
+            <Route path="/events" element={<EventsPage />} />
+            <Route path="/events/:eventId" element={<EventDetailPage />} />
+            <Route path="/events/create" element={<CreateEventPage />} />
+            <Route path="/events/:eventId/register" element={<RegisterPage />} />
+            <Route path="/organizers" element={<OrganizersPage />} />
+            <Route path="/login" element={<Login onLoginSuccess={handleLogin} />} />
+            <Route path="/signup" element={<Signup onSignupSuccess={handleLogin} />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/dashboard/events" element={<UserEvents />} />
+            <Route path="/dashboard/profile" element={<UserProfile />} />
+            <Route path="/organizer" element={<OrganizerDashboard />} />
+            <Route path="/organizer/events" element={<OrganizerEvents />} />
+            <Route path="/organizer/profile" element={<OrganizerProfile />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </TooltipProvider>
+    </QueryClientProvider>
+  );
+};
 
 export default App;
