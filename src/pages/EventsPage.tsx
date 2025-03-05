@@ -186,9 +186,9 @@ const EventsPage = () => {
           <div>
             <h3 className="font-medium mb-3">Attendee Type</h3>
             <AttendeeTypeFilter
-              selected={selectedAttendeeType}
-              onChange={setSelectedAttendeeType}
-              showAll
+              selectedType={selectedAttendeeType as any}
+              onChange={(type) => setSelectedAttendeeType(type || "all")}
+              className="w-full"
             />
           </div>
 
@@ -267,9 +267,9 @@ const EventsPage = () => {
                   <div>
                     <h3 className="font-medium mb-3">Attendee Type</h3>
                     <AttendeeTypeFilter
-                      selected={selectedAttendeeType}
-                      onChange={setSelectedAttendeeType}
-                      showAll
+                      selectedType={selectedAttendeeType as any}
+                      onChange={(type) => setSelectedAttendeeType(type || "all")}
+                      className="w-full"
                     />
                   </div>
 
@@ -315,8 +315,15 @@ const EventsPage = () => {
                 </h2>
                 <ScrollArea className="w-full whitespace-nowrap mb-6">
                   <CategoryChips
-                    selectedCategory={selectedCategory}
-                    onSelectCategory={handleCategorySelect}
+                    selectedCategories={[selectedCategory !== "all" ? selectedCategory as EventCategory : null].filter(Boolean) as EventCategory[]}
+                    onChange={(categories) => {
+                      if (categories.length > 0) {
+                        handleCategorySelect(categories[0]);
+                      } else {
+                        handleCategorySelect("all");
+                      }
+                    }}
+                    singleSelect={true}
                   />
                 </ScrollArea>
               </div>
