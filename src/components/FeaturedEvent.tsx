@@ -1,4 +1,3 @@
-
 import { Event } from "@/types";
 import { format } from "date-fns";
 import { CalendarIcon, MapPin, Users } from "lucide-react";
@@ -123,18 +122,15 @@ const FeaturedEvent = ({ event, className }: FeaturedEventProps) => {
         
         <div className="relative flex items-center justify-center">
           <div className={cn(
-            "w-full aspect-[4/3] rounded-lg overflow-hidden shadow-lg group-hover:shadow-xl",
-            !imageLoaded && "animate-pulse bg-muted"
+            "w-full aspect-[4/3] rounded-lg overflow-hidden shadow-lg group-hover:shadow-xl"
           )}>
             <img
               src={event.image}
               alt={event.title}
-              className={cn(
-                "w-full h-full object-cover transition-opacity duration-500",
-                imageLoaded ? "opacity-100" : "opacity-0"
-              )}
+              className="w-full h-full object-cover"
               onLoad={() => setImageLoaded(true)}
             />
+            {!imageLoaded && <div className="absolute inset-0 bg-muted animate-pulse" />}
           </div>
         </div>
       </div>

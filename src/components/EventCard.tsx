@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { format, formatDistanceToNow } from "date-fns";
@@ -48,19 +47,13 @@ const EventCard = ({ event, className, variant = "default" }: EventCardProps) =>
       >
         <div className="relative">
           <AspectRatio ratio={isFeatured ? 16/9 : 4/3}>
-            <div className={cn(
-              "absolute inset-0 bg-muted",
-              !imageLoaded && "animate-pulse"
-            )} />
             <img
               src={event.image}
               alt={event.title}
-              className={cn(
-                "object-cover w-full h-full z-10 transition-opacity duration-300",
-                !imageLoaded && "opacity-0"
-              )}
+              className="object-cover w-full h-full z-10"
               onLoad={() => setImageLoaded(true)}
             />
+            {!imageLoaded && <div className="absolute inset-0 bg-muted animate-pulse" />}
           </AspectRatio>
           
           {isFeatured && (
