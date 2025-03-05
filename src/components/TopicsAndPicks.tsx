@@ -89,6 +89,7 @@ const TopicsAndPicks = () => {
   const [nextBtnDisabled, setNextBtnDisabled] = useState(true);
   const [activeIndex, setActiveIndex] = useState(0);
   const [slidesInView, setSlidesInView] = useState<number[]>([]);
+  const [wrappedSlides, setWrappedSlides] = useState<number[]>([]);
   const [autoplayActive, setAutoplayActive] = useState(true);
   const [isDragging, setIsDragging] = useState(false);
 
@@ -167,18 +168,42 @@ const TopicsAndPicks = () => {
     }, 5000);
   }, [autoplayActive, startAutoplay]);
 
+  // Detect wrapped slides that should be hidden
+  const detectWrappedSlides = useCallback(() => {
+    if (!emblaApi) return [];
+    
+    const engine = emblaApi.internalEngine();
+    const scrollSnaps = engine.scrollSnapList;
+    const scrollProgress = emblaApi.scrollProgress();
+    const slidesCount = emblaApi.slideNodes().length;
+    const wrapped: number[] = [];
+
+    emblaApi.slideNodes().forEach((_, index) => {
+      // Get the normalized location (0 to 1) of this slide
+      const slideLocation = engine.location.get() + index - emblaApi.selectedScrollSnap();
+      
+      // Check if this slide is wrapping around (appearing on both ends)
+      if (slideLocation > slidesCount - 3 || slideLocation < -slidesCount + 3) {
+        wrapped.push(index);
+      }
+    });
+
+    return wrapped;
+  }, [emblaApi]);
+
   const onSelect = useCallback(() => {
     if (!emblaApi) return;
     setActiveIndex(emblaApi.selectedScrollSnap());
     setPrevBtnDisabled(!emblaApi.canScrollPrev());
     setNextBtnDisabled(!emblaApi.canScrollNext());
 
-    const inViewSlides = [];
+    const inViewSlides: number[] = [];
     emblaApi.slidesInView().forEach(index => {
       inViewSlides.push(index);
     });
     setSlidesInView(inViewSlides);
-  }, [emblaApi]);
+    setWrappedSlides(detectWrappedSlides());
+  }, [emblaApi, detectWrappedSlides]);
 
   useEffect(() => {
     const handleVisibilityChange = () => {
@@ -213,12 +238,17 @@ const TopicsAndPicks = () => {
     restartAutoplayAfterDelay();
   }, [restartAutoplayAfterDelay]);
 
+  const handleScroll = useCallback(() => {
+    setWrappedSlides(detectWrappedSlides());
+  }, [detectWrappedSlides]);
+
   useEffect(() => {
     if (!emblaApi) return;
     
     onSelect();
     emblaApi.on('select', onSelect);
     emblaApi.on('reInit', onSelect);
+    emblaApi.on('scroll', handleScroll);
     // Fix the event type names to use the correct ones for Embla Carousel
     emblaApi.on('pointerDown', handleDragStart);
     emblaApi.on('pointerUp', handleDragEnd);
@@ -229,11 +259,12 @@ const TopicsAndPicks = () => {
       stopAutoplay();
       emblaApi.off('select', onSelect);
       emblaApi.off('reInit', onSelect);
+      emblaApi.off('scroll', handleScroll);
       // Fix the event type names here too
       emblaApi.off('pointerDown', handleDragStart);
       emblaApi.off('pointerUp', handleDragEnd);
     };
-  }, [emblaApi, onSelect, startAutoplay, stopAutoplay, handleDragStart, handleDragEnd]);
+  }, [emblaApi, onSelect, startAutoplay, stopAutoplay, handleDragStart, handleDragEnd, handleScroll]);
 
   return (
     <div className="relative w-full px-4 py-8 overflow-hidden">
@@ -258,7 +289,10 @@ const TopicsAndPicks = () => {
                     "transition-all duration-500 ease-out",
                     slidesInView.includes(index) 
                       ? "opacity-100 scale-100" 
-                      : "opacity-40 scale-85 blur-[1px]"
+                      : "opacity-40 scale-85 blur-[1px]",
+                    wrappedSlides.includes(index) 
+                      ? "opacity-0 invisible" 
+                      : ""
                   )}
                 >
                   <TopicCard 
