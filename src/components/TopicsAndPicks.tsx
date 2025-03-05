@@ -6,14 +6,16 @@ import { categories } from "@/lib/data";
 import { cn } from "@/lib/utils";
 import { Card, CardContent } from "@/components/ui/card";
 import { 
-  Music, 
-  PartyPopper, 
-  Theater, 
-  Calendar, 
   Heart, 
-  Gamepad, 
+  Users, 
+  GraduationCap, 
+  Mosque, 
+  Plane, 
+  Footprints, 
+  Book, 
   Briefcase, 
-  UtensilsCrossed 
+  Users as UsersIcon,
+  HelpCircle
 } from "lucide-react";
 
 interface TopicCardProps {
@@ -40,71 +42,49 @@ const TopicCard = ({ title, category, icon, className, style }: TopicCardProps) 
 const TopicsAndPicks = () => {
   const [activeTab, setActiveTab] = useState<'topics' | 'picks'>('topics');
   
-  const topicCards = [
-    { 
-      title: "Music", 
-      category: "music" as EventCategory, 
-      icon: <Music className="h-10 w-10 text-foreground/80" /> 
-    },
-    { 
-      title: "Nightlife", 
-      category: "nightlife" as EventCategory, 
-      icon: <PartyPopper className="h-10 w-10 text-foreground/80" /> 
-    },
-    { 
-      title: "Performing Arts", 
-      category: "lecture" as EventCategory, 
-      icon: <Theater className="h-10 w-10 text-foreground/80" /> 
-    },
-    { 
-      title: "Holidays", 
-      category: "travel" as EventCategory, 
-      icon: <Calendar className="h-10 w-10 text-foreground/80" /> 
-    },
-    { 
-      title: "Dating", 
-      category: "social" as EventCategory, 
-      icon: <Heart className="h-10 w-10 text-foreground/80" /> 
-    },
-    { 
-      title: "Hobbies", 
-      category: "workshop" as EventCategory, 
-      icon: <Gamepad className="h-10 w-10 text-foreground/80" /> 
-    },
-    { 
-      title: "Business", 
-      category: "education" as EventCategory, 
-      icon: <Briefcase className="h-10 w-10 text-foreground/80" /> 
-    },
-    { 
-      title: "Food & Drink", 
-      category: "charity" as EventCategory, 
-      icon: <UtensilsCrossed className="h-10 w-10 text-foreground/80" /> 
-    },
-  ];
+  // Map of category values to their respective icons
+  const getCategoryIcon = (category: EventCategory) => {
+    switch(category) {
+      case "charity":
+        return <Heart className="h-10 w-10 text-foreground/80" />;
+      case "community":
+        return <Users className="h-10 w-10 text-foreground/80" />;
+      case "education":
+        return <GraduationCap className="h-10 w-10 text-foreground/80" />;
+      case "mosque":
+        return <Mosque className="h-10 w-10 text-foreground/80" />;
+      case "travel":
+        return <Plane className="h-10 w-10 text-foreground/80" />;
+      case "umrah":
+        return <Footprints className="h-10 w-10 text-foreground/80" />;
+      case "lecture":
+        return <Book className="h-10 w-10 text-foreground/80" />;
+      case "workshop":
+        return <Briefcase className="h-10 w-10 text-foreground/80" />;
+      case "social":
+        return <UsersIcon className="h-10 w-10 text-foreground/80" />;
+      case "other":
+      default:
+        return <HelpCircle className="h-10 w-10 text-foreground/80" />;
+    }
+  };
   
-  const picksCards = [
-    { 
-      title: "Charity Events", 
-      category: "charity" as EventCategory, 
-      icon: <Heart className="h-10 w-10 text-foreground/80" /> 
-    },
-    { 
-      title: "Mosque Events", 
-      category: "mosque" as EventCategory, 
-      icon: <Calendar className="h-10 w-10 text-foreground/80" /> 
-    },
-    { 
-      title: "Community", 
-      category: "community" as EventCategory, 
-      icon: <PartyPopper className="h-10 w-10 text-foreground/80" /> 
-    },
-    { 
-      title: "Workshops", 
-      category: "workshop" as EventCategory, 
-      icon: <Briefcase className="h-10 w-10 text-foreground/80" /> 
-    },
-  ];
+  // Create topic cards from the available categories
+  const topicCards = categories.slice(0, 8).map(category => ({
+    title: category.label,
+    category: category.value,
+    icon: getCategoryIcon(category.value)
+  }));
+  
+  // Create picks cards with a selection of categories
+  const picksCategories = ["charity", "mosque", "community", "workshop"];
+  const picksCards = categories
+    .filter(cat => picksCategories.includes(cat.value))
+    .map(category => ({
+      title: category.label,
+      category: category.value,
+      icon: getCategoryIcon(category.value)
+    }));
 
   return (
     <section className="container mx-auto px-4 py-8">
