@@ -56,7 +56,6 @@ const EventCard = ({ event, className, variant = "default" }: EventCardProps) =>
               alt={event.title}
               className={cn(
                 "object-cover w-full h-full z-10 transition-all duration-300",
-                "group-hover:scale-105",
                 !imageLoaded && "opacity-0",
                 isFeatured && "rounded-lg"
               )}
@@ -171,3 +170,4 @@ const EventCard = ({ event, className, variant = "default" }: EventCardProps) =>
 };
 
 export default EventCard;
+
