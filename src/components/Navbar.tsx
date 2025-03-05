@@ -29,12 +29,18 @@ const navItems: NavItem[] = [{
 // Added new prop to simulate unauthenticated state
 const Navbar = ({ isAuthenticated = true }: { isAuthenticated?: boolean }) => {
   const [isScrolled, setIsScrolled] = useState(false);
+  const [scrollProgress, setScrollProgress] = useState(0);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
 
   useEffect(() => {
     const handleScroll = () => {
+      // Set scrolled state based on scroll position
       setIsScrolled(window.scrollY > 10);
+      
+      // Calculate scroll progress for opacity (max at 100px scroll)
+      const progress = Math.min(window.scrollY / 100, 1);
+      setScrollProgress(progress);
     };
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
@@ -49,12 +55,22 @@ const Navbar = ({ isAuthenticated = true }: { isAuthenticated?: boolean }) => {
     active: location.pathname === item.href
   }));
 
+  // Calculate background opacity based on scroll progress
+  const bgOpacity = scrollProgress * 0.9; // Max opacity of 90%
+
   return <header className={cn(
       "fixed top-0 left-0 right-0 z-50 transition-all duration-300", 
       isScrolled 
-        ? "py-2 bg-background/80 backdrop-blur-md shadow-sm" 
-        : "py-3 bg-primary text-white"
-    )}>
+        ? "py-2 shadow-sm" 
+        : "py-3"
+    )}
+    style={{
+      backgroundColor: isScrolled 
+        ? `rgba(255, 255, 255, ${bgOpacity})` 
+        : 'transparent',
+      backdropFilter: isScrolled ? 'blur(8px)' : 'none'
+    }}
+    >
       <div className="container flex items-center justify-between">
         {/* Desktop Navigation - Left */}
         <div className="hidden md:flex items-center">
