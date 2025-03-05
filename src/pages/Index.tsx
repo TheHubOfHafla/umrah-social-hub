@@ -59,8 +59,8 @@ const Index = ({ isAuthenticated = false }: { isAuthenticated?: boolean }) => {
           isAuthenticated={isAuthenticated} 
         />
         
-        {/* Add the TopicsAndPicks component with container styling */}
-        <div className={`container mx-auto py-8 transition-all duration-700 delay-100 ${animateContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+        {/* TopicsAndPicks container with full width for carousel */}
+        <div className={`w-full transition-all duration-700 delay-100 ${animateContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
           <TopicsAndPicks />
         </div>
         
