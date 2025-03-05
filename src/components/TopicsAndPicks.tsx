@@ -40,8 +40,6 @@ const TopicCard = ({ title, category, icon, className, style }: TopicCardProps) 
 };
 
 const TopicsAndPicks = () => {
-  const [activeTab, setActiveTab] = useState<'topics' | 'picks'>('topics');
-  
   // Map of category values to their respective icons
   const getCategoryIcon = (category: EventCategory) => {
     switch(category) {
@@ -75,48 +73,11 @@ const TopicsAndPicks = () => {
     category: category.value,
     icon: getCategoryIcon(category.value)
   }));
-  
-  // Create picks cards with a selection of categories
-  const picksCategories = ["charity", "mosque", "community", "workshop"];
-  const picksCards = categories
-    .filter(cat => picksCategories.includes(cat.value))
-    .map(category => ({
-      title: category.label,
-      category: category.value,
-      icon: getCategoryIcon(category.value)
-    }));
 
   return (
     <section className="container mx-auto px-4 py-8">
-      <div className="mb-6">
-        <div className="flex border-b border-gray-200 gap-4">
-          <button
-            onClick={() => setActiveTab('topics')}
-            className={cn(
-              "pb-2 text-lg font-medium transition-colors",
-              activeTab === 'topics' 
-                ? "border-b-2 border-primary text-primary" 
-                : "text-muted-foreground hover:text-foreground"
-            )}
-          >
-            Categories
-          </button>
-          <button
-            onClick={() => setActiveTab('picks')}
-            className={cn(
-              "pb-2 text-lg font-medium transition-colors",
-              activeTab === 'picks' 
-                ? "border-b-2 border-[#9b87f5] text-[#9b87f5]" 
-                : "text-muted-foreground hover:text-foreground"
-            )}
-          >
-            Our Picks
-          </button>
-        </div>
-      </div>
-
       <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-4 md:gap-6">
-        {(activeTab === 'topics' ? topicCards : picksCards).map((card, index) => (
+        {topicCards.map((card, index) => (
           <TopicCard 
             key={index}
             title={card.title}
