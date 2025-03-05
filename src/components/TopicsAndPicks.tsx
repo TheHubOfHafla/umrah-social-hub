@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback, useRef } from "react";
 import { Link } from "react-router-dom";
 import { EventCategory } from "@/types";
@@ -43,31 +42,26 @@ const TopicCard = ({ title, category, icon, className, style, isActive }: TopicC
       <div className={cn(
         "flex flex-col items-center transition-all duration-300",
         isHovered ? "scale-120 translate-y-[-10px]" : "",
-        isActive && !isHovered ? "scale-110 translate-y-[-7px]" : "",
         className
       )} style={style}>
         <div className={cn(
           "relative mb-3 flex h-24 w-24 items-center justify-center rounded-full border border-border bg-background p-4 shadow-sm transition-all duration-300",
-          isHovered ? "shadow-xl border-primary/70 bg-primary/20" : "",
-          isActive && !isHovered ? "shadow-lg border-primary/50 bg-primary/15" : ""
+          isHovered ? "shadow-xl border-primary/70 bg-primary/20" : ""
         )}>
           <div className={cn(
             "transition-all duration-300",
-            isHovered ? "scale-115 text-primary" : "",
-            isActive && !isHovered ? "scale-110 text-primary" : ""
+            isHovered ? "scale-115 text-primary" : ""
           )}>
             {icon}
           </div>
           <div className={cn(
             "absolute -inset-1 rounded-full opacity-0 bg-gradient-to-r from-primary/20 to-transparent blur-xl transition-all duration-300",
-            isHovered ? "opacity-100" : "",
-            isActive && !isHovered ? "opacity-90" : ""
+            isHovered ? "opacity-100" : ""
           )}></div>
         </div>
         <span className={cn(
           "mt-2 block text-sm font-medium transition-colors duration-300",
-          isHovered ? "text-primary" : "",
-          isActive && !isHovered ? "text-primary" : ""
+          isHovered ? "text-primary" : ""
         )}>{title}</span>
       </div>
     </Link>
@@ -80,8 +74,8 @@ const TopicsAndPicks = () => {
     loop: true, 
     align: 'center', 
     dragFree: true,
-    watchDrag: false, // Disable drag handling when autoplay is active
-    duration: 15 // Faster animation duration (lower number = faster)
+    watchDrag: false, 
+    duration: 15 
   });
   const [prevBtnDisabled, setPrevBtnDisabled] = useState(true);
   const [nextBtnDisabled, setNextBtnDisabled] = useState(true);
@@ -148,10 +142,10 @@ const TopicsAndPicks = () => {
   const startAutoplay = useCallback(() => {
     if (emblaApi && !autoplayRef.current) {
       autoplayRef.current = setInterval(() => {
-        if (!document.hidden) { // Only scroll if page is visible
+        if (!document.hidden) {
           emblaApi.scrollNext();
         }
-      }, 2000); // Faster scroll interval (2 seconds instead of 3)
+      }, 2000);
       setAutoplayActive(true);
     }
   }, [emblaApi]);
@@ -241,10 +235,7 @@ const TopicsAndPicks = () => {
                   category={card.category}
                   icon={card.icon}
                   isActive={activeIndex === index}
-                  className={cn(
-                    "animate-fade-in transition-all duration-300", 
-                    activeIndex === index ? "scale-110" : ""
-                  )}
+                  className="animate-fade-in transition-all duration-300"
                   style={{ animationDelay: `${(index % 10) * 30}ms` }}
                 />
               </div>
