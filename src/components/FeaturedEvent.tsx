@@ -1,4 +1,3 @@
-
 import { Event } from "@/types";
 import { format } from "date-fns";
 import { CalendarIcon, MapPin, Users } from "lucide-react";
@@ -128,7 +127,7 @@ const FeaturedEvent = ({ event, className }: FeaturedEventProps) => {
               src={event.image}
               alt={event.title}
               className={cn(
-                "w-full h-full object-cover transition-all duration-500",
+                "w-full h-full object-cover transition-opacity duration-500",
                 imageLoaded ? "opacity-100" : "opacity-0"
               )}
               onLoad={() => setImageLoaded(true)}

@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { format, formatDistanceToNow } from "date-fns";
@@ -40,7 +39,7 @@ const EventCard = ({ event, className, variant = "default" }: EventCardProps) =>
     <Link to={`/events/${event.id}`}>
       <Card 
         className={cn(
-          "group overflow-hidden transition-all duration-300 hover:shadow-md relative h-full",
+          "overflow-hidden transition-all duration-300 hover:shadow-md relative h-full",
           isFeatured ? "border-0 shadow-none" : "shadow-sm",
           className
         )}
@@ -170,4 +169,3 @@ const EventCard = ({ event, className, variant = "default" }: EventCardProps) =>
 };
 
 export default EventCard;
-
