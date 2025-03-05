@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback, useRef } from "react";
 import { Link } from "react-router-dom";
 import { EventCategory } from "@/types";
@@ -71,7 +70,7 @@ const TopicsAndPicks = () => {
     align: 'center', 
     dragFree: true,
     watchDrag: false, // Disable drag handling when autoplay is active
-    speed: 15 // Faster animation speed (lower number = faster)
+    duration: 15 // Faster animation duration (lower number = faster)
   });
   const [prevBtnDisabled, setPrevBtnDisabled] = useState(true);
   const [nextBtnDisabled, setNextBtnDisabled] = useState(true);
@@ -79,7 +78,6 @@ const TopicsAndPicks = () => {
   const [slidesInView, setSlidesInView] = useState<number[]>([]);
   const [autoplayActive, setAutoplayActive] = useState(true);
 
-  // Map of category values to their respective icons
   const getCategoryIcon = (category: EventCategory) => {
     switch(category) {
       case "charity":
@@ -105,8 +103,7 @@ const TopicsAndPicks = () => {
         return <HelpCircle className="h-10 w-10 text-foreground/80" />;
     }
   };
-  
-  // Create topic cards from the available categories
+
   const topicCards = categories.map(category => ({
     title: category.label,
     category: category.value,
@@ -149,7 +146,6 @@ const TopicsAndPicks = () => {
   }, [emblaApi]);
 
   const restartAutoplayAfterDelay = useCallback(() => {
-    // Shorter delay to resume autoplay (5 seconds instead of 7)
     setTimeout(() => {
       if (!autoplayActive) {
         startAutoplay();
@@ -170,7 +166,6 @@ const TopicsAndPicks = () => {
     setSlidesInView(inViewSlides);
   }, [emblaApi]);
 
-  // Handle visibility change to pause autoplay when tab is not visible
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (document.hidden) {
@@ -186,7 +181,6 @@ const TopicsAndPicks = () => {
     };
   }, [stopAutoplay, startAutoplay]);
 
-  // Pause autoplay on hover
   const handleMouseEnter = useCallback(() => {
     stopAutoplay();
   }, [stopAutoplay]);
@@ -202,7 +196,6 @@ const TopicsAndPicks = () => {
     emblaApi.on('select', onSelect);
     emblaApi.on('reInit', onSelect);
 
-    // Start autoplay after component is mounted
     startAutoplay();
     
     return () => {
