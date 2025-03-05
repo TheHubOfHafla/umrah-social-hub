@@ -8,35 +8,48 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import Chatbot from "./Chatbot";
 
 const ChatbotButton = () => {
   const [isOpen, setIsOpen] = useState(false);
 
   const handleToggleChat = () => {
     setIsOpen(!isOpen);
-    // Future implementation: This will toggle the chat interface
-    console.log("Chat toggled:", !isOpen);
+  };
+
+  const handleCloseChat = () => {
+    setIsOpen(false);
   };
 
   return (
-    <div className="fixed bottom-6 right-6 z-50">
-      <TooltipProvider>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              onClick={handleToggleChat}
-              size="icon"
-              className="h-14 w-14 rounded-full shadow-lg bg-primary hover:bg-primary/90 transition-all duration-300 hover:scale-105"
-            >
-              <MessageCircle className="h-6 w-6" />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent side="left">
-            <p>Chat with us</p>
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
-    </div>
+    <>
+      <div className="fixed bottom-6 right-6 z-50">
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                onClick={handleToggleChat}
+                size="icon"
+                className={`h-14 w-14 rounded-full shadow-lg transition-all duration-300 hover:scale-105 ${
+                  isOpen ? "bg-secondary hover:bg-secondary/90" : "bg-primary hover:bg-primary/90"
+                }`}
+              >
+                <MessageCircle className="h-6 w-6" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side="left">
+              <p>Chat with us</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      </div>
+      
+      <Chatbot 
+        isOpen={isOpen}
+        onClose={handleCloseChat}
+        initialMessage="👋 Hi there! I'm your Event Buddy. I can help you find events, answer questions about the platform, or assist with any issues you're having. How can I help you today?"
+      />
+    </>
   );
 };
 
