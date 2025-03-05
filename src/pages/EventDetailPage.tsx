@@ -31,7 +31,6 @@ const EventDetailPage = () => {
   const { toast } = useToast();
   const [imageLoaded, setImageLoaded] = useState(false);
   
-  // Scroll to top when component mounts
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [eventId]);
@@ -88,11 +87,9 @@ const EventDetailPage = () => {
   const formattedTime = format(eventDate, "h:mm a");
   const formattedEndTime = eventEndDate ? format(eventEndDate, "h:mm a") : null;
   
-  // Calculate if the event spans multiple days
   const isMultiDay = eventEndDate && 
     eventEndDate.toDateString() !== eventDate.toDateString();
   
-  // Calculate sold percentage for the ticket progress bar
   const soldPercentage = event.ticketTypes 
     ? Math.min(
         100,
@@ -107,7 +104,6 @@ const EventDetailPage = () => {
 
   return (
     <>
-      {/* Hero section with image and overlay */}
       <div className="relative w-full bg-muted/30 pt-10 md:pt-24">
         <div className="absolute inset-0 overflow-hidden bg-muted">
           <div 
@@ -119,13 +115,11 @@ const EventDetailPage = () => {
 
         <div className="container mx-auto px-4 py-8">
           <div className="flex flex-col lg:flex-row gap-8 relative z-10">
-            {/* Back button */}
             <Link to="/events" className="inline-flex items-center text-muted-foreground hover:text-primary mb-4 transition-colors">
               <ChevronLeft size={16} className="mr-1" />
               Back to events
             </Link>
             
-            {/* Event details column */}
             <div className="flex flex-col w-full lg:w-2/3">
               <div className="flex flex-wrap gap-2 mb-4">
                 {event.categories.map(category => (
@@ -196,7 +190,6 @@ const EventDetailPage = () => {
               </div>
             </div>
             
-            {/* Ticket information sidebar */}
             <div className="w-full lg:w-1/3 mt-8 lg:mt-16">
               <Card className="sticky top-8 border rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300">
                 <CardContent className="p-6">
@@ -277,11 +270,11 @@ const EventDetailPage = () => {
                     fullWidth 
                     size="lg" 
                     className="mb-4 transition-transform hover:scale-[1.02] active:scale-[0.98]"
+                    onClick={handleRegisterClick}
                   >
                     {event.isFree ? 'Register Now' : 'Book Tickets'}
                   </Button>
                   
-                  {/* Conditionally render attendees list */}
                   {event.attendees && event.attendees.length > 0 && (
                     <div className="mt-6">
                       <AttendeesList attendees={event.attendees} maxDisplay={5} />
@@ -294,7 +287,6 @@ const EventDetailPage = () => {
         </div>
       </div>
       
-      {/* Event content tabs */}
       <div className="container mx-auto px-4 py-8">
         <Tabs defaultValue="about">
           <TabsList className="mb-6">
@@ -383,7 +375,6 @@ const EventDetailPage = () => {
         </Tabs>
       </div>
       
-      {/* Related events section */}
       {relatedEvents.length > 0 && (
         <div className="container mx-auto px-4 py-12 border-t border-border/50">
           <div className="flex items-center justify-between mb-8">
@@ -406,7 +397,6 @@ const EventDetailPage = () => {
   );
 };
 
-// Loading skeleton for the event detail page
 const EventDetailSkeleton = () => {
   return (
     <div className="container mx-auto px-4 py-8">
