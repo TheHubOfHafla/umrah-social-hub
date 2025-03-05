@@ -24,7 +24,7 @@ const HeroBanner = ({ user, onLocationSelect }: HeroBannerProps) => {
           !bannerLoaded && "animate-pulse bg-muted"
         )}></div>
         <img 
-          src="/lovable-uploads/cef6e842-fcc3-4b46-8a93-7dbe053d8cd0.png" 
+          src="/lovable-uploads/3fa0e5f2-adb1-4481-b5cd-7871743c9ab3.png" 
           alt="Islamic community gathering" 
           className={cn(
             "w-full h-full object-cover transition-opacity duration-500",
