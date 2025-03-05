@@ -60,17 +60,7 @@ const Index = ({ isAuthenticated = false }: { isAuthenticated?: boolean }) => {
           isAuthenticated={isAuthenticated} 
         />
         
-        <div className={`container mx-auto px-4 -mt-8 relative z-10 flex justify-center md:justify-end transition-all duration-700 ${animateContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-          <Link to="/events/create">
-            <Button 
-              variant="primary" 
-              size="lg" 
-              className="shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
-            >
-              Create Event
-            </Button>
-          </Link>
-        </div>
+        {/* Removed Create Event button from here */}
         
         <section className={`container mx-auto px-4 py-12 transition-all duration-700 delay-100 ${animateContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
           <CategoryCarousel 
