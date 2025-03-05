@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback, useRef } from "react";
 import { Link } from "react-router-dom";
 import { EventCategory } from "@/types";
@@ -65,12 +64,6 @@ const TopicCard = ({ title, category, icon, className, style, isActive }: TopicC
           "mt-2 block text-sm font-medium transition-colors duration-300",
           isHovered ? "text-primary" : ""
         )}>{title}</span>
-        {isHovered && (
-          <div className="mt-1 text-xs text-primary/80 flex items-center gap-1 animate-fade-in">
-            <span>Explore</span>
-            <ArrowRight className="h-3 w-3" />
-          </div>
-        )}
       </div>
     </Link>
   );
