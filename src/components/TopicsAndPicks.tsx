@@ -29,11 +29,11 @@ const TopicCard = ({ title, category, icon, className, style }: TopicCardProps) 
     <Link to={`/events?category=${category}`} className="block text-center">
       <div className={cn(
         "group flex flex-col items-center transition-all duration-300",
-        "hover:scale-105 hover:translate-y-[-3px]",
+        "hover:scale-110 hover:translate-y-[-5px]",
         className
       )} style={style}>
-        <div className="relative mb-2 flex h-24 w-24 items-center justify-center rounded-full border border-border bg-background p-4 shadow-sm transition-all duration-300 group-hover:shadow-md group-hover:border-primary/30 group-hover:bg-primary/5">
-          <div className="transition-transform duration-300 group-hover:scale-110 group-hover:text-primary">
+        <div className="relative mb-2 flex h-24 w-24 items-center justify-center rounded-full border border-border bg-background p-4 shadow-sm transition-all duration-300 group-hover:shadow-lg group-hover:border-primary/40 group-hover:bg-primary/10">
+          <div className="transition-all duration-300 group-hover:scale-115 group-hover:text-primary">
             {icon}
           </div>
         </div>

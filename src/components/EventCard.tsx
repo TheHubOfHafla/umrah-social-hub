@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { format, formatDistanceToNow } from "date-fns";
@@ -40,7 +41,7 @@ const EventCard = ({ event, className, variant = "default" }: EventCardProps) =>
       <Card 
         className={cn(
           "overflow-hidden transition-all duration-300 group relative h-full",
-          "hover:shadow-lg hover:border-primary hover:translate-y-[-3px]",
+          "hover:shadow-xl hover:border-primary/50 hover:translate-y-[-6px]",
           isFeatured ? "border-0 shadow-none" : "shadow-sm",
           className
         )}
@@ -50,7 +51,7 @@ const EventCard = ({ event, className, variant = "default" }: EventCardProps) =>
             <img
               src={event.image}
               alt={event.title}
-              className="object-cover w-full h-full z-10"
+              className="object-cover w-full h-full z-10 transition-transform duration-500 group-hover:scale-105"
               onLoad={() => setImageLoaded(true)}
             />
             {!imageLoaded && <div className="absolute inset-0 bg-muted animate-pulse" />}
@@ -85,16 +86,16 @@ const EventCard = ({ event, className, variant = "default" }: EventCardProps) =>
         </div>
 
         <CardContent className={cn(
-          "p-4 transition-colors duration-300 group-hover:bg-primary/5",
+          "p-4 transition-all duration-300 group-hover:bg-primary/5",
           isFeatured && "px-0 pt-3"
         )}>
           <div className="space-y-2">
             <div className="flex items-center gap-2">
-              <Badge variant="outline" className="bg-primary/10 border-0 text-xs group-hover:bg-primary/20">
+              <Badge variant="outline" className="bg-primary/10 border-0 text-xs group-hover:bg-primary/20 transition-colors duration-300">
                 {event.categories[0]}
               </Badge>
               {event.isFree ? (
-                <Badge variant="outline" className="bg-green-50 text-green-600 border-0 text-xs">
+                <Badge variant="outline" className="bg-green-50 text-green-600 border-0 text-xs group-hover:bg-green-100 transition-colors duration-300">
                   Free
                 </Badge>
               ) : (
@@ -111,17 +112,17 @@ const EventCard = ({ event, className, variant = "default" }: EventCardProps) =>
               {event.title}
             </h3>
 
-            <p className="text-muted-foreground text-sm line-clamp-2 group-hover:text-foreground/90">
+            <p className="text-muted-foreground text-sm line-clamp-2 transition-colors duration-300 group-hover:text-foreground/90">
               {event.shortDescription}
             </p>
 
             <div className="flex flex-col gap-2 pt-2">
-              <div className="flex items-center text-sm text-muted-foreground group-hover:text-foreground/70">
-                <CalendarIcon className="mr-1 h-4 w-4" />
+              <div className="flex items-center text-sm text-muted-foreground transition-colors duration-300 group-hover:text-foreground/70">
+                <CalendarIcon className="mr-1 h-4 w-4 transition-colors duration-300 group-hover:text-primary/70" />
                 {displayDate}
               </div>
-              <div className="flex items-center text-sm text-muted-foreground group-hover:text-foreground/70">
-                <MapPin className="mr-1 h-4 w-4" />
+              <div className="flex items-center text-sm text-muted-foreground transition-colors duration-300 group-hover:text-foreground/70">
+                <MapPin className="mr-1 h-4 w-4 transition-colors duration-300 group-hover:text-primary/70" />
                 {displayLocation}
               </div>
             </div>
@@ -146,11 +147,11 @@ const EventCard = ({ event, className, variant = "default" }: EventCardProps) =>
                   key={attendee.userId}
                   user={attendee}
                   size="sm"
-                  className="ring-2 ring-background"
+                  className="ring-2 ring-background transition-transform duration-300 group-hover:translate-y-[-2px]"
                 />
               ))}
               {event.attendees.length > 3 && (
-                <div className="flex items-center justify-center rounded-full bg-secondary h-8 w-8 ring-2 ring-background text-xs font-medium">
+                <div className="flex items-center justify-center rounded-full bg-secondary h-8 w-8 ring-2 ring-background text-xs font-medium transition-transform duration-300 group-hover:translate-y-[-2px] group-hover:bg-primary/20">
                   +{event.attendees.length - 3}
                 </div>
               )}
