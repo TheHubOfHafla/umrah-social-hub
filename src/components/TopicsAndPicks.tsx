@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback, useRef } from "react";
 import { Link } from "react-router-dom";
 import { EventCategory } from "@/types";
@@ -181,8 +180,6 @@ const TopicsAndPicks = () => {
   const detectWrappedSlides = useCallback(() => {
     if (!emblaApi) return [];
     
-    const engine = emblaApi.internalEngine();
-    const scrollSnaps = engine.scrollSnapList;
     const scrollProgress = emblaApi.scrollProgress();
     
     // Detect slides at the wrap-around point
@@ -222,7 +219,6 @@ const TopicsAndPicks = () => {
     });
     setSlidesInView(inViewSlides);
     
-    // Update wrapped slides on select
     setWrappedSlides(detectWrappedSlides());
   }, [emblaApi, detectWrappedSlides]);
 
@@ -235,7 +231,6 @@ const TopicsAndPicks = () => {
     });
     setSlidesInView(inViewSlides);
     
-    // Update wrapped slides on scroll
     setWrappedSlides(detectWrappedSlides());
   }, [emblaApi, isTransitioning, detectWrappedSlides]);
 
