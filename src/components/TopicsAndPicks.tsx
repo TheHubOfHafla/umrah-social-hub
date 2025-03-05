@@ -219,8 +219,9 @@ const TopicsAndPicks = () => {
     onSelect();
     emblaApi.on('select', onSelect);
     emblaApi.on('reInit', onSelect);
-    emblaApi.on('dragStart', handleDragStart);
-    emblaApi.on('dragEnd', handleDragEnd);
+    // Fix the event type names to use the correct ones for Embla Carousel
+    emblaApi.on('pointerDown', handleDragStart);
+    emblaApi.on('pointerUp', handleDragEnd);
 
     startAutoplay();
     
@@ -228,8 +229,9 @@ const TopicsAndPicks = () => {
       stopAutoplay();
       emblaApi.off('select', onSelect);
       emblaApi.off('reInit', onSelect);
-      emblaApi.off('dragStart', handleDragStart);
-      emblaApi.off('dragEnd', handleDragEnd);
+      // Fix the event type names here too
+      emblaApi.off('pointerDown', handleDragStart);
+      emblaApi.off('pointerUp', handleDragEnd);
     };
   }, [emblaApi, onSelect, startAutoplay, stopAutoplay, handleDragStart, handleDragEnd]);
 
