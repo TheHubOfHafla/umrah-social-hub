@@ -14,7 +14,7 @@ const TicketAlert = ({ type, timeAgo, className }: TicketAlertProps) => {
   return (
     <div 
       className={cn(
-        "flex items-center gap-1.5 text-xs font-medium px-2 py-1 rounded-md",
+        "flex items-center gap-1.5 text-xs font-medium px-2.5 py-1.5 rounded-md",
         "bg-red-50 text-red-600 dark:bg-red-950 dark:text-red-400",
         className
       )}
@@ -22,12 +22,12 @@ const TicketAlert = ({ type, timeAgo, className }: TicketAlertProps) => {
       {type === "selling-fast" ? (
         <>
           <Flame className="h-3 w-3" />
-          <span>Tickets selling fast</span>
+          <span className="tracking-tight">Tickets selling fast</span>
         </>
       ) : (
         <>
           <Clock className="h-3 w-3" />
-          <span>Ticket bought {timeAgo}</span>
+          <span className="tracking-tight">Ticket bought {timeAgo}</span>
         </>
       )}
     </div>

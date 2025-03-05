@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -93,8 +92,10 @@
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-body;
     font-feature-settings: "rlig" 1, "calt" 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -115,6 +116,14 @@
 
   h4 {
     @apply text-xl leading-tight sm:text-2xl;
+  }
+
+  p {
+    @apply leading-relaxed text-base text-foreground/90;
+  }
+
+  small {
+    @apply text-sm text-muted-foreground;
   }
 
   ::selection {
@@ -198,4 +207,13 @@
   100% {
     transform: translateX(100%);
   }
+}
+
+/* Typography utilities */
+.text-balance {
+  text-wrap: balance;
+}
+
+.text-pretty {
+  text-wrap: pretty;
 }

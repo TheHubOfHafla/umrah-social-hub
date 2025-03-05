@@ -42,7 +42,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         size={shadcnSize}
         disabled={loading || disabled}
         className={cn(
-          'font-medium transition-all',
+          'font-medium transition-all tracking-tight',
           'active:scale-[0.98]',
           variant === 'primary' && 'bg-primary text-primary-foreground hover:bg-primary/90',
           variant === 'subtle' && 'bg-secondary text-secondary-foreground hover:bg-secondary/80',

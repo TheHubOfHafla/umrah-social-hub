@@ -38,10 +38,10 @@ const HeroBanner = ({ user, onLocationSelect }: HeroBannerProps) => {
       <div className="absolute inset-0 z-20 flex items-center justify-center">
         <div className="container mx-auto px-4">
           <div className="text-center max-w-3xl mx-auto space-y-6 bg-background/10 backdrop-blur-sm p-8 rounded-2xl">
-            <h1 className="text-4xl sm:text-5xl font-bold tracking-tight font-heading">
+            <h1 className="text-4xl sm:text-5xl font-bold tracking-tight font-heading leading-tight text-balance">
               Instant Islamic Events Near You
             </h1>
-            <p className="text-xl text-muted-foreground font-light">
+            <p className="text-xl text-muted-foreground font-light max-w-2xl mx-auto text-pretty">
               Connect with community events, Umrah trips, lectures, and more
             </p>
             
