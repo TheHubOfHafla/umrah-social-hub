@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -31,7 +32,8 @@ const Index = () => {
     }
   };
 
-  return <div className="min-h-screen">
+  return (
+    <div className="min-h-screen">
       <Navbar />
       
       <main className="pt-24 pb-16">
@@ -86,9 +88,11 @@ const Index = () => {
         </section>
         
         {/* Featured Events */}
-        {featuredEvents.length > 0 && <section className="container mx-auto px-4 mb-16 animate-slide-up">
+        {featuredEvents.length > 0 && (
+          <section className="container mx-auto px-4 mb-16 animate-slide-up">
             <FeaturedEvent event={featuredEvents[0]} />
-          </section>}
+          </section>
+        )}
         
         {/* Recommended Events */}
         <section className="container mx-auto px-4 py-8">
@@ -114,7 +118,8 @@ const Index = () => {
         </section>
         
         {/* Category Events */}
-        {selectedCategories.length === 1 && <section className="container mx-auto px-4 py-8">
+        {selectedCategories.length === 1 && (
+          <section className="container mx-auto px-4 py-8">
             <div className="flex items-center justify-between mb-6">
               <div>
                 <h2 className="text-2xl font-bold tracking-tight capitalize">
@@ -140,7 +145,8 @@ const Index = () => {
                 </Button>
               </Link>
             </div>
-          </section>}
+          </section>
+        )}
         
         {/* My Events Section */}
         <section className="container mx-auto px-4 py-8">
@@ -189,9 +195,9 @@ const Index = () => {
             <div>
               <h4 className="text-sm font-semibold mb-4 uppercase tracking-wider">Legal</h4>
               <ul className="space-y-2">
-                <li><a href="#" className="text-muted-foreground hover:text-foreground">Terms of Service</Link></li>
-                <li><a href="#" className="text-muted-foreground hover:text-foreground">Privacy Policy</Link></li>
-                <li><a href="#" className="text-muted-foreground hover:text-foreground">Cookie Policy</Link></li>
+                <li><a href="#" className="text-muted-foreground hover:text-foreground">Terms of Service</a></li>
+                <li><a href="#" className="text-muted-foreground hover:text-foreground">Privacy Policy</a></li>
+                <li><a href="#" className="text-muted-foreground hover:text-foreground">Cookie Policy</a></li>
               </ul>
             </div>
           </div>
@@ -200,7 +206,8 @@ const Index = () => {
           </div>
         </div>
       </footer>
-    </div>;
+    </div>
+  );
 };
 
 export default Index;
