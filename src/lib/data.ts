@@ -1,4 +1,4 @@
-import { Event, EventCategory, User, EventOrganizer } from '@/types';
+import { Event, EventCategory, User, EventOrganizer, AttendeeType } from '@/types';
 
 export const categories: { value: EventCategory; label: string; }[] = [
   { value: 'charity', label: 'Charity' },
