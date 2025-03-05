@@ -34,30 +34,30 @@ const TopicCard = ({ title, category, icon, className, style, isActive }: TopicC
   return (
     <Link to={`/events?category=${category}`} className="block text-center">
       <div className={cn(
-        "group flex flex-col items-center transition-all duration-500",
-        "hover:scale-125 hover:translate-y-[-8px]",
-        isActive ? "scale-115 translate-y-[-5px]" : "",
+        "group flex flex-col items-center transition-all duration-300",
+        "hover:scale-130 hover:translate-y-[-10px]",
+        isActive ? "scale-120 translate-y-[-7px]" : "",
         className
       )} style={style}>
         <div className={cn(
-          "relative mb-3 flex h-24 w-24 items-center justify-center rounded-full border border-border bg-background p-4 shadow-sm transition-all duration-500",
-          "group-hover:shadow-xl group-hover:border-primary/60 group-hover:bg-primary/15",
-          isActive ? "shadow-lg border-primary/40 bg-primary/10" : ""
+          "relative mb-3 flex h-24 w-24 items-center justify-center rounded-full border border-border bg-background p-4 shadow-sm transition-all duration-300",
+          "group-hover:shadow-xl group-hover:border-primary/70 group-hover:bg-primary/20",
+          isActive ? "shadow-lg border-primary/50 bg-primary/15" : ""
         )}>
           <div className={cn(
-            "transition-all duration-500 group-hover:scale-110 group-hover:text-primary",
-            isActive ? "scale-105 text-primary/90" : ""
+            "transition-all duration-300 group-hover:scale-115 group-hover:text-primary",
+            isActive ? "scale-110 text-primary" : ""
           )}>
             {icon}
           </div>
           <div className={cn(
-            "absolute -inset-1 rounded-full opacity-0 bg-gradient-to-r from-primary/10 to-transparent blur-xl transition-all duration-500 group-hover:opacity-100",
-            isActive ? "opacity-80" : ""
+            "absolute -inset-1 rounded-full opacity-0 bg-gradient-to-r from-primary/20 to-transparent blur-xl transition-all duration-300 group-hover:opacity-100",
+            isActive ? "opacity-90" : ""
           )}></div>
         </div>
         <span className={cn(
-          "mt-2 block text-sm font-medium transition-colors duration-500 group-hover:text-primary",
-          isActive ? "text-primary/90" : ""
+          "mt-2 block text-sm font-medium transition-colors duration-300 group-hover:text-primary",
+          isActive ? "text-primary" : ""
         )}>{title}</span>
       </div>
     </Link>
@@ -70,7 +70,8 @@ const TopicsAndPicks = () => {
     loop: true, 
     align: 'center', 
     dragFree: true,
-    watchDrag: false // Disable drag handling when autoplay is active
+    watchDrag: false, // Disable drag handling when autoplay is active
+    speed: 15 // Faster animation speed (lower number = faster)
   });
   const [prevBtnDisabled, setPrevBtnDisabled] = useState(true);
   const [nextBtnDisabled, setNextBtnDisabled] = useState(true);
@@ -140,20 +141,20 @@ const TopicsAndPicks = () => {
     if (emblaApi && !autoplayRef.current) {
       autoplayRef.current = setInterval(() => {
         if (!document.hidden) { // Only scroll if page is visible
-          emblaApi.scrollNext({ animation: 'smooth' });
+          emblaApi.scrollNext();
         }
-      }, 3000); // Scroll every 3 seconds
+      }, 2000); // Faster scroll interval (2 seconds instead of 3)
       setAutoplayActive(true);
     }
   }, [emblaApi]);
 
   const restartAutoplayAfterDelay = useCallback(() => {
-    // Restart autoplay after 7 seconds of user inactivity
+    // Shorter delay to resume autoplay (5 seconds instead of 7)
     setTimeout(() => {
       if (!autoplayActive) {
         startAutoplay();
       }
-    }, 7000);
+    }, 5000);
   }, [autoplayActive, startAutoplay]);
 
   const onSelect = useCallback(() => {
@@ -216,7 +217,7 @@ const TopicsAndPicks = () => {
       <h2 className="text-2xl font-bold mb-6 text-center">Categories & Our Picks</h2>
       
       <div 
-        className="relative" 
+        className="relative group" 
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
       >
@@ -227,8 +228,8 @@ const TopicsAndPicks = () => {
                 key={index} 
                 className={cn(
                   "flex-grow-0 flex-shrink-0 basis-1/4 min-w-0 md:basis-1/6 lg:basis-1/8 px-2",
-                  "transition-all duration-700",
-                  slidesInView.includes(index) ? "opacity-100 scale-100" : "opacity-60 scale-90"
+                  "transition-all duration-300",
+                  slidesInView.includes(index) ? "opacity-100 scale-100" : "opacity-50 scale-85"
                 )}
               >
                 <TopicCard 
@@ -237,10 +238,10 @@ const TopicsAndPicks = () => {
                   icon={card.icon}
                   isActive={activeIndex === index}
                   className={cn(
-                    "animate-fade-in transition-all duration-700", 
+                    "animate-fade-in transition-all duration-300", 
                     activeIndex === index ? "scale-110" : ""
                   )}
-                  style={{ animationDelay: `${(index % 10) * 50}ms` }}
+                  style={{ animationDelay: `${(index % 10) * 30}ms` }}
                 />
               </div>
             ))}
@@ -274,7 +275,7 @@ const TopicsAndPicks = () => {
             key={index}
             onClick={() => {
               stopAutoplay();
-              emblaApi?.scrollTo(index, true);
+              emblaApi?.scrollTo(index);
               restartAutoplayAfterDelay();
             }}
             className={cn(
