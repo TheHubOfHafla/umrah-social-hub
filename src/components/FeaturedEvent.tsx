@@ -1,3 +1,4 @@
+
 import { Event } from "@/types";
 import { format } from "date-fns";
 import { CalendarIcon, MapPin, Users } from "lucide-react";
