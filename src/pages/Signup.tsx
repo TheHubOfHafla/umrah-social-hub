@@ -1,10 +1,9 @@
-
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Eye, EyeOff, UserPlus, Mail, Lock, User, AlertCircle, Loader2, Google } from "lucide-react";
+import { Eye, EyeOff, UserPlus, Mail, Lock, User, AlertCircle, Loader2, Github } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -19,7 +18,6 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 
-// Form schema
 const formSchema = z
   .object({
     name: z.string().min(2, { message: "Name must be at least 2 characters" }),
@@ -42,7 +40,6 @@ const Signup = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
 
-  // Form definition
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -53,19 +50,15 @@ const Signup = () => {
     },
   });
 
-  // Handle form submission
   const onSubmit = async (values: FormValues) => {
     setIsLoading(true);
     setAuthError(null);
     
     try {
-      // This is a mock registration - would be replaced with real auth
       console.log("Signing up with:", values);
       
-      // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1500));
       
-      // For demo, we'll just simulate success and navigate to home
       toast({
         title: "Account created!",
         description: "You have successfully signed up.",
@@ -85,10 +78,8 @@ const Signup = () => {
     setAuthError(null);
     
     try {
-      // This would be replaced with actual Google auth integration
       console.log("Signing up with Google");
       
-      // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1500));
       
       toast({
@@ -285,7 +276,7 @@ const Signup = () => {
               disabled={isLoading}
               className="w-full"
             >
-              <Google className="mr-2 h-4 w-4" />
+              <Github className="mr-2 h-4 w-4" />
               Google
             </Button>
           </div>
