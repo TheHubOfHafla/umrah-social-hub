@@ -56,7 +56,7 @@ const Navbar = () => {
     )}>
       <div className="container flex items-center justify-between">
         <div className="flex items-center">
-          <Link to="/" className="font-semibold mr-8"></Link>
+          <Link to="/" className="font-heading text-xl tracking-tight mr-8 text-primary font-semibold">EventHub</Link>
 
           {/* Desktop Navigation */}
           <NavigationMenu className="hidden md:flex">
@@ -64,8 +64,11 @@ const Navbar = () => {
               {navigation.map(item => <NavigationMenuItem key={item.href}>
                   <NavigationMenuLink asChild className={cn(
                     navigationMenuTriggerStyle(), 
-                    "bg-transparent hover:bg-secondary/80", 
-                    item.active && "text-primary font-medium"
+                    "bg-transparent font-medium text-base tracking-wide transition-all duration-200",
+                    "hover:text-primary hover:bg-primary/10 hover:scale-105",
+                    item.active 
+                      ? "text-primary font-semibold border-b-2 border-primary" 
+                      : "text-foreground/80"
                   )}>
                     <Link to={item.href}>
                       {item.label}
@@ -78,29 +81,29 @@ const Navbar = () => {
 
         {/* Desktop Actions */}
         <div className="hidden md:flex items-center space-x-2">
-          <Button variant="ghost" size="icon">
+          <Button variant="ghost" size="icon" className="hover:bg-primary/10 hover:text-primary transition-all duration-200">
             <Search className="h-5 w-5" />
           </Button>
-          <Button variant="ghost" size="icon">
+          <Button variant="ghost" size="icon" className="hover:bg-primary/10 hover:text-primary transition-all duration-200">
             <Bell className="h-5 w-5" />
           </Button>
           
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="flex items-center gap-2">
+              <Button variant="ghost" className="flex items-center gap-2 hover:bg-primary/10 hover:text-primary transition-all duration-200">
                 <UserAvatar user={currentUser} size="sm" />
                 <ChevronDown className="h-4 w-4 text-muted-foreground" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56">
               <Link to="/dashboard">
-                <DropdownMenuItem>
+                <DropdownMenuItem className="hover:bg-primary/10 hover:text-primary">
                   <User className="mr-2 h-4 w-4" />
                   Dashboard
                 </DropdownMenuItem>
               </Link>
               <Link to="/dashboard/events">
-                <DropdownMenuItem>
+                <DropdownMenuItem className="hover:bg-primary/10 hover:text-primary">
                   <Calendar className="mr-2 h-4 w-4" />
                   My Events
                 </DropdownMenuItem>
@@ -110,7 +113,7 @@ const Navbar = () => {
         </div>
 
         {/* Mobile Menu Button */}
-        <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+        <Button variant="ghost" size="icon" className="md:hidden hover:bg-primary/10 hover:text-primary" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
           {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
         </Button>
       </div>
@@ -126,18 +129,20 @@ const Navbar = () => {
               key={item.href} 
               to={item.href} 
               className={cn(
-                "px-4 py-3 text-lg rounded-md", 
-                item.active ? "bg-secondary font-medium" : "hover:bg-secondary/80"
+                "px-4 py-3 text-lg rounded-md transition-all duration-200 font-medium", 
+                item.active 
+                  ? "bg-primary/10 text-primary font-semibold" 
+                  : "text-foreground/80 hover:bg-primary/10 hover:text-primary"
               )}
             >
                 {item.label}
               </Link>)}
             <div className="border-t my-2" />
-            <Link to="/dashboard" className="px-4 py-3 text-lg rounded-md hover:bg-secondary/80 flex items-center">
+            <Link to="/dashboard" className="px-4 py-3 text-lg rounded-md hover:bg-primary/10 hover:text-primary transition-all duration-200 flex items-center">
               <User className="mr-2 h-5 w-5" />
               Dashboard
             </Link>
-            <Link to="/dashboard/events" className="px-4 py-3 text-lg rounded-md hover:bg-secondary/80 flex items-center">
+            <Link to="/dashboard/events" className="px-4 py-3 text-lg rounded-md hover:bg-primary/10 hover:text-primary transition-all duration-200 flex items-center">
               <Calendar className="mr-2 h-5 w-5" />
               My Events
             </Link>
