@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -112,7 +111,7 @@ const CreateEventPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white py-12">
+    <div className="min-h-screen bg-white pt-28 pb-12">
       <div className="container max-w-6xl mx-auto px-4">
         <div className="mb-10 text-center">
           <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-blue-500 bg-clip-text text-transparent">Create Your Event</h1>
