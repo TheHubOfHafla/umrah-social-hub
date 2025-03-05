@@ -219,8 +219,8 @@ const TopicsAndPicks = () => {
     onSelect();
     emblaApi.on('select', onSelect);
     emblaApi.on('reInit', onSelect);
-    emblaApi.on('dragStart', handleDragStart);
-    emblaApi.on('dragEnd', handleDragEnd);
+    emblaApi.on('pointerDown', handleDragStart);
+    emblaApi.on('pointerUp', handleDragEnd);
 
     startAutoplay();
     
@@ -228,8 +228,8 @@ const TopicsAndPicks = () => {
       stopAutoplay();
       emblaApi.off('select', onSelect);
       emblaApi.off('reInit', onSelect);
-      emblaApi.off('dragStart', handleDragStart);
-      emblaApi.off('dragEnd', handleDragEnd);
+      emblaApi.off('pointerDown', handleDragStart);
+      emblaApi.off('pointerUp', handleDragEnd);
     };
   }, [emblaApi, onSelect, startAutoplay, stopAutoplay, handleDragStart, handleDragEnd]);
 
