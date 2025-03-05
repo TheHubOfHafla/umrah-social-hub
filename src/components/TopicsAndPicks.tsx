@@ -234,14 +234,24 @@ const TopicsAndPicks = () => {
   }, [emblaApi, onSelect, startAutoplay, stopAutoplay, handleDragStart, handleDragEnd]);
 
   return (
-    <div className="relative w-full px-4 py-16 mb-10 overflow-hidden" style={{ isolation: 'isolate' }}>
-      <div className="max-w-5xl mx-auto">
+    <div className="relative w-full px-4 py-16 mb-10 overflow-hidden" 
+      style={{ 
+        isolation: 'isolate',
+        contain: 'paint layout style', // Add CSS containment to ensure effects don't leak
+        position: 'relative',
+        zIndex: 0 // Keep a neutral z-index
+      }}>
+      <div className="max-w-5xl mx-auto relative">
         <h2 className="text-2xl font-bold mb-8 text-center bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent animate-pulse-soft">Categories & Our Picks</h2>
         
         <div 
           className="relative group" 
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
+          style={{ 
+            contain: 'content', // Add additional containment for the carousel group 
+            isolation: 'isolate' // Apply isolation to this element specifically
+          }}
         >
           <div className="overflow-hidden" ref={emblaRef}>
             <div className={cn(
@@ -258,6 +268,7 @@ const TopicsAndPicks = () => {
                       ? "opacity-100 scale-100" 
                       : "opacity-40 scale-85 blur-[1px]"
                   )}
+                  style={{ contain: 'content' }} // Apply containment to each card
                 >
                   <TopicCard 
                     title={card.title}
