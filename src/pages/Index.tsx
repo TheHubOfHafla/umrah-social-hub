@@ -1,6 +1,6 @@
+
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import CategoryCarousel from "@/components/CategoryCarousel";
 import FeaturedEvent from "@/components/FeaturedEvent";
 import HeroBanner from "@/components/HeroBanner";
 import RecommendedEvents from "@/components/RecommendedEvents";
@@ -63,14 +63,6 @@ const Index = ({ isAuthenticated = false }: { isAuthenticated?: boolean }) => {
         <div className={`container mx-auto py-8 transition-all duration-700 delay-100 ${animateContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
           <TopicsAndPicks />
         </div>
-        
-        <section className={`container mx-auto px-4 py-12 transition-all duration-700 delay-200 ${animateContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-          <CategoryCarousel 
-            selectedCategories={selectedCategories} 
-            onChange={handleCategoryChange} 
-            singleSelect 
-          />
-        </section>
         
         {featuredEvents.length > 0 && (
           <section className={`container mx-auto px-4 mb-16 transition-all duration-700 delay-200 ${animateContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
