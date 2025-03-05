@@ -36,7 +36,8 @@ const EventsList = ({ events, onDeleteClick, emptyMessage = "No events found" }:
         {events.map((event) => (
           <div
             key={event.id}
-            className="grid grid-cols-1 items-center gap-4 p-4 sm:grid-cols-6 transition-colors duration-300 hover:bg-primary/5"
+            className="grid grid-cols-1 items-center gap-4 p-4 sm:grid-cols-6 transition-all duration-300 
+                      hover:bg-primary/10 hover:border-l-4 hover:border-l-primary"
           >
             <div className="col-span-1 sm:col-span-3">
               <div className="flex items-center space-x-3">
@@ -48,7 +49,9 @@ const EventsList = ({ events, onDeleteClick, emptyMessage = "No events found" }:
                   />
                 </div>
                 <div>
-                  <p className="font-medium transition-colors duration-300 hover:text-primary">{event.title}</p>
+                  <p className="font-medium transition-colors duration-300 hover:text-primary">
+                    {event.title}
+                  </p>
                   <div className="flex items-center text-xs text-muted-foreground">
                     <Calendar className="mr-1 h-3 w-3" />
                     {new Date(event.date.start).toLocaleDateString("en-US", {
@@ -75,7 +78,7 @@ const EventsList = ({ events, onDeleteClick, emptyMessage = "No events found" }:
             <div className="col-span-1 flex items-center justify-end">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="hover:bg-primary/10">
+                  <Button variant="ghost" size="icon" className="hover:bg-primary/20 hover:text-primary">
                     <MoreVertical className="h-4 w-4" />
                   </Button>
                 </DropdownMenuTrigger>

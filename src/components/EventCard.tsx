@@ -40,7 +40,8 @@ const EventCard = ({ event, className, variant = "default" }: EventCardProps) =>
     <Link to={`/events/${event.id}`}>
       <Card 
         className={cn(
-          "overflow-hidden transition-all duration-300 hover:shadow-md hover:border-primary/30 relative h-full",
+          "overflow-hidden transition-all duration-300 group relative h-full",
+          "hover:shadow-lg hover:border-primary hover:translate-y-[-3px]",
           isFeatured ? "border-0 shadow-none" : "shadow-sm",
           className
         )}
@@ -91,12 +92,12 @@ const EventCard = ({ event, className, variant = "default" }: EventCardProps) =>
         </div>
 
         <CardContent className={cn(
-          "p-4 transition-colors duration-300",
+          "p-4 transition-colors duration-300 group-hover:bg-primary/5",
           isFeatured && "px-0 pt-3"
         )}>
           <div className="space-y-2">
             <div className="flex items-center gap-2">
-              <Badge variant="outline" className="bg-primary/10 border-0 text-xs">
+              <Badge variant="outline" className="bg-primary/10 border-0 text-xs group-hover:bg-primary/20">
                 {event.categories[0]}
               </Badge>
               {event.isFree ? (
@@ -111,22 +112,22 @@ const EventCard = ({ event, className, variant = "default" }: EventCardProps) =>
             </div>
 
             <h3 className={cn(
-              "font-semibold leading-tight transition-colors duration-300 hover:text-primary",
+              "font-semibold leading-tight transition-colors duration-300 group-hover:text-primary",
               isFeatured ? "text-2xl" : "text-lg"
             )}>
               {event.title}
             </h3>
 
-            <p className="text-muted-foreground text-sm line-clamp-2">
+            <p className="text-muted-foreground text-sm line-clamp-2 group-hover:text-foreground/90">
               {event.shortDescription}
             </p>
 
             <div className="flex flex-col gap-2 pt-2">
-              <div className="flex items-center text-sm text-muted-foreground">
+              <div className="flex items-center text-sm text-muted-foreground group-hover:text-foreground/70">
                 <CalendarIcon className="mr-1 h-4 w-4" />
                 {displayDate}
               </div>
-              <div className="flex items-center text-sm text-muted-foreground">
+              <div className="flex items-center text-sm text-muted-foreground group-hover:text-foreground/70">
                 <MapPin className="mr-1 h-4 w-4" />
                 {displayLocation}
               </div>
@@ -135,7 +136,7 @@ const EventCard = ({ event, className, variant = "default" }: EventCardProps) =>
         </CardContent>
 
         <CardFooter className={cn(
-          "p-4 pt-0 flex items-center justify-between",
+          "p-4 pt-0 flex items-center justify-between transition-colors duration-300 group-hover:bg-primary/5",
           isFeatured && "px-0"
         )}>
           <UserAvatar 
