@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -27,15 +28,12 @@ const navItems: NavItem[] = [{
 
 const Navbar = ({ isAuthenticated = true }: { isAuthenticated?: boolean }) => {
   const [isScrolled, setIsScrolled] = useState(false);
-  const [scrollProgress, setScrollProgress] = useState(0);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
 
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 10);
-      const progress = Math.min(window.scrollY / 100, 1);
-      setScrollProgress(progress);
     };
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
@@ -50,20 +48,12 @@ const Navbar = ({ isAuthenticated = true }: { isAuthenticated?: boolean }) => {
     active: location.pathname === item.href
   }));
 
-  const bgOpacity = scrollProgress * 0.9;
-
   return <header className={cn(
       "fixed top-0 left-0 right-0 z-50 transition-all duration-300", 
       isScrolled 
-        ? "py-2 shadow-sm" 
-        : "py-3"
+        ? "py-2 navbar-scrolled" 
+        : "py-3 navbar-transparent"
     )}
-    style={{
-      backgroundColor: isScrolled 
-        ? `rgba(255, 255, 255, ${bgOpacity})` 
-        : 'transparent',
-      backdropFilter: isScrolled ? 'blur(8px)' : 'none'
-    }}
     >
       <div className="container flex items-center justify-between">
         <div className="hidden md:flex items-center">
