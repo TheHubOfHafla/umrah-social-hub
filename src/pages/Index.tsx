@@ -59,7 +59,7 @@ const Index = () => {
           {/* Content overlay */}
           <div className="absolute inset-0 z-20 flex items-center justify-center">
             <div className="container mx-auto px-4">
-              <div className="text-center max-w-3xl mx-auto space-y-4 bg-background/40 backdrop-blur-sm p-8 rounded-2xl">
+              <div className="text-center max-w-3xl mx-auto space-y-4 bg-background/10 backdrop-blur-sm p-8 rounded-2xl">
                 <h1 className="text-4xl sm:text-5xl font-bold tracking-tight">Instant Islamic Events Near You</h1>
                 <p className="text-xl text-muted-foreground">
                   Connect with community events, Umrah trips, lectures, and more
