@@ -7,6 +7,13 @@ export const getFeaturedEvents = (): Event[] => {
   return mockEvents.filter(event => event.featured);
 };
 
+export const getPopularEvents = (): Event[] => {
+  // Sort events by the number of attendees, with most attended first
+  return [...mockEvents]
+    .sort((a, b) => (b.attendees?.length || 0) - (a.attendees?.length || 0))
+    .slice(0, 6);
+};
+
 export const getEventsByCategory = (category: EventCategory): Event[] => {
   return mockEvents.filter(event => event.categories.includes(category));
 };

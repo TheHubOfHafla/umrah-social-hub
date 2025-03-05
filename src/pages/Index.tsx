@@ -1,5 +1,6 @@
 
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import CategoryCarousel from "@/components/CategoryCarousel";
 import FeaturedEvent from "@/components/FeaturedEvent";
 import HeroBanner from "@/components/HeroBanner";
@@ -7,16 +8,24 @@ import RecommendedEvents from "@/components/RecommendedEvents";
 import CategoryEvents from "@/components/CategoryEvents";
 import MyEventsPromo from "@/components/MyEventsPromo";
 import Footer from "@/components/Footer";
-import { EventCard } from "@/components";
+import EventCard from "@/components/EventCard";
+import Button from "@/components/Button";
 import { EventCategory } from "@/types";
-import { getFeaturedEvents, getRecommendedEvents, getEventsByCategory, categories, currentUser, getPopularEvents } from "@/lib/data";
+import { 
+  getFeaturedEvents,
+  getRecommendedEvents, 
+  getEventsByCategory, 
+  categories, 
+  currentUser 
+} from "@/lib/data";
 
 // Add prop to simulate guest view
 const Index = ({ isAuthenticated = false }: { isAuthenticated?: boolean }) => {
   const [selectedCategories, setSelectedCategories] = useState<EventCategory[]>([]);
   const [selectedLocation, setSelectedLocation] = useState("");
   const [featuredEvents, setFeaturedEvents] = useState(getFeaturedEvents());
-  const [popularEvents, setPopularEvents] = useState(getPopularEvents());
+  // Use getFeaturedEvents as a fallback since getPopularEvents doesn't exist yet
+  const [popularEvents, setPopularEvents] = useState(getFeaturedEvents());
   const [recommendedEvents, setRecommendedEvents] = useState(
     isAuthenticated 
       ? getRecommendedEvents(currentUser.id)
