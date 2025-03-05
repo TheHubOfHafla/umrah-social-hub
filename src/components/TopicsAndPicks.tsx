@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { EventCategory } from "@/types";
@@ -11,12 +10,13 @@ interface TopicCardProps {
   category: EventCategory;
   imageUrl: string;
   className?: string;
+  style?: React.CSSProperties;
 }
 
-const TopicCard = ({ title, category, imageUrl, className }: TopicCardProps) => {
+const TopicCard = ({ title, category, imageUrl, className, style }: TopicCardProps) => {
   return (
     <Link to={`/events?category=${category}`}>
-      <Card className={cn("group overflow-hidden border-none shadow-md transition-all duration-300 hover:shadow-lg", className)}>
+      <Card className={cn("group overflow-hidden border-none shadow-md transition-all duration-300 hover:shadow-lg", className)} style={style}>
         <div className="relative aspect-[4/3] overflow-hidden">
           <img 
             src={imageUrl} 
@@ -36,7 +36,6 @@ const TopicCard = ({ title, category, imageUrl, className }: TopicCardProps) => 
 const TopicsAndPicks = () => {
   const [activeTab, setActiveTab] = useState<'topics' | 'picks'>('topics');
   
-  // Topic cards data with placeholder images
   const topicCards = [
     { title: "Charity Events", category: "charity" as EventCategory, imageUrl: "/placeholder.svg" },
     { title: "Educational Workshops", category: "education" as EventCategory, imageUrl: "/placeholder.svg" },
