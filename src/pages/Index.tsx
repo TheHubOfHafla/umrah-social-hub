@@ -65,7 +65,7 @@ const Index = ({ isAuthenticated = false }: { isAuthenticated?: boolean }) => {
         </div>
         
         {featuredEvents.length > 0 && (
-          <section className={`container mx-auto px-4 mb-16 transition-all duration-700 delay-200 ${animateContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+          <section className={`container mx-auto px-4 mt-8 mb-16 transition-all duration-700 delay-200 ${animateContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
             <FeaturedEvent event={featuredEvents[0]} />
           </section>
         )}
