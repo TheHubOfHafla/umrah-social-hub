@@ -10,6 +10,7 @@ import {
   BrowserRouter,
   Routes,
   Route,
+  Navigate,
 } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Index from "./pages/Index";
@@ -65,8 +66,9 @@ const App = () => {
             <Route path="/events/create" element={<CreateEventPage />} />
             <Route path="/events/:eventId/register" element={<RegisterPage />} />
             <Route path="/organizers" element={<OrganizersPage />} />
-            <Route path="/login" element={<Login onLoginSuccess={handleLogin} />} />
-            <Route path="/signup" element={<Signup onSignupSuccess={handleLogin} />} />
+            <Route path="/login" element={isAuthenticated ? <Navigate to="/profile" /> : <Login onLoginSuccess={handleLogin} />} />
+            <Route path="/signup" element={isAuthenticated ? <Navigate to="/profile" /> : <Signup onSignupSuccess={handleLogin} />} />
+            <Route path="/profile" element={isAuthenticated ? <UserProfile /> : <Navigate to="/login" />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/dashboard/events" element={<UserEvents />} />
             <Route path="/dashboard/profile" element={<UserProfile />} />
