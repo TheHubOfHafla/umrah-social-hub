@@ -27,11 +27,17 @@ interface TopicCardProps {
 const TopicCard = ({ title, category, icon, className, style }: TopicCardProps) => {
   return (
     <Link to={`/events?category=${category}`} className="block text-center">
-      <div className={cn("group flex flex-col items-center transition-transform duration-300 hover:scale-105", className)} style={style}>
-        <div className="relative mb-2 flex h-24 w-24 items-center justify-center rounded-full border border-border bg-background p-4 shadow-sm transition-all duration-300 group-hover:shadow-md">
-          {icon}
+      <div className={cn(
+        "group flex flex-col items-center transition-all duration-300",
+        "hover:scale-105 hover:translate-y-[-3px]",
+        className
+      )} style={style}>
+        <div className="relative mb-2 flex h-24 w-24 items-center justify-center rounded-full border border-border bg-background p-4 shadow-sm transition-all duration-300 group-hover:shadow-md group-hover:border-primary/30 group-hover:bg-primary/5">
+          <div className="transition-transform duration-300 group-hover:scale-110 group-hover:text-primary">
+            {icon}
+          </div>
         </div>
-        <span className="mt-2 block text-sm font-medium">{title}</span>
+        <span className="mt-2 block text-sm font-medium transition-colors duration-300 group-hover:text-primary">{title}</span>
       </div>
     </Link>
   );
