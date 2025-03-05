@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import CategoryCarousel from "@/components/CategoryCarousel";
@@ -7,6 +6,7 @@ import HeroBanner from "@/components/HeroBanner";
 import RecommendedEvents from "@/components/RecommendedEvents";
 import CategoryEvents from "@/components/CategoryEvents";
 import MyEventsPromo from "@/components/MyEventsPromo";
+import TopicsAndPicks from "@/components/TopicsAndPicks";
 import Footer from "@/components/Footer";
 import EventCard from "@/components/EventCard";
 import Button from "@/components/Button";
@@ -60,9 +60,12 @@ const Index = ({ isAuthenticated = false }: { isAuthenticated?: boolean }) => {
           isAuthenticated={isAuthenticated} 
         />
         
-        {/* Removed Create Event button from here */}
+        {/* Add the TopicsAndPicks component right after the HeroBanner */}
+        <div className={`transition-all duration-700 delay-100 ${animateContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+          <TopicsAndPicks />
+        </div>
         
-        <section className={`container mx-auto px-4 py-12 transition-all duration-700 delay-100 ${animateContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+        <section className={`container mx-auto px-4 py-12 transition-all duration-700 delay-200 ${animateContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
           <CategoryCarousel 
             selectedCategories={selectedCategories} 
             onChange={handleCategoryChange} 
