@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { NavigationMenu, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, navigationMenuTriggerStyle } from "@/components/ui/navigation-menu";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Bell, Calendar, ChevronDown, Menu, Search, User, X } from "lucide-react";
+import { Bell, Calendar, ChevronDown, LogIn, Menu, Search, User, UserPlus, X } from "lucide-react";
 import UserAvatar from "./UserAvatar";
 import { currentUser } from "@/lib/data";
 
@@ -26,7 +26,8 @@ const navItems: NavItem[] = [{
   href: "/organizers"
 }];
 
-const Navbar = () => {
+// Added new prop to simulate unauthenticated state
+const Navbar = ({ isAuthenticated = true }: { isAuthenticated?: boolean }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
@@ -84,32 +85,52 @@ const Navbar = () => {
           <Button variant="ghost" size="icon" className="hover:bg-primary/10 hover:text-primary transition-all duration-200">
             <Search className="h-5 w-5" />
           </Button>
-          <Button variant="ghost" size="icon" className="hover:bg-primary/10 hover:text-primary transition-all duration-200">
-            <Bell className="h-5 w-5" />
-          </Button>
           
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="flex items-center gap-2 hover:bg-primary/10 hover:text-primary transition-all duration-200">
-                <UserAvatar user={currentUser} size="sm" />
-                <ChevronDown className="h-4 w-4 text-muted-foreground" />
+          {isAuthenticated ? (
+            <>
+              <Button variant="ghost" size="icon" className="hover:bg-primary/10 hover:text-primary transition-all duration-200">
+                <Bell className="h-5 w-5" />
               </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56">
-              <Link to="/dashboard">
-                <DropdownMenuItem className="hover:bg-primary/10 hover:text-primary">
-                  <User className="mr-2 h-4 w-4" />
-                  Dashboard
-                </DropdownMenuItem>
+              
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="flex items-center gap-2 hover:bg-primary/10 hover:text-primary transition-all duration-200">
+                    <UserAvatar user={currentUser} size="sm" />
+                    <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  <Link to="/dashboard">
+                    <DropdownMenuItem className="hover:bg-primary/10 hover:text-primary">
+                      <User className="mr-2 h-4 w-4" />
+                      Dashboard
+                    </DropdownMenuItem>
+                  </Link>
+                  <Link to="/dashboard/events">
+                    <DropdownMenuItem className="hover:bg-primary/10 hover:text-primary">
+                      <Calendar className="mr-2 h-4 w-4" />
+                      My Events
+                    </DropdownMenuItem>
+                  </Link>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </>
+          ) : (
+            <>
+              <Link to="/login">
+                <Button variant="outline" className="flex items-center gap-2">
+                  <LogIn className="h-4 w-4" />
+                  Sign In
+                </Button>
               </Link>
-              <Link to="/dashboard/events">
-                <DropdownMenuItem className="hover:bg-primary/10 hover:text-primary">
-                  <Calendar className="mr-2 h-4 w-4" />
-                  My Events
-                </DropdownMenuItem>
+              <Link to="/signup">
+                <Button className="flex items-center gap-2">
+                  <UserPlus className="h-4 w-4" />
+                  Sign Up
+                </Button>
               </Link>
-            </DropdownMenuContent>
-          </DropdownMenu>
+            </>
+          )}
         </div>
 
         {/* Mobile Menu Button */}
@@ -138,14 +159,30 @@ const Navbar = () => {
                 {item.label}
               </Link>)}
             <div className="border-t my-2" />
-            <Link to="/dashboard" className="px-4 py-3 text-lg rounded-md hover:bg-primary/10 hover:text-primary transition-all duration-200 flex items-center">
-              <User className="mr-2 h-5 w-5" />
-              Dashboard
-            </Link>
-            <Link to="/dashboard/events" className="px-4 py-3 text-lg rounded-md hover:bg-primary/10 hover:text-primary transition-all duration-200 flex items-center">
-              <Calendar className="mr-2 h-5 w-5" />
-              My Events
-            </Link>
+            
+            {isAuthenticated ? (
+              <>
+                <Link to="/dashboard" className="px-4 py-3 text-lg rounded-md hover:bg-primary/10 hover:text-primary transition-all duration-200 flex items-center">
+                  <User className="mr-2 h-5 w-5" />
+                  Dashboard
+                </Link>
+                <Link to="/dashboard/events" className="px-4 py-3 text-lg rounded-md hover:bg-primary/10 hover:text-primary transition-all duration-200 flex items-center">
+                  <Calendar className="mr-2 h-5 w-5" />
+                  My Events
+                </Link>
+              </>
+            ) : (
+              <>
+                <Link to="/login" className="px-4 py-3 text-lg rounded-md hover:bg-primary/10 hover:text-primary transition-all duration-200 flex items-center">
+                  <LogIn className="mr-2 h-5 w-5" />
+                  Sign In
+                </Link>
+                <Link to="/signup" className="px-4 py-3 text-lg rounded-md hover:bg-primary/10 hover:text-primary transition-all duration-200 flex items-center">
+                  <UserPlus className="mr-2 h-5 w-5" />
+                  Sign Up
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </div>

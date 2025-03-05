@@ -2,17 +2,18 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { Filter } from "lucide-react";
+import { Filter, UserPlus } from "lucide-react";
 import Button from "@/components/Button";
 import LocationSearch from "@/components/LocationSearch";
 import { User } from "@/types";
 
 interface HeroBannerProps {
-  user: User;
+  user?: User;
   onLocationSelect: (location: string) => void;
+  isAuthenticated?: boolean;
 }
 
-const HeroBanner = ({ user, onLocationSelect }: HeroBannerProps) => {
+const HeroBanner = ({ user, onLocationSelect, isAuthenticated = true }: HeroBannerProps) => {
   const [bannerLoaded, setBannerLoaded] = useState(false);
   
   return (
@@ -48,7 +49,7 @@ const HeroBanner = ({ user, onLocationSelect }: HeroBannerProps) => {
             <div className="flex flex-col sm:flex-row gap-3 mt-8 justify-center">
               <LocationSearch 
                 onLocationSelect={onLocationSelect} 
-                initialLocation={user.location ? `${user.location.city}, ${user.location.country}` : ""} 
+                initialLocation={user?.location ? `${user.location.city}, ${user.location.country}` : "London, United Kingdom"} 
                 className="w-full sm:w-64" 
               />
               <Link to="/events">
@@ -57,6 +58,17 @@ const HeroBanner = ({ user, onLocationSelect }: HeroBannerProps) => {
                 </Button>
               </Link>
             </div>
+            
+            {!isAuthenticated && (
+              <div className="mt-6 pt-4 border-t border-primary/20">
+                <p className="text-muted-foreground mb-3">Create an account to track events, get personalized recommendations, and more</p>
+                <Link to="/signup">
+                  <Button variant="outline" className="border-primary/40 hover:bg-primary/10" icon={<UserPlus className="w-4 h-4" />}>
+                    Sign up for free
+                  </Button>
+                </Link>
+              </div>
+            )}
           </div>
         </div>
       </div>

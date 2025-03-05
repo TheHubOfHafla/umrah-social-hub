@@ -1,9 +1,15 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import {
+  QueryClient,
+  QueryClientProvider,
+} from "@tanstack/react-query";
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+} from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Index from "./pages/Index";
 import EventsPage from "./pages/EventsPage";
@@ -18,6 +24,9 @@ import OrganizerEvents from "./pages/dashboard/OrganizerEvents";
 import UserProfile from "./pages/dashboard/UserProfile";
 import OrganizerProfile from "./pages/dashboard/OrganizerProfile";
 
+// Added isAuthenticated simulation
+const isAuthenticated = false;
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -26,9 +35,9 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <Navbar />
+        <Navbar isAuthenticated={isAuthenticated} />
         <Routes>
-          <Route path="/" element={<Index />} />
+          <Route path="/" element={<Index isAuthenticated={isAuthenticated} />} />
           <Route path="/events" element={<EventsPage />} />
           <Route path="/events/:eventId" element={<EventDetailPage />} />
           <Route path="/events/:eventId/register" element={<RegisterPage />} />
@@ -39,7 +48,6 @@ const App = () => (
           <Route path="/organizer" element={<OrganizerDashboard />} />
           <Route path="/organizer/events" element={<OrganizerEvents />} />
           <Route path="/organizer/profile" element={<OrganizerProfile />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
