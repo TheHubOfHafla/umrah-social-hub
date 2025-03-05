@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
@@ -8,54 +7,37 @@ import FeaturedEvent from "@/components/FeaturedEvent";
 import Button from "@/components/Button";
 import LocationSearch from "@/components/LocationSearch";
 import { EventCategory } from "@/types";
-import { 
-  getFeaturedEvents, 
-  getRecommendedEvents, 
-  getEventsByCategory,
-  categories,
-  currentUser
-} from "@/lib/data";
+import { getFeaturedEvents, getRecommendedEvents, getEventsByCategory, categories, currentUser } from "@/lib/data";
 import { ArrowRight, CalendarCheck, Filter } from "lucide-react";
-
 const Index = () => {
   const [selectedCategories, setSelectedCategories] = useState<EventCategory[]>([]);
   const [selectedLocation, setSelectedLocation] = useState("");
   const [featuredEvents, setFeaturedEvents] = useState(getFeaturedEvents());
   const [recommendedEvents, setRecommendedEvents] = useState(getRecommendedEvents(currentUser.id));
   const [categoryEvents, setCategoryEvents] = useState(getEventsByCategory(categories[0].value));
-  
   const handleLocationSelect = (location: string) => {
     setSelectedLocation(location);
   };
-
   const handleCategoryChange = (categories: EventCategory[]) => {
     setSelectedCategories(categories);
     if (categories.length === 1) {
       setCategoryEvents(getEventsByCategory(categories[0]));
     }
   };
-
-  return (
-    <div className="min-h-screen">
+  return <div className="min-h-screen">
       <Navbar />
       
       <main className="pt-24 pb-16">
         {/* Hero Section */}
         <section className="container mx-auto px-4 pt-8 pb-16">
           <div className="text-center max-w-3xl mx-auto mb-12 space-y-4">
-            <h1 className="text-4xl sm:text-5xl font-bold tracking-tight">
-              Discover Islamic Events Near You
-            </h1>
+            <h1 className="text-4xl sm:text-5xl font-bold tracking-tight">Instant Islamic Events Near You</h1>
             <p className="text-xl text-muted-foreground">
               Connect with community events, Umrah trips, lectures, and more
             </p>
             
             <div className="flex flex-col sm:flex-row gap-3 mt-8 justify-center">
-              <LocationSearch 
-                onLocationSelect={handleLocationSelect}
-                initialLocation={currentUser.location?.city + ", " + currentUser.location?.country}
-                className="w-full sm:w-64"
-              />
+              <LocationSearch onLocationSelect={handleLocationSelect} initialLocation={currentUser.location?.city + ", " + currentUser.location?.country} className="w-full sm:w-64" />
               <Link to="/events">
                 <Button className="w-full sm:w-auto" icon={<Filter className="w-4 h-4" />}>
                   Browse All Events
@@ -66,19 +48,13 @@ const Index = () => {
           
           {/* Categories */}
           <div className="mb-12">
-            <CategoryChips
-              selectedCategories={selectedCategories}
-              onChange={handleCategoryChange}
-              singleSelect
-            />
+            <CategoryChips selectedCategories={selectedCategories} onChange={handleCategoryChange} singleSelect />
           </div>
           
           {/* Featured Events */}
-          {featuredEvents.length > 0 && (
-            <div className="mb-16 animate-slide-up">
+          {featuredEvents.length > 0 && <div className="mb-16 animate-slide-up">
               <FeaturedEvent event={featuredEvents[0]} />
-            </div>
-          )}
+            </div>}
         </section>
         
         {/* Recommended Events */}
@@ -105,8 +81,7 @@ const Index = () => {
         </section>
         
         {/* Category Events */}
-        {selectedCategories.length === 1 && (
-          <section className="container mx-auto px-4 py-8">
+        {selectedCategories.length === 1 && <section className="container mx-auto px-4 py-8">
             <div className="flex items-center justify-between mb-6">
               <div>
                 <h2 className="text-2xl font-bold tracking-tight capitalize">
@@ -132,8 +107,7 @@ const Index = () => {
                 </Button>
               </Link>
             </div>
-          </section>
-        )}
+          </section>}
         
         {/* My Events Section */}
         <section className="container mx-auto px-4 py-8">
@@ -193,8 +167,6 @@ const Index = () => {
           </div>
         </div>
       </footer>
-    </div>
-  );
+    </div>;
 };
-
 export default Index;
