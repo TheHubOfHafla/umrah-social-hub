@@ -93,13 +93,13 @@ const Navbar = () => {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56">
-              <Link to="/profile">
+              <Link to="/dashboard">
                 <DropdownMenuItem>
                   <User className="mr-2 h-4 w-4" />
-                  Profile
+                  Dashboard
                 </DropdownMenuItem>
               </Link>
-              <Link to="/my-events">
+              <Link to="/dashboard/events">
                 <DropdownMenuItem>
                   <Calendar className="mr-2 h-4 w-4" />
                   My Events
@@ -133,11 +133,11 @@ const Navbar = () => {
                 {item.label}
               </Link>)}
             <div className="border-t my-2" />
-            <Link to="/profile" className="px-4 py-3 text-lg rounded-md hover:bg-secondary/80 flex items-center">
+            <Link to="/dashboard" className="px-4 py-3 text-lg rounded-md hover:bg-secondary/80 flex items-center">
               <User className="mr-2 h-5 w-5" />
-              Profile
+              Dashboard
             </Link>
-            <Link to="/my-events" className="px-4 py-3 text-lg rounded-md hover:bg-secondary/80 flex items-center">
+            <Link to="/dashboard/events" className="px-4 py-3 text-lg rounded-md hover:bg-secondary/80 flex items-center">
               <Calendar className="mr-2 h-5 w-5" />
               My Events
             </Link>
