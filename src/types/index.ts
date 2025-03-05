@@ -1,4 +1,3 @@
-
 export type EventCategory = 
   | 'charity'
   | 'community'
@@ -30,6 +29,8 @@ export type EventOrganizer = {
   website?: string;
   organizationType: 'individual' | 'mosque' | 'charity' | 'company' | 'influencer' | 'scholar';
 };
+
+export type AttendeeType = 'ladies-only' | 'couples' | 'mixed' | 'men-only';
 
 export type User = {
   id: string;
@@ -75,6 +76,7 @@ export type Event = {
   location: EventLocation;
   organizer: EventOrganizer;
   categories: EventCategory[];
+  attendeeType?: AttendeeType;
   featured?: boolean;
   ticketTypes?: EventTicketType[];
   attendees?: EventAttendee[];

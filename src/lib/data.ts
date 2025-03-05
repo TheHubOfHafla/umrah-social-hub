@@ -1,4 +1,3 @@
-
 import { Event, EventCategory, User, EventOrganizer } from '@/types';
 
 export const categories: { value: EventCategory; label: string; }[] = [
@@ -76,6 +75,7 @@ export const mockEvents: Event[] = [
     },
     organizer: organizers[0],
     categories: ['community', 'mosque', 'social'],
+    attendeeType: 'mixed',
     featured: true,
     isFree: true,
     capacity: 300,
@@ -115,6 +115,7 @@ export const mockEvents: Event[] = [
     },
     organizer: organizers[1],
     categories: ['charity', 'social'],
+    attendeeType: 'mixed',
     price: 50,
     isFree: false,
     ticketTypes: [
@@ -181,6 +182,7 @@ export const mockEvents: Event[] = [
     },
     organizer: organizers[2],
     categories: ['travel', 'umrah'],
+    attendeeType: 'mixed',
     price: 2000,
     isFree: false,
     ticketTypes: [
@@ -232,6 +234,7 @@ export const mockEvents: Event[] = [
     },
     organizer: organizers[4],
     categories: ['education', 'workshop'],
+    attendeeType: 'mixed',
     price: 75,
     isFree: false,
     capacity: 50,
@@ -254,6 +257,7 @@ export const mockEvents: Event[] = [
     },
     organizer: organizers[0],
     categories: ['education', 'mosque', 'community'],
+    attendeeType: 'mixed',
     isFree: true,
   },
   {
@@ -274,8 +278,77 @@ export const mockEvents: Event[] = [
     },
     organizer: organizers[4],
     categories: ['community', 'education', 'social'],
+    attendeeType: 'mixed',
     isFree: true,
   },
+  {
+    id: 'event7',
+    title: 'Sisters Wellness Retreat',
+    shortDescription: 'A weekend of spiritual and physical wellness for Muslim women',
+    description: 'Join us for a rejuvenating weekend retreat designed exclusively for Muslim women. Activities include yoga sessions, spiritual discussions, nature walks, and workshops on mindfulness and self-care from an Islamic perspective.',
+    image: 'https://images.unsplash.com/photo-1580894897591-ff1e18c89183',
+    date: {
+      start: '2024-09-20T14:00:00Z',
+      end: '2024-09-22T16:00:00Z',
+    },
+    location: {
+      name: 'Tranquility Resort',
+      address: '567 Serenity Lane',
+      city: 'Lake District',
+      country: 'United Kingdom',
+    },
+    organizer: organizers[4],
+    categories: ['social', 'education', 'other'],
+    attendeeType: 'ladies-only',
+    price: 250,
+    isFree: false,
+    capacity: 40,
+  },
+  {
+    id: 'event8',
+    title: 'Muslim Couples Dinner & Workshop',
+    shortDescription: 'Strengthen your marriage with this special couples event',
+    description: 'A special evening designed for Muslim couples to strengthen their relationship through Islamic teachings. The event includes a gourmet dinner, interactive workshop on effective communication, and guidance from a respected marriage counselor.',
+    image: 'https://images.unsplash.com/photo-1529636798458-92914e1115b7',
+    date: {
+      start: '2024-10-12T18:00:00Z',
+      end: '2024-10-12T22:00:00Z',
+    },
+    location: {
+      name: 'Garden Banquet Hall',
+      address: '890 Harmony Road',
+      city: 'Birmingham',
+      country: 'United Kingdom',
+    },
+    organizer: organizers[3],
+    categories: ['social', 'education'],
+    attendeeType: 'couples',
+    price: 120,
+    isFree: false,
+    capacity: 30,
+  },
+  {
+    id: 'event9',
+    title: 'Brothers Football Tournament',
+    shortDescription: 'Annual football competition for Muslim men',
+    description: 'Join our annual football tournament for Muslim men. Form your team or join as an individual player to be assigned to a team. The day includes competitive matches, refreshments, and prizes for the winning teams.',
+    image: 'https://images.unsplash.com/photo-1522778119026-d647f0596c20',
+    date: {
+      start: '2024-08-04T09:00:00Z',
+      end: '2024-08-04T18:00:00Z',
+    },
+    location: {
+      name: 'Community Sports Center',
+      address: '432 Athletic Avenue',
+      city: 'Manchester',
+      country: 'United Kingdom',
+    },
+    organizer: organizers[0],
+    categories: ['social', 'community'],
+    attendeeType: 'men-only',
+    isFree: true,
+    capacity: 120,
+  }
 ];
 
 export const currentUser: User = {
@@ -331,4 +404,8 @@ export const getRecommendedEvents = (userId: string): Event[] => {
       !user.eventsAttending?.includes(event.id)
     )
     .slice(0, 4);
+};
+
+export const getEventsByAttendeeType = (type: AttendeeType): Event[] => {
+  return mockEvents.filter(event => event.attendeeType === type);
 };
