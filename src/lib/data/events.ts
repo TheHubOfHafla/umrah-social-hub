@@ -197,7 +197,7 @@ export const mockEvents: Event[] = [
     title: 'Quran Competition for Children',
     shortDescription: 'Annual Quran recitation and memorization competition',
     description: 'Our annual Quran competition for children aged 7-15 encourages young Muslims to connect with the Quran through recitation and memorization. Various categories available based on age and experience. Prizes and certificates awarded to all participants.',
-    image: '/placeholder.svg',
+    image: 'https://images.unsplash.com/photo-1473177104440-ffee2f376098',
     date: {
       start: '2024-07-28T10:00:00Z',
       end: '2024-07-28T16:00:00Z',
@@ -218,7 +218,7 @@ export const mockEvents: Event[] = [
     title: 'Islamic Art Exhibition',
     shortDescription: 'Showcasing traditional and contemporary Islamic art',
     description: 'This exhibition brings together a diverse collection of Islamic art, from traditional calligraphy and geometric patterns to contemporary interpretations. Featured artists from across the globe share their unique perspectives and techniques.',
-    image: '/placeholder.svg',
+    image: 'https://images.unsplash.com/photo-1600001707172-3ff3d6d24013',
     date: {
       start: '2024-08-10T10:00:00Z',
       end: '2024-08-30T18:00:00Z',
