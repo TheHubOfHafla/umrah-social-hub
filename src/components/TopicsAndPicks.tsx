@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useCallback, useRef } from "react";
 import { Link } from "react-router-dom";
 import { EventCategory } from "@/types";
@@ -81,11 +82,8 @@ const TopicsAndPicks = () => {
     loop: true, 
     align: 'center', 
     dragFree: true,
-    skipSnaps: false,
-    watchDrag: false,
-    duration: 40,
-    inViewThreshold: 0.7, 
-    startIndex: 0
+    watchDrag: false, 
+    duration: 30 
   });
   const [prevBtnDisabled, setPrevBtnDisabled] = useState(true);
   const [nextBtnDisabled, setNextBtnDisabled] = useState(true);
@@ -93,8 +91,6 @@ const TopicsAndPicks = () => {
   const [slidesInView, setSlidesInView] = useState<number[]>([]);
   const [autoplayActive, setAutoplayActive] = useState(true);
   const [isDragging, setIsDragging] = useState(false);
-  const [isTransitioning, setIsTransitioning] = useState(false);
-  const [wrappedSlides, setWrappedSlides] = useState<number[]>([]);
 
   const getCategoryIcon = (category: EventCategory) => {
     switch(category) {
@@ -131,9 +127,7 @@ const TopicsAndPicks = () => {
   const scrollPrev = useCallback(() => {
     if (emblaApi) {
       stopAutoplay();
-      setIsTransitioning(true);
       emblaApi.scrollPrev();
-      setTimeout(() => setIsTransitioning(false), 400);
       restartAutoplayAfterDelay();
     }
   }, [emblaApi]);
@@ -141,9 +135,7 @@ const TopicsAndPicks = () => {
   const scrollNext = useCallback(() => {
     if (emblaApi) {
       stopAutoplay();
-      setIsTransitioning(true);
       emblaApi.scrollNext();
-      setTimeout(() => setIsTransitioning(false), 400);
       restartAutoplayAfterDelay();
     }
   }, [emblaApi]);
@@ -159,15 +151,13 @@ const TopicsAndPicks = () => {
   const startAutoplay = useCallback(() => {
     if (emblaApi && !autoplayRef.current) {
       autoplayRef.current = setInterval(() => {
-        if (!document.hidden && !isTransitioning) {
-          setIsTransitioning(true);
+        if (!document.hidden) {
           emblaApi.scrollNext();
-          setTimeout(() => setIsTransitioning(false), 400);
         }
       }, 3000);
       setAutoplayActive(true);
     }
-  }, [emblaApi, isTransitioning]);
+  }, [emblaApi]);
 
   const restartAutoplayAfterDelay = useCallback(() => {
     setTimeout(() => {
@@ -177,62 +167,18 @@ const TopicsAndPicks = () => {
     }, 5000);
   }, [autoplayActive, startAutoplay]);
 
-  const detectWrappedSlides = useCallback(() => {
-    if (!emblaApi) return [];
-    
-    const scrollProgress = emblaApi.scrollProgress();
-    
-    // Detect slides at the wrap-around point
-    const wrapped: number[] = [];
-    if (scrollProgress < 0.1) {
-      // Near the start, some of the last slides might be visible
-      const slideCount = emblaApi.slideNodes().length;
-      const firstVisible = emblaApi.slidesInView(true)[0];
-      
-      for (let i = Math.max(slideCount - 3, 0); i < slideCount; i++) {
-        if (i !== firstVisible) {
-          wrapped.push(i);
-        }
-      }
-    } else if (scrollProgress > 0.9) {
-      // Near the end, some of the first slides might be visible
-      const firstVisible = emblaApi.slidesInView(true)[0];
-      for (let i = 0; i < 3; i++) {
-        if (i !== firstVisible) {
-          wrapped.push(i);
-        }
-      }
-    }
-    
-    return wrapped;
-  }, [emblaApi]);
-
   const onSelect = useCallback(() => {
     if (!emblaApi) return;
     setActiveIndex(emblaApi.selectedScrollSnap());
     setPrevBtnDisabled(!emblaApi.canScrollPrev());
     setNextBtnDisabled(!emblaApi.canScrollNext());
 
-    const inViewSlides: number[] = [];
-    emblaApi.slidesInView(true).forEach(index => {
+    const inViewSlides = [];
+    emblaApi.slidesInView().forEach(index => {
       inViewSlides.push(index);
     });
     setSlidesInView(inViewSlides);
-    
-    setWrappedSlides(detectWrappedSlides());
-  }, [emblaApi, detectWrappedSlides]);
-
-  const onScroll = useCallback(() => {
-    if (!emblaApi || isTransitioning) return;
-    // Update which slides are in view during scrolling
-    const inViewSlides: number[] = [];
-    emblaApi.slidesInView(true).forEach(index => {
-      inViewSlides.push(index);
-    });
-    setSlidesInView(inViewSlides);
-    
-    setWrappedSlides(detectWrappedSlides());
-  }, [emblaApi, isTransitioning, detectWrappedSlides]);
+  }, [emblaApi]);
 
   useEffect(() => {
     const handleVisibilityChange = () => {
@@ -259,25 +205,13 @@ const TopicsAndPicks = () => {
   
   const handleDragStart = useCallback(() => {
     setIsDragging(true);
-    setIsTransitioning(true);
     stopAutoplay();
   }, [stopAutoplay]);
   
   const handleDragEnd = useCallback(() => {
     setIsDragging(false);
-    setTimeout(() => setIsTransitioning(false), 300);
     restartAutoplayAfterDelay();
   }, [restartAutoplayAfterDelay]);
-
-  const scrollToSlide = useCallback((index: number) => {
-    if (emblaApi) {
-      stopAutoplay();
-      setIsTransitioning(true);
-      emblaApi.scrollTo(index);
-      setTimeout(() => setIsTransitioning(false), 400);
-      restartAutoplayAfterDelay();
-    }
-  }, [emblaApi, stopAutoplay, restartAutoplayAfterDelay]);
 
   useEffect(() => {
     if (!emblaApi) return;
@@ -285,10 +219,8 @@ const TopicsAndPicks = () => {
     onSelect();
     emblaApi.on('select', onSelect);
     emblaApi.on('reInit', onSelect);
-    emblaApi.on('scroll', onScroll);
-    emblaApi.on('pointerDown', handleDragStart);
-    emblaApi.on('pointerUp', handleDragEnd);
-    emblaApi.on('settle', () => setIsTransitioning(false));
+    emblaApi.on('dragStart', handleDragStart);
+    emblaApi.on('dragEnd', handleDragEnd);
 
     startAutoplay();
     
@@ -296,12 +228,10 @@ const TopicsAndPicks = () => {
       stopAutoplay();
       emblaApi.off('select', onSelect);
       emblaApi.off('reInit', onSelect);
-      emblaApi.off('scroll', onScroll);
-      emblaApi.off('pointerDown', handleDragStart);
-      emblaApi.off('pointerUp', handleDragEnd);
-      emblaApi.off('settle', () => setIsTransitioning(false));
+      emblaApi.off('dragStart', handleDragStart);
+      emblaApi.off('dragEnd', handleDragEnd);
     };
-  }, [emblaApi, onSelect, onScroll, startAutoplay, stopAutoplay, handleDragStart, handleDragEnd]);
+  }, [emblaApi, onSelect, startAutoplay, stopAutoplay, handleDragStart, handleDragEnd]);
 
   return (
     <div className="relative w-full px-4 py-8 overflow-hidden">
@@ -313,11 +243,10 @@ const TopicsAndPicks = () => {
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
         >
-          <div className="overflow-hidden relative" ref={emblaRef}>
+          <div className="overflow-hidden" ref={emblaRef}>
             <div className={cn(
-              "flex cursor-grab transition-opacity duration-300",
-              isDragging ? "cursor-grabbing" : "",
-              isTransitioning ? "transition-transform duration-300 ease-out" : ""
+              "flex cursor-grab",
+              isDragging ? "cursor-grabbing" : ""
             )}>
               {topicCards.map((card, index) => (
                 <div 
@@ -326,10 +255,8 @@ const TopicsAndPicks = () => {
                     "flex-grow-0 flex-shrink-0 basis-1/4 min-w-0 md:basis-1/6 lg:basis-1/8 px-2",
                     "transition-all duration-500 ease-out",
                     slidesInView.includes(index) 
-                      ? "opacity-100 scale-100 blur-0" 
-                      : "opacity-40 scale-85 blur-[1px]",
-                    wrappedSlides.includes(index) ? "opacity-0" : "", // Hide wrapped slides
-                    isTransitioning ? "transition-transform duration-300 ease-out" : ""
+                      ? "opacity-100 scale-100" 
+                      : "opacity-40 scale-85 blur-[1px]"
                   )}
                 >
                   <TopicCard 
@@ -349,7 +276,7 @@ const TopicsAndPicks = () => {
             variant="outline" 
             size="icon" 
             onClick={scrollPrev} 
-            disabled={prevBtnDisabled || isTransitioning}
+            disabled={prevBtnDisabled}
             className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-background/70 backdrop-blur-sm border-primary/20 shadow-md hover:bg-primary/10 hover:border-primary/40 transition-all opacity-0 group-hover:opacity-100 hover:opacity-100 focus:opacity-100"
           >
             <ChevronLeft className="h-5 w-5" />
@@ -359,7 +286,7 @@ const TopicsAndPicks = () => {
             variant="outline" 
             size="icon" 
             onClick={scrollNext} 
-            disabled={nextBtnDisabled || isTransitioning}
+            disabled={nextBtnDisabled}
             className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-background/70 backdrop-blur-sm border-primary/20 shadow-md hover:bg-primary/10 hover:border-primary/40 transition-all opacity-0 group-hover:opacity-100 hover:opacity-100 focus:opacity-100"
           >
             <ChevronRight className="h-5 w-5" />
@@ -372,8 +299,11 @@ const TopicsAndPicks = () => {
           {topicCards.map((_, index) => (
             <button
               key={index}
-              onClick={() => scrollToSlide(index)}
-              disabled={isTransitioning}
+              onClick={() => {
+                stopAutoplay();
+                emblaApi?.scrollTo(index);
+                restartAutoplayAfterDelay();
+              }}
               className={cn(
                 "w-2 h-2 rounded-full transition-all duration-300",
                 activeIndex === index 
