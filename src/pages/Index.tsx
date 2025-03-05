@@ -24,7 +24,6 @@ const Index = ({ isAuthenticated = false }: { isAuthenticated?: boolean }) => {
   const [selectedCategories, setSelectedCategories] = useState<EventCategory[]>([]);
   const [selectedLocation, setSelectedLocation] = useState("");
   const [featuredEvents, setFeaturedEvents] = useState(getFeaturedEvents());
-  // Use getFeaturedEvents as a fallback since getPopularEvents doesn't exist yet
   const [popularEvents, setPopularEvents] = useState(getFeaturedEvents());
   const [recommendedEvents, setRecommendedEvents] = useState(
     isAuthenticated 
@@ -60,8 +59,8 @@ const Index = ({ isAuthenticated = false }: { isAuthenticated?: boolean }) => {
           isAuthenticated={isAuthenticated} 
         />
         
-        {/* Add the TopicsAndPicks component right after the HeroBanner */}
-        <div className={`transition-all duration-700 delay-100 ${animateContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+        {/* Add the TopicsAndPicks component with container styling */}
+        <div className={`container mx-auto py-8 transition-all duration-700 delay-100 ${animateContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
           <TopicsAndPicks />
         </div>
         

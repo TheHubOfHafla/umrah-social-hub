@@ -1,10 +1,8 @@
 
-import { useState } from "react";
 import { Link } from "react-router-dom";
 import { EventCategory } from "@/types";
 import { categories } from "@/lib/data";
 import { cn } from "@/lib/utils";
-import { Card, CardContent } from "@/components/ui/card";
 import { 
   Heart, 
   Users, 
@@ -75,20 +73,18 @@ const TopicsAndPicks = () => {
   }));
 
   return (
-    <section className="container mx-auto px-4 py-8">
-      <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-4 md:gap-6">
-        {topicCards.map((card, index) => (
-          <TopicCard 
-            key={index}
-            title={card.title}
-            category={card.category}
-            icon={card.icon}
-            className="animate-fade-in"
-            style={{ animationDelay: `${index * 50}ms` }}
-          />
-        ))}
-      </div>
-    </section>
+    <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-4 md:gap-6 px-4">
+      {topicCards.map((card, index) => (
+        <TopicCard 
+          key={index}
+          title={card.title}
+          category={card.category}
+          icon={card.icon}
+          className="animate-fade-in"
+          style={{ animationDelay: `${index * 50}ms` }}
+        />
+      ))}
+    </div>
   );
 };
 
