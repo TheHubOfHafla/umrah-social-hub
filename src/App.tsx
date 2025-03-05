@@ -25,6 +25,8 @@ import UserEvents from "./pages/dashboard/UserEvents";
 import OrganizerEvents from "./pages/dashboard/OrganizerEvents";
 import UserProfile from "./pages/dashboard/UserProfile";
 import OrganizerProfile from "./pages/dashboard/OrganizerProfile";
+import Login from "./pages/Login";
+import Signup from "./pages/Signup";
 
 // Added isAuthenticated simulation
 const isAuthenticated = false;
@@ -45,6 +47,8 @@ const App = () => (
           <Route path="/events/create" element={<CreateEventPage />} />
           <Route path="/events/:eventId/register" element={<RegisterPage />} />
           <Route path="/organizers" element={<OrganizersPage />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/dashboard/events" element={<UserEvents />} />
           <Route path="/dashboard/profile" element={<UserProfile />} />
