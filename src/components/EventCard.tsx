@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { format } from "date-fns";
+import { format, formatDistanceToNow } from "date-fns";
 import { CalendarIcon, Clock, MapPin } from "lucide-react";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -11,6 +11,7 @@ import UserAvatar from "./UserAvatar";
 import { cn } from "@/lib/utils";
 import Button from "./Button";
 import AttendeesList from "./AttendeesList";
+import TicketAlert from "./TicketAlert";
 
 interface EventCardProps {
   event: Event;
@@ -24,6 +25,16 @@ const EventCard = ({ event, className, variant = "default" }: EventCardProps) =>
   const isFeatured = variant === "featured";
   const displayDate = format(new Date(event.date.start), "EEE, MMM d • h:mm a");
   const displayLocation = `${event.location.city}, ${event.location.country}`;
+
+  // Calculate time since last purchase if available
+  const getTimeAgo = () => {
+    if (event.ticketActivity?.lastPurchaseTime) {
+      return formatDistanceToNow(new Date(event.ticketActivity.lastPurchaseTime), { 
+        addSuffix: false 
+      });
+    }
+    return "";
+  };
 
   return (
     <Link to={`/events/${event.id}`}>
@@ -59,6 +70,25 @@ const EventCard = ({ event, className, variant = "default" }: EventCardProps) =>
             >
               Featured
             </Badge>
+          )}
+
+          {/* Ticket Activity Alerts */}
+          {event.ticketActivity && (
+            <div className="absolute bottom-3 left-3 right-3 z-20">
+              {event.ticketActivity.isSellingFast && (
+                <TicketAlert 
+                  type="selling-fast" 
+                  className="mb-1 backdrop-blur-sm"
+                />
+              )}
+              {event.ticketActivity.lastPurchaseTime && (
+                <TicketAlert 
+                  type="recent-purchase" 
+                  timeAgo={getTimeAgo()} 
+                  className="backdrop-blur-sm"
+                />
+              )}
+            </div>
           )}
         </div>
 

@@ -25,6 +25,9 @@ export const mockEvents: Event[] = [
     featured: true,
     isFree: true,
     capacity: 300,
+    ticketActivity: {
+      isSellingFast: true,
+    },
     attendees: [
       {
         userId: 'user1',
@@ -95,6 +98,10 @@ export const mockEvents: Event[] = [
     ],
     capacity: 270,
     featured: true,
+    ticketActivity: {
+      isSellingFast: true,
+      lastPurchaseTime: new Date(Date.now() - 10 * 60 * 1000).toISOString(), // 10 minutes ago
+    },
     attendees: [
       {
         userId: 'user1',

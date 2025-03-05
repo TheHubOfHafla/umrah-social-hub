@@ -1,3 +1,4 @@
+
 export type EventCategory = 
   | 'charity'
   | 'community'
@@ -63,6 +64,11 @@ export type EventTicketType = {
   available: boolean;
 };
 
+export type TicketActivity = {
+  isSellingFast?: boolean;
+  lastPurchaseTime?: string; // ISO date string
+};
+
 export type Event = {
   id: string;
   title: string;
@@ -83,4 +89,5 @@ export type Event = {
   capacity?: number;
   isFree: boolean;
   price?: number; // Starting price if multiple ticket types
+  ticketActivity?: TicketActivity;
 };
