@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
@@ -6,7 +5,7 @@ import { format } from "date-fns";
 import { ChevronLeft, Calendar, MapPin, Clock, Info, CreditCard, Check } from "lucide-react";
 
 import { getEventById } from "@/lib/data/queries";
-import { Button } from "@/components/ui/button";
+import Button from "@/components/Button";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -69,7 +68,6 @@ const RegisterPage = () => {
         </Link>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Registration Form */}
           <div className="lg:col-span-2 space-y-6">
             <div>
               <h1 className="text-3xl font-bold tracking-tight mb-2">Register for Event</h1>
@@ -149,7 +147,6 @@ const RegisterPage = () => {
             </Card>
           </div>
 
-          {/* Event Summary */}
           <div className="space-y-6">
             <Card className="shadow-sm overflow-hidden sticky top-24">
               <div className="aspect-video w-full relative">
@@ -217,7 +214,6 @@ const RegisterPage = () => {
         </div>
       </div>
 
-      {/* Confirmation Dialog */}
       <Dialog open={confirmationOpen} onOpenChange={setConfirmationOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
@@ -245,7 +241,6 @@ const RegisterPage = () => {
   );
 };
 
-// Loading skeleton for the register page
 const RegisterPageSkeleton = () => {
   return (
     <div className="min-h-screen bg-slate-50 pt-24 pb-12">
