@@ -130,30 +130,30 @@ const Chatbot = ({ isOpen, onClose, initialMessage = "Hi there! How can I help y
   if (!isOpen) return null;
 
   return (
-    <div className="fixed bottom-24 right-6 z-50 w-full max-w-[380px] rounded-lg shadow-xl transition-all duration-300 ease-in-out">
-      <div className="flex flex-col h-[500px] bg-card border border-border rounded-lg overflow-hidden">
+    <div className="fixed bottom-16 sm:bottom-24 right-4 sm:right-6 z-50 w-[92%] sm:w-full max-w-[380px] rounded-lg shadow-xl transition-all duration-300 ease-in-out">
+      <div className="flex flex-col h-[60vh] sm:h-[500px] bg-card border border-border rounded-lg overflow-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between bg-primary px-4 py-3 text-primary-foreground">
+        <div className="flex items-center justify-between bg-primary px-3 sm:px-4 py-2 sm:py-3 text-primary-foreground">
           <div className="flex items-center space-x-2">
-            <Bot className="h-5 w-5" />
-            <h3 className="font-semibold">Event Buddy</h3>
+            <Bot className="h-4 w-4 sm:h-5 sm:w-5" />
+            <h3 className="text-sm sm:text-base font-semibold">Event Buddy</h3>
           </div>
           <div className="flex items-center space-x-1">
             <Button 
               variant="ghost" 
               size="icon" 
-              className="h-8 w-8 text-primary-foreground hover:bg-primary/90"
+              className="h-7 w-7 sm:h-8 sm:w-8 text-primary-foreground hover:bg-primary/90"
               onClick={() => setIsExpanded(!isExpanded)}
             >
-              <ChevronDown className={cn("h-5 w-5 transition-transform", !isExpanded && "rotate-180")} />
+              <ChevronDown className={cn("h-4 w-4 sm:h-5 sm:w-5 transition-transform", !isExpanded && "rotate-180")} />
             </Button>
             <Button 
               variant="ghost" 
               size="icon" 
-              className="h-8 w-8 text-primary-foreground hover:bg-primary/90"
+              className="h-7 w-7 sm:h-8 sm:w-8 text-primary-foreground hover:bg-primary/90"
               onClick={onClose}
             >
-              <X className="h-5 w-5" />
+              <X className="h-4 w-4 sm:h-5 sm:w-5" />
             </Button>
           </div>
         </div>
@@ -161,30 +161,30 @@ const Chatbot = ({ isOpen, onClose, initialMessage = "Hi there! How can I help y
         {/* Chat content */}
         {isExpanded && (
           <>
-            <ScrollArea className="flex-grow p-4 bg-accent/10">
+            <ScrollArea className="flex-grow p-3 sm:p-4 bg-accent/10">
               {messages.map((message) => (
                 <div
                   key={message.id}
                   className={cn(
-                    "mb-4 max-w-[85%] rounded-lg p-3",
+                    "mb-3 sm:mb-4 max-w-[85%] rounded-lg p-2 sm:p-3",
                     message.role === "user"
                       ? "ml-auto bg-primary text-primary-foreground"
                       : "bg-muted"
                   )}
                 >
-                  <div className="flex items-center mb-1 space-x-2">
+                  <div className="flex items-center mb-1 space-x-1 sm:space-x-2">
                     {message.role === "user" ? (
-                      <User className="h-4 w-4" />
+                      <User className="h-3 w-3 sm:h-4 sm:w-4" />
                     ) : (
-                      <Bot className="h-4 w-4" />
+                      <Bot className="h-3 w-3 sm:h-4 sm:w-4" />
                     )}
-                    <span className="text-xs font-medium">
+                    <span className="text-[10px] sm:text-xs font-medium">
                       {message.role === "user" ? "You" : "Event Buddy"}
                     </span>
                   </div>
-                  <p className="text-sm leading-relaxed">{message.content}</p>
+                  <p className="text-xs sm:text-sm leading-relaxed">{message.content}</p>
                   <div className="flex justify-end mt-1">
-                    <span className="text-xs opacity-70">
+                    <span className="text-[9px] sm:text-xs opacity-70">
                       {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                       {message.status === "sending" && " · Sending..."}
                       {message.status === "error" && " · Failed to send"}
@@ -196,7 +196,7 @@ const Chatbot = ({ isOpen, onClose, initialMessage = "Hi there! How can I help y
             </ScrollArea>
             
             {/* Input area */}
-            <div className="border-t p-3 bg-background">
+            <div className="border-t p-2 sm:p-3 bg-background">
               <div className="flex items-end space-x-2">
                 <div className="flex-grow relative">
                   <Textarea
@@ -205,28 +205,28 @@ const Chatbot = ({ isOpen, onClose, initialMessage = "Hi there! How can I help y
                     onChange={(e) => setInput(e.target.value)}
                     onKeyDown={handleKeyDown}
                     placeholder="Type your message..."
-                    className="min-h-[60px] max-h-[120px] py-2 pr-10 resize-none"
+                    className="min-h-[50px] sm:min-h-[60px] max-h-[100px] sm:max-h-[120px] py-2 pr-8 sm:pr-10 resize-none text-xs sm:text-sm"
                     disabled={isLoading}
                   />
                   <CornerDownLeft 
-                    className="absolute right-3 bottom-3 h-4 w-4 text-muted-foreground pointer-events-none" 
+                    className="absolute right-2 sm:right-3 bottom-2 sm:bottom-3 h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground pointer-events-none" 
                   />
                 </div>
                 <Button
                   size="icon"
-                  className="h-10 w-10 rounded-full"
+                  className="h-8 w-8 sm:h-10 sm:w-10 rounded-full"
                   onClick={handleSendMessage}
                   disabled={isLoading || !input.trim()}
                 >
                   {isLoading ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
+                    <Loader2 className="h-3 w-3 sm:h-4 sm:w-4 animate-spin" />
                   ) : (
-                    <Send className="h-4 w-4" />
+                    <Send className="h-3 w-3 sm:h-4 sm:w-4" />
                   )}
                 </Button>
               </div>
-              <div className="mt-2 text-center">
-                <p className="text-xs text-muted-foreground">
+              <div className="mt-1 sm:mt-2 text-center">
+                <p className="text-[9px] sm:text-xs text-muted-foreground">
                   Ask me about events, recommendations, or how to use the platform
                 </p>
               </div>

@@ -23,18 +23,18 @@ const ChatbotButton = () => {
 
   return (
     <>
-      <div className="fixed bottom-6 right-6 z-50">
+      <div className="fixed bottom-4 sm:bottom-6 right-4 sm:right-6 z-50">
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
               <Button
                 onClick={handleToggleChat}
                 size="icon"
-                className={`h-14 w-14 rounded-full shadow-lg transition-all duration-300 hover:scale-105 ${
+                className={`h-11 w-11 sm:h-14 sm:w-14 rounded-full shadow-lg transition-all duration-300 hover:scale-105 ${
                   isOpen ? "bg-secondary hover:bg-secondary/90" : "bg-primary hover:bg-primary/90"
                 }`}
               >
-                <MessageCircle className="h-6 w-6" />
+                <MessageCircle className="h-5 w-5 sm:h-6 sm:w-6" />
               </Button>
             </TooltipTrigger>
             <TooltipContent side="left">
