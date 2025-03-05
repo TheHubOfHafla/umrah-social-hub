@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import CategoryCarousel from "@/components/CategoryCarousel";
@@ -52,6 +51,18 @@ const Index = ({ isAuthenticated = false }: { isAuthenticated?: boolean }) => {
           onLocationSelect={handleLocationSelect}
           isAuthenticated={isAuthenticated} 
         />
+        
+        <div className="container mx-auto px-4 -mt-8 relative z-10 flex justify-center md:justify-end">
+          <Link to="/events/create">
+            <Button 
+              variant="primary" 
+              size="lg" 
+              className="shadow-lg hover:shadow-xl transition-all duration-300"
+            >
+              Create Event
+            </Button>
+          </Link>
+        </div>
         
         <section className="container mx-auto px-4 py-12">
           <CategoryCarousel 
