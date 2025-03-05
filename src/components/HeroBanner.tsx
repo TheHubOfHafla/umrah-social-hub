@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Filter, UserPlus } from "lucide-react";
@@ -15,6 +15,16 @@ interface HeroBannerProps {
 
 const HeroBanner = ({ user, onLocationSelect, isAuthenticated = true }: HeroBannerProps) => {
   const [bannerLoaded, setBannerLoaded] = useState(false);
+  const [contentVisible, setContentVisible] = useState(false);
+  
+  // Trigger content animation after a short delay
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setContentVisible(true);
+    }, 500);
+    
+    return () => clearTimeout(timer);
+  }, []);
   
   return (
     <section className="relative">
@@ -28,8 +38,8 @@ const HeroBanner = ({ user, onLocationSelect, isAuthenticated = true }: HeroBann
           src="/lovable-uploads/3fa0e5f2-adb1-4481-b5cd-7871743c9ab3.png" 
           alt="Islamic community gathering" 
           className={cn(
-            "w-full h-full object-cover transition-opacity duration-500",
-            bannerLoaded ? "opacity-100" : "opacity-0"
+            "w-full h-full object-cover transition-all duration-1000",
+            bannerLoaded ? "opacity-100 scale-100" : "opacity-0 scale-110"
           )}
           onLoad={() => setBannerLoaded(true)}
         />
@@ -38,32 +48,54 @@ const HeroBanner = ({ user, onLocationSelect, isAuthenticated = true }: HeroBann
       {/* Content overlay */}
       <div className="absolute inset-0 z-20 flex items-center justify-center">
         <div className="container mx-auto px-4">
-          <div className="text-center max-w-3xl mx-auto space-y-6 bg-background/10 backdrop-blur-sm p-8 rounded-2xl">
-            <h1 className="text-4xl sm:text-5xl font-bold tracking-tight font-heading leading-tight text-balance">
+          <div className={cn(
+            "text-center max-w-3xl mx-auto space-y-6 backdrop-blur-sm p-8 rounded-2xl transition-all duration-700 ease-out",
+            contentVisible ? "opacity-100 translate-y-0 bg-background/10" : "opacity-0 translate-y-8 bg-background/0"
+          )}>
+            <h1 className={cn(
+              "text-4xl sm:text-5xl font-bold tracking-tight font-heading leading-tight text-balance transition-all duration-700 delay-100",
+              contentVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+            )}>
               Instant Islamic Events Near You
             </h1>
-            <p className="text-xl text-muted-foreground font-light max-w-2xl mx-auto text-pretty">
+            <p className={cn(
+              "text-xl text-muted-foreground font-light max-w-2xl mx-auto text-pretty transition-all duration-700 delay-200",
+              contentVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+            )}>
               Connect with community events, Umrah trips, lectures, and more
             </p>
             
-            <div className="flex flex-col sm:flex-row gap-3 mt-8 justify-center">
+            <div className={cn(
+              "flex flex-col sm:flex-row gap-3 mt-8 justify-center transition-all duration-700 delay-300",
+              contentVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+            )}>
               <LocationSearch 
                 onLocationSelect={onLocationSelect} 
                 initialLocation={user?.location ? `${user.location.city}, ${user.location.country}` : "London, United Kingdom"} 
                 className="w-full sm:w-64" 
               />
               <Link to="/events">
-                <Button className="w-full sm:w-auto" icon={<Filter className="w-4 h-4" />}>
+                <Button 
+                  className="w-full sm:w-auto hover:scale-105 transition-transform duration-300" 
+                  icon={<Filter className="w-4 h-4" />}
+                >
                   Browse All Events
                 </Button>
               </Link>
             </div>
             
             {!isAuthenticated && (
-              <div className="mt-6 pt-4 border-t border-primary/20">
+              <div className={cn(
+                "mt-6 pt-4 border-t border-primary/20 transition-all duration-700 delay-400",
+                contentVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+              )}>
                 <p className="text-muted-foreground mb-3">Create an account to track events, get personalized recommendations, and more</p>
                 <Link to="/signup">
-                  <Button variant="outline" className="border-primary/40 hover:bg-primary/10" icon={<UserPlus className="w-4 h-4" />}>
+                  <Button 
+                    variant="outline" 
+                    className="border-primary/40 hover:bg-primary/10 hover:scale-105 transition-all duration-300" 
+                    icon={<UserPlus className="w-4 h-4" />}
+                  >
                     Sign up for free
                   </Button>
                 </Link>

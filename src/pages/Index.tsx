@@ -1,4 +1,5 @@
-import { useState } from "react";
+
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import CategoryCarousel from "@/components/CategoryCarousel";
 import FeaturedEvent from "@/components/FeaturedEvent";
@@ -31,6 +32,13 @@ const Index = ({ isAuthenticated = false }: { isAuthenticated?: boolean }) => {
       : [] // No recommendations for guests
   );
   const [categoryEvents, setCategoryEvents] = useState(getEventsByCategory(categories[0].value));
+  const [animateContent, setAnimateContent] = useState(false);
+
+  // Animation delay
+  useEffect(() => {
+    // Trigger animations after component mount
+    setTimeout(() => setAnimateContent(true), 300);
+  }, []);
 
   const handleLocationSelect = (location: string) => {
     setSelectedLocation(location);
@@ -44,7 +52,7 @@ const Index = ({ isAuthenticated = false }: { isAuthenticated?: boolean }) => {
   };
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen overflow-hidden">
       <main className="pb-16">
         <HeroBanner 
           user={isAuthenticated ? currentUser : undefined} 
@@ -52,19 +60,19 @@ const Index = ({ isAuthenticated = false }: { isAuthenticated?: boolean }) => {
           isAuthenticated={isAuthenticated} 
         />
         
-        <div className="container mx-auto px-4 -mt-8 relative z-10 flex justify-center md:justify-end">
+        <div className={`container mx-auto px-4 -mt-8 relative z-10 flex justify-center md:justify-end transition-all duration-700 ${animateContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
           <Link to="/events/create">
             <Button 
               variant="primary" 
               size="lg" 
-              className="shadow-lg hover:shadow-xl transition-all duration-300"
+              className="shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
             >
               Create Event
             </Button>
           </Link>
         </div>
         
-        <section className="container mx-auto px-4 py-12">
+        <section className={`container mx-auto px-4 py-12 transition-all duration-700 delay-100 ${animateContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
           <CategoryCarousel 
             selectedCategories={selectedCategories} 
             onChange={handleCategoryChange} 
@@ -73,49 +81,57 @@ const Index = ({ isAuthenticated = false }: { isAuthenticated?: boolean }) => {
         </section>
         
         {featuredEvents.length > 0 && (
-          <section className="container mx-auto px-4 mb-16 animate-slide-up">
+          <section className={`container mx-auto px-4 mb-16 transition-all duration-700 delay-200 ${animateContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
             <FeaturedEvent event={featuredEvents[0]} />
           </section>
         )}
         
         {isAuthenticated ? (
-          <RecommendedEvents events={recommendedEvents} />
+          <div className={`transition-all duration-700 delay-300 ${animateContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+            <RecommendedEvents events={recommendedEvents} />
+          </div>
         ) : (
-          <section className="container mx-auto px-4 py-12">
+          <section className={`container mx-auto px-4 py-12 transition-all duration-700 delay-300 ${animateContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
             <div className="mb-8">
               <h2 className="text-2xl font-bold mb-2">Popular Events</h2>
               <p className="text-muted-foreground">Discover what's trending in the community</p>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {popularEvents.slice(0, 6).map((event) => (
-                <EventCard key={event.id} event={event} />
+              {popularEvents.slice(0, 6).map((event, index) => (
+                <div key={event.id} className={`transition-all duration-500 ${animateContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`} style={{transitionDelay: `${300 + index * 100}ms`}}>
+                  <EventCard event={event} />
+                </div>
               ))}
             </div>
           </section>
         )}
         
         {selectedCategories.length === 1 && (
-          <CategoryEvents 
-            category={selectedCategories[0]} 
-            events={categoryEvents} 
-          />
+          <div className={`transition-all duration-700 delay-[600ms] ${animateContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+            <CategoryEvents 
+              category={selectedCategories[0]} 
+              events={categoryEvents} 
+            />
+          </div>
         )}
         
         {isAuthenticated ? (
-          <MyEventsPromo />
+          <div className={`transition-all duration-700 delay-[700ms] ${animateContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+            <MyEventsPromo />
+          </div>
         ) : (
-          <section className="container mx-auto px-4 py-12 my-12 bg-primary/5 rounded-lg">
+          <section className={`container mx-auto px-4 py-12 my-12 bg-gradient-to-r from-primary/10 to-accent/10 rounded-lg backdrop-blur-sm transition-all duration-700 delay-[700ms] transform ${animateContent ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-8 scale-95'}`}>
             <div className="max-w-4xl mx-auto text-center space-y-6 py-8">
-              <h2 className="text-3xl font-bold">Join Our Community</h2>
+              <h2 className="text-3xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent animate-pulse-soft">Join Our Community</h2>
               <p className="text-xl text-muted-foreground">
                 Create an account to get personalized event recommendations, save favorite events, and connect with event organizers.
               </p>
               <div className="flex flex-wrap gap-4 justify-center">
                 <Link to="/signup">
-                  <Button size="lg">Sign Up Now</Button>
+                  <Button size="lg" className="animate-slide-up hover:scale-105 transition-transform duration-300" style={{animationDelay: '800ms'}}>Sign Up Now</Button>
                 </Link>
                 <Link to="/login">
-                  <Button variant="outline" size="lg">Sign In</Button>
+                  <Button variant="outline" size="lg" className="animate-slide-up hover:scale-105 transition-transform duration-300" style={{animationDelay: '900ms'}}>Sign In</Button>
                 </Link>
               </div>
             </div>
@@ -123,7 +139,9 @@ const Index = ({ isAuthenticated = false }: { isAuthenticated?: boolean }) => {
         )}
       </main>
       
-      <Footer />
+      <div className={`transition-opacity duration-1000 delay-[800ms] ${animateContent ? 'opacity-100' : 'opacity-0'}`}>
+        <Footer />
+      </div>
     </div>
   );
 };
