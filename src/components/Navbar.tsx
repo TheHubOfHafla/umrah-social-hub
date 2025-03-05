@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { NavigationMenu, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, navigationMenuTriggerStyle } from "@/components/ui/navigation-menu";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Bell, Calendar, ChevronDown, Heart, LogIn, Menu, Search, User, UserPlus, X, Plus, UserRound } from "lucide-react";
+import { Bell, Calendar, ChevronDown, LogIn, Menu, Search, User, UserPlus, X, Plus, UserRound } from "lucide-react";
 import UserAvatar from "./UserAvatar";
 import { currentUser } from "@/lib/data";
 
@@ -53,72 +53,36 @@ const Navbar = ({ isAuthenticated = true }: { isAuthenticated?: boolean }) => {
       "fixed top-0 left-0 right-0 z-50 transition-all duration-300", 
       isScrolled 
         ? "py-2 bg-background/80 backdrop-blur-md shadow-sm" 
-        : "py-3 bg-primary text-white"
+        : "py-3 bg-transparent"
     )}>
       <div className="container flex items-center justify-between">
-        {/* Desktop Navigation - Left */}
-        <div className="hidden md:flex items-center">
-          <NavigationMenu>
-            <NavigationMenuList>
-              {navigation.map((item, index) => index < Math.floor(navigation.length / 2) && (
-                <NavigationMenuItem key={item.href}>
-                  <NavigationMenuLink asChild className={cn(
-                    navigationMenuTriggerStyle(), 
-                    "bg-transparent font-medium text-base tracking-wide transition-all duration-200",
-                    "hover:text-primary hover:bg-primary/10 hover:scale-105",
-                    item.active 
-                      ? "text-primary font-semibold border-b-2 border-primary" 
-                      : isScrolled ? "text-foreground/80" : "text-white"
-                  )}>
-                    <Link to={item.href}>
-                      {item.label}
-                    </Link>
-                  </NavigationMenuLink>
-                </NavigationMenuItem>
-              ))}
-            </NavigationMenuList>
-          </NavigationMenu>
-        </div>
+        <div className="flex items-center">
+          <Link to="/" className="font-heading text-xl tracking-tight mr-8 text-primary font-semibold">EventHub</Link>
 
-        {/* Logo - Centered */}
-        <Link to="/" className="font-heading text-xl tracking-tight flex items-center gap-2 text-white mx-auto absolute left-1/2 -translate-x-1/2">
-          <Heart className="h-6 w-6 fill-white stroke-white" />
-          <span className={cn(
-            "font-semibold", 
-            isScrolled ? "text-primary" : "text-white"
-          )}>LaunchGood</span>
-        </Link>
-        
-        {/* Desktop Navigation - Right */}
-        <div className="hidden md:flex items-center">
-          <NavigationMenu>
+          {/* Desktop Navigation */}
+          <NavigationMenu className="hidden md:flex">
             <NavigationMenuList>
-              {navigation.map((item, index) => index >= Math.floor(navigation.length / 2) && (
-                <NavigationMenuItem key={item.href}>
+              {navigation.map(item => <NavigationMenuItem key={item.href}>
                   <NavigationMenuLink asChild className={cn(
                     navigationMenuTriggerStyle(), 
                     "bg-transparent font-medium text-base tracking-wide transition-all duration-200",
                     "hover:text-primary hover:bg-primary/10 hover:scale-105",
                     item.active 
                       ? "text-primary font-semibold border-b-2 border-primary" 
-                      : isScrolled ? "text-foreground/80" : "text-white"
+                      : "text-foreground/80"
                   )}>
                     <Link to={item.href}>
                       {item.label}
                     </Link>
                   </NavigationMenuLink>
-                </NavigationMenuItem>
-              ))}
+                </NavigationMenuItem>)}
             </NavigationMenuList>
           </NavigationMenu>
         </div>
 
         {/* Desktop Actions */}
         <div className="hidden md:flex items-center space-x-2">
-          <Button variant="ghost" size="icon" className={cn(
-            "hover:bg-primary/10 transition-all duration-200",
-            isScrolled ? "text-foreground hover:text-primary" : "text-white hover:text-white/80"
-          )}>
+          <Button variant="ghost" size="icon" className="hover:bg-primary/10 hover:text-primary transition-all duration-200">
             <Search className="h-5 w-5" />
           </Button>
           
@@ -132,19 +96,13 @@ const Navbar = ({ isAuthenticated = true }: { isAuthenticated?: boolean }) => {
           
           {isAuthenticated ? (
             <>
-              <Button variant="ghost" size="icon" className={cn(
-                "hover:bg-primary/10 transition-all duration-200",
-                isScrolled ? "text-foreground hover:text-primary" : "text-white hover:text-white/80"
-              )}>
+              <Button variant="ghost" size="icon" className="hover:bg-primary/10 hover:text-primary transition-all duration-200">
                 <Bell className="h-5 w-5" />
               </Button>
               
               {/* My Profile Button */}
               <Link to="/dashboard/profile">
-                <Button variant="outline" className={cn(
-                  "flex items-center gap-2 hover:bg-primary/10 hover:text-primary transition-all duration-200",
-                  !isScrolled && "border-white text-white hover:text-white/80 hover:bg-white/10"
-                )}>
+                <Button variant="outline" className="flex items-center gap-2 hover:bg-primary/10 hover:text-primary transition-all duration-200">
                   <UserRound className="h-4 w-4" />
                   My Profile
                 </Button>
@@ -152,12 +110,9 @@ const Navbar = ({ isAuthenticated = true }: { isAuthenticated?: boolean }) => {
               
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className={cn(
-                    "flex items-center gap-2 hover:bg-primary/10 transition-all duration-200",
-                    isScrolled ? "hover:text-primary" : "text-white hover:text-white/80"
-                  )}>
+                  <Button variant="ghost" className="flex items-center gap-2 hover:bg-primary/10 hover:text-primary transition-all duration-200">
                     <UserAvatar user={currentUser} size="sm" />
-                    <ChevronDown className="h-4 w-4" />
+                    <ChevronDown className="h-4 w-4 text-muted-foreground" />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-56">
@@ -179,19 +134,13 @@ const Navbar = ({ isAuthenticated = true }: { isAuthenticated?: boolean }) => {
           ) : (
             <>
               <Link to="/login">
-                <Button variant="outline" className={cn(
-                  "flex items-center gap-2 hover:bg-primary/10 hover:text-primary",
-                  !isScrolled && "border-white text-white hover:text-white/80 hover:bg-white/10"
-                )}>
+                <Button variant="outline" className="flex items-center gap-2">
                   <LogIn className="h-4 w-4" />
                   Sign In
                 </Button>
               </Link>
               <Link to="/signup">
-                <Button className={cn(
-                  "flex items-center gap-2",
-                  isScrolled ? "bg-primary hover:bg-primary/90" : "bg-white text-primary hover:bg-white/90"
-                )}>
+                <Button className="flex items-center gap-2">
                   <UserPlus className="h-4 w-4" />
                   Sign Up
                 </Button>
@@ -201,10 +150,7 @@ const Navbar = ({ isAuthenticated = true }: { isAuthenticated?: boolean }) => {
         </div>
 
         {/* Mobile Menu Button */}
-        <Button variant="ghost" size="icon" className={cn(
-          "md:hidden hover:bg-primary/10",
-          isScrolled ? "hover:text-primary" : "text-white hover:text-white/80"
-        )} onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+        <Button variant="ghost" size="icon" className="md:hidden hover:bg-primary/10 hover:text-primary" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
           {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
         </Button>
       </div>
@@ -216,12 +162,6 @@ const Navbar = ({ isAuthenticated = true }: { isAuthenticated?: boolean }) => {
       )}>
         <div className="container py-4">
           <div className="flex flex-col space-y-4">
-            {/* Mobile Logo */}
-            <Link to="/" className="font-heading text-xl tracking-tight flex items-center gap-2 text-primary justify-center mb-4">
-              <Heart className="h-6 w-6 fill-primary stroke-primary" />
-              <span className="font-semibold">LaunchGood</span>
-            </Link>
-            
             {navigation.map(item => <Link 
               key={item.href} 
               to={item.href} 
