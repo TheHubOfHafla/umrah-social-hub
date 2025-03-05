@@ -1,6 +1,5 @@
 
 import { useState } from "react";
-import Navbar from "@/components/Navbar";
 import CategoryCarousel from "@/components/CategoryCarousel";
 import FeaturedEvent from "@/components/FeaturedEvent";
 import HeroBanner from "@/components/HeroBanner";
@@ -31,9 +30,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen">
-      <Navbar />
-      
-      <main className="pt-24 pb-16">
+      <main className="pb-16">
         <HeroBanner user={currentUser} onLocationSelect={handleLocationSelect} />
         
         <section className="container mx-auto px-4 py-12">

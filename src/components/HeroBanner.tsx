@@ -18,7 +18,7 @@ const HeroBanner = ({ user, onLocationSelect }: HeroBannerProps) => {
   return (
     <section className="relative">
       {/* Banner Image */}
-      <div className="w-full h-[500px] relative overflow-hidden">
+      <div className="w-full h-[100vh] relative overflow-hidden">
         <div className={cn(
           "absolute inset-0 bg-gradient-to-b from-background/0 via-background/0 to-background z-10",
           !bannerLoaded && "animate-pulse bg-muted"
