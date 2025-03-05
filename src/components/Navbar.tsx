@@ -52,11 +52,11 @@ const Navbar = () => {
       "fixed top-0 left-0 right-0 z-50 transition-all duration-300", 
       isScrolled 
         ? "py-2 bg-background/80 backdrop-blur-md shadow-sm" 
-        : "py-4 bg-transparent"
+        : "py-3 bg-transparent"
     )}>
       <div className="container flex items-center justify-between">
         <div className="flex items-center">
-          <Link to="/" className="text-xl font-semibold mr-8">Islamic Social</Link>
+          <Link to="/" className="font-semibold mr-8"></Link>
 
           {/* Desktop Navigation */}
           <NavigationMenu className="hidden md:flex">
