@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
@@ -109,7 +108,7 @@ const EventDetailPage = () => {
   return (
     <>
       {/* Hero section with image and overlay */}
-      <div className="relative w-full bg-muted/30">
+      <div className="relative w-full bg-muted/30 pt-10 md:pt-24">
         <div className="absolute inset-0 overflow-hidden bg-muted">
           <div 
             className="absolute inset-0 z-0 bg-cover bg-center opacity-10 blur-sm"
