@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -13,6 +12,7 @@ import {
   Navigate,
 } from "react-router-dom";
 import Navbar from "./components/Navbar";
+import ChatbotButton from "./components/ChatbotButton";
 import Index from "./pages/Index";
 import EventsPage from "./pages/EventsPage";
 import EventDetailPage from "./pages/EventDetailPage";
@@ -33,25 +33,20 @@ import { useState, useEffect } from "react";
 const queryClient = new QueryClient();
 
 const App = () => {
-  // Add state to track authentication status
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   
-  // Check if user is authenticated on initial load
   useEffect(() => {
-    // Check if we have some indicator of authentication in localStorage
     const token = localStorage.getItem('auth_token');
     if (token) {
       setIsAuthenticated(true);
     }
   }, []);
 
-  // Function to handle successful login
   const handleLogin = () => {
-    // Set auth token in localStorage
     localStorage.setItem('auth_token', 'user-is-logged-in');
     setIsAuthenticated(true);
   };
-  
+
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
@@ -77,6 +72,7 @@ const App = () => {
             <Route path="/organizer/profile" element={<OrganizerProfile />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
+          <ChatbotButton />
         </BrowserRouter>
       </TooltipProvider>
     </QueryClientProvider>
