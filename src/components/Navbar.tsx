@@ -75,17 +75,18 @@ const Navbar = () => {
             <NavigationMenuList>
               {navigation.map((item) => (
                 <NavigationMenuItem key={item.href}>
-                  <Link to={item.href} passHref legacyBehavior>
-                    <NavigationMenuLink
-                      className={cn(
-                        navigationMenuTriggerStyle(),
-                        "bg-transparent hover:bg-secondary/80",
-                        item.active && "text-primary font-medium"
-                      )}
-                    >
+                  <NavigationMenuLink
+                    asChild
+                    className={cn(
+                      navigationMenuTriggerStyle(),
+                      "bg-transparent hover:bg-secondary/80",
+                      item.active && "text-primary font-medium"
+                    )}
+                  >
+                    <Link to={item.href}>
                       {item.label}
-                    </NavigationMenuLink>
-                  </Link>
+                    </Link>
+                  </NavigationMenuLink>
                 </NavigationMenuItem>
               ))}
             </NavigationMenuList>

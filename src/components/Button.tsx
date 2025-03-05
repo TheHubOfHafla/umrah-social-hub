@@ -32,11 +32,14 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       variant === 'subtle' ? 'secondary' :
       variant;
     
+    // Map our size values to shadcn sizes
+    const shadcnSize = size === 'md' ? 'default' : size;
+    
     return (
       <ShadcnButton
         ref={ref}
         variant={shadcnVariant}
-        size={size}
+        size={shadcnSize}
         disabled={loading || disabled}
         className={cn(
           'font-medium transition-all',
