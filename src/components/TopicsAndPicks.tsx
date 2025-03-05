@@ -234,7 +234,7 @@ const TopicsAndPicks = () => {
   }, [emblaApi, onSelect, startAutoplay, stopAutoplay, handleDragStart, handleDragEnd]);
 
   return (
-    <div className="relative w-full px-4 py-12 overflow-hidden">
+    <div className="relative w-full px-4 py-12 overflow-hidden" style={{ isolation: 'isolate' }}>
       <div className="max-w-5xl mx-auto">
         <h2 className="text-2xl font-bold mb-8 text-center bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent animate-pulse-soft">Categories & Our Picks</h2>
         
