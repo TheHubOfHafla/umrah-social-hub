@@ -9,7 +9,7 @@ import {
   Heart, 
   Users, 
   GraduationCap, 
-  Mosque, 
+  Building, 
   Plane, 
   Footprints, 
   Book, 
@@ -52,7 +52,7 @@ const TopicsAndPicks = () => {
       case "education":
         return <GraduationCap className="h-10 w-10 text-foreground/80" />;
       case "mosque":
-        return <Mosque className="h-10 w-10 text-foreground/80" />;
+        return <Building className="h-10 w-10 text-foreground/80" />; // Changed Mosque to Building
       case "travel":
         return <Plane className="h-10 w-10 text-foreground/80" />;
       case "umrah":
