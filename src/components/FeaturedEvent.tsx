@@ -1,3 +1,4 @@
+
 import { Event } from "@/types";
 import { format } from "date-fns";
 import { CalendarIcon, MapPin, Users } from "lucide-react";
@@ -35,8 +36,9 @@ const FeaturedEvent = ({ event, className }: FeaturedEventProps) => {
   return (
     <div 
       className={cn(
-        "relative overflow-hidden rounded-2xl bg-gradient-to-b from-primary/5 to-background",
-        "border border-border/50 shadow-sm",
+        "relative overflow-hidden rounded-2xl transition-all duration-300",
+        "bg-gradient-to-b from-primary/5 to-background",
+        "border border-border/50 shadow-sm hover:shadow-md hover:border-primary/20",
         className
       )}
     >
@@ -51,7 +53,7 @@ const FeaturedEvent = ({ event, className }: FeaturedEventProps) => {
             </Badge>
           </div>
           
-          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight mb-4">
+          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight mb-4 transition-colors duration-300 hover:text-primary">
             {event.title}
           </h1>
           
@@ -106,12 +108,12 @@ const FeaturedEvent = ({ event, className }: FeaturedEventProps) => {
           
           <div className="flex space-x-4">
             <Link to={`/events/${event.id}`}>
-              <Button size="lg">
+              <Button size="lg" className="transition-transform duration-300 hover:scale-105">
                 {event.isFree ? 'Register Now' : 'Book Tickets'}
               </Button>
             </Link>
             <Link to={`/events/${event.id}`}>
-              <Button variant="outline" size="lg">
+              <Button variant="outline" size="lg" className="transition-transform duration-300 hover:scale-105">
                 Learn More
               </Button>
             </Link>

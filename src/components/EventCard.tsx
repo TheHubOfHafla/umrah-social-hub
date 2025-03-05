@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { format, formatDistanceToNow } from "date-fns";
@@ -39,7 +40,7 @@ const EventCard = ({ event, className, variant = "default" }: EventCardProps) =>
     <Link to={`/events/${event.id}`}>
       <Card 
         className={cn(
-          "overflow-hidden transition-all duration-300 hover:shadow-md relative h-full",
+          "overflow-hidden transition-all duration-300 hover:shadow-md hover:border-primary/30 relative h-full",
           isFeatured ? "border-0 shadow-none" : "shadow-sm",
           className
         )}
@@ -54,9 +55,8 @@ const EventCard = ({ event, className, variant = "default" }: EventCardProps) =>
               src={event.image}
               alt={event.title}
               className={cn(
-                "object-cover w-full h-full z-10 transition-all duration-300",
-                !imageLoaded && "opacity-0",
-                isFeatured && "rounded-lg"
+                "object-cover w-full h-full z-10 transition-opacity duration-300",
+                !imageLoaded && "opacity-0"
               )}
               onLoad={() => setImageLoaded(true)}
             />
@@ -91,7 +91,7 @@ const EventCard = ({ event, className, variant = "default" }: EventCardProps) =>
         </div>
 
         <CardContent className={cn(
-          "p-4",
+          "p-4 transition-colors duration-300",
           isFeatured && "px-0 pt-3"
         )}>
           <div className="space-y-2">
@@ -111,7 +111,7 @@ const EventCard = ({ event, className, variant = "default" }: EventCardProps) =>
             </div>
 
             <h3 className={cn(
-              "font-semibold leading-tight group-hover:text-primary transition-colors",
+              "font-semibold leading-tight transition-colors duration-300 hover:text-primary",
               isFeatured ? "text-2xl" : "text-lg"
             )}>
               {event.title}
