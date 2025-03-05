@@ -85,7 +85,6 @@ const TopicsAndPicks = () => {
     skipSnaps: false,
     watchDrag: false,
     duration: 40,
-    speed: 8,
     inViewThreshold: 0.7, 
     startIndex: 0
   });
@@ -96,6 +95,7 @@ const TopicsAndPicks = () => {
   const [autoplayActive, setAutoplayActive] = useState(true);
   const [isDragging, setIsDragging] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const [wrappedSlides, setWrappedSlides] = useState<number[]>([]);
 
   const getCategoryIcon = (category: EventCategory) => {
     switch(category) {
@@ -133,7 +133,7 @@ const TopicsAndPicks = () => {
     if (emblaApi) {
       stopAutoplay();
       setIsTransitioning(true);
-      emblaApi.scrollPrev({ duration: 30 });
+      emblaApi.scrollPrev();
       setTimeout(() => setIsTransitioning(false), 400);
       restartAutoplayAfterDelay();
     }
@@ -143,7 +143,7 @@ const TopicsAndPicks = () => {
     if (emblaApi) {
       stopAutoplay();
       setIsTransitioning(true);
-      emblaApi.scrollNext({ duration: 30 });
+      emblaApi.scrollNext();
       setTimeout(() => setIsTransitioning(false), 400);
       restartAutoplayAfterDelay();
     }
@@ -162,7 +162,7 @@ const TopicsAndPicks = () => {
       autoplayRef.current = setInterval(() => {
         if (!document.hidden && !isTransitioning) {
           setIsTransitioning(true);
-          emblaApi.scrollNext({ duration: 30 });
+          emblaApi.scrollNext();
           setTimeout(() => setIsTransitioning(false), 400);
         }
       }, 3000);
@@ -178,28 +178,66 @@ const TopicsAndPicks = () => {
     }, 5000);
   }, [autoplayActive, startAutoplay]);
 
+  const detectWrappedSlides = useCallback(() => {
+    if (!emblaApi) return [];
+    
+    const engine = emblaApi.internalEngine();
+    const scrollSnaps = engine.scrollSnapList;
+    const scrollProgress = emblaApi.scrollProgress();
+    
+    // Detect slides at the wrap-around point
+    const wrapped: number[] = [];
+    if (scrollProgress < 0.1) {
+      // Near the start, some of the last slides might be visible
+      const slideCount = emblaApi.slideNodes().length;
+      const firstVisible = emblaApi.slidesInView(true)[0];
+      
+      for (let i = Math.max(slideCount - 3, 0); i < slideCount; i++) {
+        if (i !== firstVisible) {
+          wrapped.push(i);
+        }
+      }
+    } else if (scrollProgress > 0.9) {
+      // Near the end, some of the first slides might be visible
+      const firstVisible = emblaApi.slidesInView(true)[0];
+      for (let i = 0; i < 3; i++) {
+        if (i !== firstVisible) {
+          wrapped.push(i);
+        }
+      }
+    }
+    
+    return wrapped;
+  }, [emblaApi]);
+
   const onSelect = useCallback(() => {
     if (!emblaApi) return;
     setActiveIndex(emblaApi.selectedScrollSnap());
     setPrevBtnDisabled(!emblaApi.canScrollPrev());
     setNextBtnDisabled(!emblaApi.canScrollNext());
 
-    const inViewSlides = [];
+    const inViewSlides: number[] = [];
     emblaApi.slidesInView(true).forEach(index => {
       inViewSlides.push(index);
     });
     setSlidesInView(inViewSlides);
-  }, [emblaApi]);
+    
+    // Update wrapped slides on select
+    setWrappedSlides(detectWrappedSlides());
+  }, [emblaApi, detectWrappedSlides]);
 
   const onScroll = useCallback(() => {
     if (!emblaApi || isTransitioning) return;
     // Update which slides are in view during scrolling
-    const inViewSlides = [];
+    const inViewSlides: number[] = [];
     emblaApi.slidesInView(true).forEach(index => {
       inViewSlides.push(index);
     });
     setSlidesInView(inViewSlides);
-  }, [emblaApi, isTransitioning]);
+    
+    // Update wrapped slides on scroll
+    setWrappedSlides(detectWrappedSlides());
+  }, [emblaApi, isTransitioning, detectWrappedSlides]);
 
   useEffect(() => {
     const handleVisibilityChange = () => {
@@ -240,7 +278,7 @@ const TopicsAndPicks = () => {
     if (emblaApi) {
       stopAutoplay();
       setIsTransitioning(true);
-      emblaApi.scrollTo(index, { duration: 30 });
+      emblaApi.scrollTo(index);
       setTimeout(() => setIsTransitioning(false), 400);
       restartAutoplayAfterDelay();
     }
@@ -295,6 +333,7 @@ const TopicsAndPicks = () => {
                     slidesInView.includes(index) 
                       ? "opacity-100 scale-100 blur-0" 
                       : "opacity-40 scale-85 blur-[1px]",
+                    wrappedSlides.includes(index) ? "opacity-0" : "", // Hide wrapped slides
                     isTransitioning ? "transition-transform duration-300 ease-out" : ""
                   )}
                 >
@@ -356,4 +395,3 @@ const TopicsAndPicks = () => {
 };
 
 export default TopicsAndPicks;
-
