@@ -154,8 +154,8 @@ export default {
 				'pulse-soft': 'pulse-soft 2s ease-in-out infinite'
 			},
 			fontFamily: {
-				sans: ['SF Pro Display', 'Inter', 'sans-serif'],
-				heading: ['SF Pro Display', 'Inter', 'sans-serif']
+				sans: ['Poppins', 'Inter', 'sans-serif'],
+				heading: ['Playfair Display', 'SF Pro Display', 'serif']
 			}
 		}
 	},

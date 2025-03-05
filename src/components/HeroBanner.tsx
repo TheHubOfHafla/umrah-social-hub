@@ -24,7 +24,7 @@ const HeroBanner = ({ user, onLocationSelect }: HeroBannerProps) => {
           !bannerLoaded && "animate-pulse bg-muted"
         )}></div>
         <img 
-          src="/lovable-uploads/b58af5a3-4dc6-4800-b56b-d650348f2032.png" 
+          src="/lovable-uploads/cef6e842-fcc3-4b46-8a93-7dbe053d8cd0.png" 
           alt="Islamic community gathering" 
           className={cn(
             "w-full h-full object-cover transition-opacity duration-500",
@@ -37,9 +37,11 @@ const HeroBanner = ({ user, onLocationSelect }: HeroBannerProps) => {
       {/* Content overlay */}
       <div className="absolute inset-0 z-20 flex items-center justify-center">
         <div className="container mx-auto px-4">
-          <div className="text-center max-w-3xl mx-auto space-y-4 bg-background/10 backdrop-blur-sm p-8 rounded-2xl">
-            <h1 className="text-4xl sm:text-5xl font-bold tracking-tight">Instant Islamic Events Near You</h1>
-            <p className="text-xl text-muted-foreground">
+          <div className="text-center max-w-3xl mx-auto space-y-6 bg-background/10 backdrop-blur-sm p-8 rounded-2xl">
+            <h1 className="text-4xl sm:text-5xl font-bold tracking-tight font-heading">
+              Instant Islamic Events Near You
+            </h1>
+            <p className="text-xl text-muted-foreground font-light">
               Connect with community events, Umrah trips, lectures, and more
             </p>
             
