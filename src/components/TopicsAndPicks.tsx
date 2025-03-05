@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useCallback, useRef } from "react";
 import { Link } from "react-router-dom";
 import { EventCategory } from "@/types";
@@ -15,7 +16,8 @@ import {
   Users as UsersIcon,
   HelpCircle,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  ArrowRight
 } from "lucide-react";
 import useEmblaCarousel from 'embla-carousel-react';
 import { Button } from "./ui/button";
@@ -41,12 +43,12 @@ const TopicCard = ({ title, category, icon, className, style, isActive }: TopicC
     >
       <div className={cn(
         "flex flex-col items-center transition-all duration-300",
-        isHovered ? "scale-120 translate-y-[-10px]" : "",
+        isHovered ? "scale-110 translate-y-[-8px]" : "",
         className
       )} style={style}>
         <div className={cn(
           "relative mb-3 flex h-24 w-24 items-center justify-center rounded-full border border-border bg-background p-4 shadow-sm transition-all duration-300",
-          isHovered ? "shadow-xl border-primary/70 bg-primary/20" : ""
+          isHovered ? "shadow-xl border-primary/70 bg-gradient-to-br from-primary/20 to-accent/10" : ""
         )}>
           <div className={cn(
             "transition-all duration-300",
@@ -55,7 +57,7 @@ const TopicCard = ({ title, category, icon, className, style, isActive }: TopicC
             {icon}
           </div>
           <div className={cn(
-            "absolute -inset-1 rounded-full opacity-0 bg-gradient-to-r from-primary/20 to-transparent blur-xl transition-all duration-300",
+            "absolute -inset-1 rounded-full opacity-0 bg-gradient-to-r from-primary/30 via-accent/20 to-transparent blur-xl transition-all duration-300",
             isHovered ? "opacity-100" : ""
           )}></div>
         </div>
@@ -63,6 +65,12 @@ const TopicCard = ({ title, category, icon, className, style, isActive }: TopicC
           "mt-2 block text-sm font-medium transition-colors duration-300",
           isHovered ? "text-primary" : ""
         )}>{title}</span>
+        {isHovered && (
+          <div className="mt-1 text-xs text-primary/80 flex items-center gap-1 animate-fade-in">
+            <span>Explore</span>
+            <ArrowRight className="h-3 w-3" />
+          </div>
+        )}
       </div>
     </Link>
   );
@@ -75,13 +83,14 @@ const TopicsAndPicks = () => {
     align: 'center', 
     dragFree: true,
     watchDrag: false, 
-    duration: 15 
+    duration: 30 
   });
   const [prevBtnDisabled, setPrevBtnDisabled] = useState(true);
   const [nextBtnDisabled, setNextBtnDisabled] = useState(true);
   const [activeIndex, setActiveIndex] = useState(0);
   const [slidesInView, setSlidesInView] = useState<number[]>([]);
   const [autoplayActive, setAutoplayActive] = useState(true);
+  const [isDragging, setIsDragging] = useState(false);
 
   const getCategoryIcon = (category: EventCategory) => {
     switch(category) {
@@ -145,7 +154,7 @@ const TopicsAndPicks = () => {
         if (!document.hidden) {
           emblaApi.scrollNext();
         }
-      }, 2000);
+      }, 3000);
       setAutoplayActive(true);
     }
   }, [emblaApi]);
@@ -193,6 +202,16 @@ const TopicsAndPicks = () => {
   const handleMouseLeave = useCallback(() => {
     startAutoplay();
   }, [startAutoplay]);
+  
+  const handleDragStart = useCallback(() => {
+    setIsDragging(true);
+    stopAutoplay();
+  }, [stopAutoplay]);
+  
+  const handleDragEnd = useCallback(() => {
+    setIsDragging(false);
+    restartAutoplayAfterDelay();
+  }, [restartAutoplayAfterDelay]);
 
   useEffect(() => {
     if (!emblaApi) return;
@@ -200,6 +219,8 @@ const TopicsAndPicks = () => {
     onSelect();
     emblaApi.on('select', onSelect);
     emblaApi.on('reInit', onSelect);
+    emblaApi.on('dragStart', handleDragStart);
+    emblaApi.on('dragEnd', handleDragEnd);
 
     startAutoplay();
     
@@ -207,81 +228,92 @@ const TopicsAndPicks = () => {
       stopAutoplay();
       emblaApi.off('select', onSelect);
       emblaApi.off('reInit', onSelect);
+      emblaApi.off('dragStart', handleDragStart);
+      emblaApi.off('dragEnd', handleDragEnd);
     };
-  }, [emblaApi, onSelect, startAutoplay, stopAutoplay]);
+  }, [emblaApi, onSelect, startAutoplay, stopAutoplay, handleDragStart, handleDragEnd]);
 
   return (
-    <div className="relative w-full px-4 py-8">
-      <h2 className="text-2xl font-bold mb-6 text-center">Categories & Our Picks</h2>
-      
-      <div 
-        className="relative group" 
-        onMouseEnter={handleMouseEnter}
-        onMouseLeave={handleMouseLeave}
-      >
-        <div className="overflow-hidden" ref={emblaRef}>
-          <div className="flex cursor-default">
-            {topicCards.map((card, index) => (
-              <div 
-                key={index} 
-                className={cn(
-                  "flex-grow-0 flex-shrink-0 basis-1/4 min-w-0 md:basis-1/6 lg:basis-1/8 px-2",
-                  "transition-all duration-300",
-                  slidesInView.includes(index) ? "opacity-100 scale-100" : "opacity-50 scale-85"
-                )}
-              >
-                <TopicCard 
-                  title={card.title}
-                  category={card.category}
-                  icon={card.icon}
-                  isActive={activeIndex === index}
-                  className="animate-fade-in transition-all duration-300"
-                  style={{ animationDelay: `${(index % 10) * 30}ms` }}
-                />
-              </div>
-            ))}
+    <div className="relative w-full px-4 py-8 overflow-hidden">
+      <div className="max-w-5xl mx-auto">
+        <h2 className="text-2xl font-bold mb-6 text-center bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent animate-pulse-soft">Categories & Our Picks</h2>
+        
+        <div 
+          className="relative group" 
+          onMouseEnter={handleMouseEnter}
+          onMouseLeave={handleMouseLeave}
+        >
+          <div className="overflow-hidden" ref={emblaRef}>
+            <div className={cn(
+              "flex cursor-grab",
+              isDragging ? "cursor-grabbing" : ""
+            )}>
+              {topicCards.map((card, index) => (
+                <div 
+                  key={index} 
+                  className={cn(
+                    "flex-grow-0 flex-shrink-0 basis-1/4 min-w-0 md:basis-1/6 lg:basis-1/8 px-2",
+                    "transition-all duration-500 ease-out",
+                    slidesInView.includes(index) 
+                      ? "opacity-100 scale-100" 
+                      : "opacity-40 scale-85 blur-[1px]"
+                  )}
+                >
+                  <TopicCard 
+                    title={card.title}
+                    category={card.category}
+                    icon={card.icon}
+                    isActive={activeIndex === index}
+                    className="animate-fade-in transition-all duration-300"
+                    style={{ animationDelay: `${(index % 10) * 30}ms` }}
+                  />
+                </div>
+              ))}
+            </div>
           </div>
+          
+          <Button 
+            variant="outline" 
+            size="icon" 
+            onClick={scrollPrev} 
+            disabled={prevBtnDisabled}
+            className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-background/70 backdrop-blur-sm border-primary/20 shadow-md hover:bg-primary/10 hover:border-primary/40 transition-all opacity-0 group-hover:opacity-100 hover:opacity-100 focus:opacity-100"
+          >
+            <ChevronLeft className="h-5 w-5" />
+          </Button>
+          
+          <Button 
+            variant="outline" 
+            size="icon" 
+            onClick={scrollNext} 
+            disabled={nextBtnDisabled}
+            className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-background/70 backdrop-blur-sm border-primary/20 shadow-md hover:bg-primary/10 hover:border-primary/40 transition-all opacity-0 group-hover:opacity-100 hover:opacity-100 focus:opacity-100"
+          >
+            <ChevronRight className="h-5 w-5" />
+          </Button>
+          
+          <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-background to-transparent opacity-0 pointer-events-none"></div>
         </div>
         
-        <Button 
-          variant="outline" 
-          size="icon" 
-          onClick={scrollPrev} 
-          disabled={prevBtnDisabled}
-          className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-background/70 backdrop-blur-sm border-primary/20 shadow-md hover:bg-primary/10 hover:border-primary/40 transition-all opacity-0 group-hover:opacity-100 hover:opacity-100 focus:opacity-100"
-        >
-          <ChevronLeft className="h-5 w-5" />
-        </Button>
-        
-        <Button 
-          variant="outline" 
-          size="icon" 
-          onClick={scrollNext} 
-          disabled={nextBtnDisabled}
-          className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-background/70 backdrop-blur-sm border-primary/20 shadow-md hover:bg-primary/10 hover:border-primary/40 transition-all opacity-0 group-hover:opacity-100 hover:opacity-100 focus:opacity-100"
-        >
-          <ChevronRight className="h-5 w-5" />
-        </Button>
-      </div>
-      
-      <div className="flex justify-center mt-6 space-x-1">
-        {topicCards.map((_, index) => (
-          <button
-            key={index}
-            onClick={() => {
-              stopAutoplay();
-              emblaApi?.scrollTo(index);
-              restartAutoplayAfterDelay();
-            }}
-            className={cn(
-              "w-2 h-2 rounded-full transition-all duration-300",
-              activeIndex === index 
-                ? "bg-primary w-4" 
-                : "bg-primary/30 hover:bg-primary/50"
-            )}
-            aria-label={`Go to slide ${index + 1}`}
-          />
-        ))}
+        <div className="flex justify-center mt-6 space-x-1">
+          {topicCards.map((_, index) => (
+            <button
+              key={index}
+              onClick={() => {
+                stopAutoplay();
+                emblaApi?.scrollTo(index);
+                restartAutoplayAfterDelay();
+              }}
+              className={cn(
+                "w-2 h-2 rounded-full transition-all duration-300",
+                activeIndex === index 
+                  ? "bg-primary w-4" 
+                  : "bg-primary/30 hover:bg-primary/50"
+              )}
+              aria-label={`Go to slide ${index + 1}`}
+            />
+          ))}
+        </div>
       </div>
     </div>
   );
