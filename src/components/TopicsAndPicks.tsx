@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useCallback, useRef } from "react";
 import { Link } from "react-router-dom";
 import { EventCategory } from "@/types";
@@ -30,33 +31,43 @@ interface TopicCardProps {
 }
 
 const TopicCard = ({ title, category, icon, className, style, isActive }: TopicCardProps) => {
+  const [isHovered, setIsHovered] = useState(false);
+  
   return (
-    <Link to={`/events?category=${category}`} className="block text-center">
+    <Link 
+      to={`/events?category=${category}`} 
+      className="block text-center"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
       <div className={cn(
-        "group flex flex-col items-center transition-all duration-300",
-        "hover:scale-130 hover:translate-y-[-10px]",
-        isActive ? "scale-120 translate-y-[-7px]" : "",
+        "flex flex-col items-center transition-all duration-300",
+        isHovered ? "scale-120 translate-y-[-10px]" : "",
+        isActive && !isHovered ? "scale-110 translate-y-[-7px]" : "",
         className
       )} style={style}>
         <div className={cn(
           "relative mb-3 flex h-24 w-24 items-center justify-center rounded-full border border-border bg-background p-4 shadow-sm transition-all duration-300",
-          "group-hover:shadow-xl group-hover:border-primary/70 group-hover:bg-primary/20",
-          isActive ? "shadow-lg border-primary/50 bg-primary/15" : ""
+          isHovered ? "shadow-xl border-primary/70 bg-primary/20" : "",
+          isActive && !isHovered ? "shadow-lg border-primary/50 bg-primary/15" : ""
         )}>
           <div className={cn(
-            "transition-all duration-300 group-hover:scale-115 group-hover:text-primary",
-            isActive ? "scale-110 text-primary" : ""
+            "transition-all duration-300",
+            isHovered ? "scale-115 text-primary" : "",
+            isActive && !isHovered ? "scale-110 text-primary" : ""
           )}>
             {icon}
           </div>
           <div className={cn(
-            "absolute -inset-1 rounded-full opacity-0 bg-gradient-to-r from-primary/20 to-transparent blur-xl transition-all duration-300 group-hover:opacity-100",
-            isActive ? "opacity-90" : ""
+            "absolute -inset-1 rounded-full opacity-0 bg-gradient-to-r from-primary/20 to-transparent blur-xl transition-all duration-300",
+            isHovered ? "opacity-100" : "",
+            isActive && !isHovered ? "opacity-90" : ""
           )}></div>
         </div>
         <span className={cn(
-          "mt-2 block text-sm font-medium transition-colors duration-300 group-hover:text-primary",
-          isActive ? "text-primary" : ""
+          "mt-2 block text-sm font-medium transition-colors duration-300",
+          isHovered ? "text-primary" : "",
+          isActive && !isHovered ? "text-primary" : ""
         )}>{title}</span>
       </div>
     </Link>
