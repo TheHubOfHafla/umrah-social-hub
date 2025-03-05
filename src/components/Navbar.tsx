@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -26,7 +25,6 @@ const navItems: NavItem[] = [{
   href: "/organizers"
 }];
 
-// Added new prop to simulate unauthenticated state
 const Navbar = ({ isAuthenticated = true }: { isAuthenticated?: boolean }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);
@@ -35,10 +33,7 @@ const Navbar = ({ isAuthenticated = true }: { isAuthenticated?: boolean }) => {
 
   useEffect(() => {
     const handleScroll = () => {
-      // Set scrolled state based on scroll position
       setIsScrolled(window.scrollY > 10);
-      
-      // Calculate scroll progress for opacity (max at 100px scroll)
       const progress = Math.min(window.scrollY / 100, 1);
       setScrollProgress(progress);
     };
@@ -55,8 +50,7 @@ const Navbar = ({ isAuthenticated = true }: { isAuthenticated?: boolean }) => {
     active: location.pathname === item.href
   }));
 
-  // Calculate background opacity based on scroll progress
-  const bgOpacity = scrollProgress * 0.9; // Max opacity of 90%
+  const bgOpacity = scrollProgress * 0.9;
 
   return <header className={cn(
       "fixed top-0 left-0 right-0 z-50 transition-all duration-300", 
@@ -72,7 +66,6 @@ const Navbar = ({ isAuthenticated = true }: { isAuthenticated?: boolean }) => {
     }}
     >
       <div className="container flex items-center justify-between">
-        {/* Desktop Navigation - Left */}
         <div className="hidden md:flex items-center">
           <NavigationMenu>
             <NavigationMenuList>
@@ -96,16 +89,14 @@ const Navbar = ({ isAuthenticated = true }: { isAuthenticated?: boolean }) => {
           </NavigationMenu>
         </div>
 
-        {/* Logo - Centered */}
         <Link to="/" className="font-heading text-xl tracking-tight flex items-center gap-2 text-white mx-auto absolute left-1/2 -translate-x-1/2">
           <Heart className="h-6 w-6 fill-white stroke-white" />
           <span className={cn(
             "font-semibold", 
             isScrolled ? "text-primary" : "text-white"
-          )}>LaunchGood</span>
+          )}>EventHub</span>
         </Link>
         
-        {/* Desktop Navigation - Right */}
         <div className="hidden md:flex items-center">
           <NavigationMenu>
             <NavigationMenuList>
@@ -129,7 +120,6 @@ const Navbar = ({ isAuthenticated = true }: { isAuthenticated?: boolean }) => {
           </NavigationMenu>
         </div>
 
-        {/* Desktop Actions */}
         <div className="hidden md:flex items-center space-x-2">
           <Button variant="ghost" size="icon" className={cn(
             "hover:bg-primary/10 transition-all duration-200",
@@ -138,7 +128,6 @@ const Navbar = ({ isAuthenticated = true }: { isAuthenticated?: boolean }) => {
             <Search className="h-5 w-5" />
           </Button>
           
-          {/* Create Event Button */}
           <Link to="/events/create">
             <Button className="flex items-center gap-2 bg-primary hover:bg-primary/90 transition-all duration-200 hover:scale-105">
               <Plus className="h-4 w-4" />
@@ -155,7 +144,6 @@ const Navbar = ({ isAuthenticated = true }: { isAuthenticated?: boolean }) => {
                 <Bell className="h-5 w-5" />
               </Button>
               
-              {/* My Profile Button */}
               <Link to="/dashboard/profile">
                 <Button variant="outline" className={cn(
                   "flex items-center gap-2 hover:bg-primary/10 hover:text-primary transition-all duration-200",
@@ -216,7 +204,6 @@ const Navbar = ({ isAuthenticated = true }: { isAuthenticated?: boolean }) => {
           )}
         </div>
 
-        {/* Mobile Menu Button */}
         <Button variant="ghost" size="icon" className={cn(
           "md:hidden hover:bg-primary/10",
           isScrolled ? "hover:text-primary" : "text-white hover:text-white/80"
@@ -225,17 +212,15 @@ const Navbar = ({ isAuthenticated = true }: { isAuthenticated?: boolean }) => {
         </Button>
       </div>
 
-      {/* Mobile Menu */}
       <div className={cn(
         "fixed inset-x-0 top-[57px] z-50 h-[calc(100vh-57px)] bg-background/90 backdrop-blur-md transition-transform duration-300 ease-in-out md:hidden", 
         mobileMenuOpen ? "translate-x-0" : "translate-x-full"
       )}>
         <div className="container py-4">
           <div className="flex flex-col space-y-4">
-            {/* Mobile Logo */}
             <Link to="/" className="font-heading text-xl tracking-tight flex items-center gap-2 text-primary justify-center mb-4">
               <Heart className="h-6 w-6 fill-primary stroke-primary" />
-              <span className="font-semibold">LaunchGood</span>
+              <span className="font-semibold">EventHub</span>
             </Link>
             
             {navigation.map(item => <Link 
@@ -251,7 +236,6 @@ const Navbar = ({ isAuthenticated = true }: { isAuthenticated?: boolean }) => {
                 {item.label}
               </Link>)}
             
-            {/* Create Event Button for Mobile */}
             <Link to="/events/create" className="px-4 py-3 text-lg bg-primary text-white rounded-md hover:bg-primary/90 transition-all duration-200 flex items-center">
               <Plus className="mr-2 h-5 w-5" />
               Create Event
@@ -261,7 +245,6 @@ const Navbar = ({ isAuthenticated = true }: { isAuthenticated?: boolean }) => {
             
             {isAuthenticated ? (
               <>
-                {/* Updated to show My Profile link in mobile menu */}
                 <Link to="/dashboard/profile" className="px-4 py-3 text-lg rounded-md hover:bg-primary/10 hover:text-primary transition-all duration-200 flex items-center">
                   <UserRound className="mr-2 h-5 w-5" />
                   My Profile
