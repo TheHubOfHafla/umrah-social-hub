@@ -1,7 +1,9 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { cn } from "@/lib/utils";
 import Navbar from "@/components/Navbar";
 import CategoryChips from "@/components/CategoryChips";
+import CategoryCarousel from "@/components/CategoryCarousel";
 import EventGrid from "@/components/EventGrid";
 import FeaturedEvent from "@/components/FeaturedEvent";
 import Button from "@/components/Button";
@@ -9,53 +11,84 @@ import LocationSearch from "@/components/LocationSearch";
 import { EventCategory } from "@/types";
 import { getFeaturedEvents, getRecommendedEvents, getEventsByCategory, categories, currentUser } from "@/lib/data";
 import { ArrowRight, CalendarCheck, Filter } from "lucide-react";
+
 const Index = () => {
   const [selectedCategories, setSelectedCategories] = useState<EventCategory[]>([]);
   const [selectedLocation, setSelectedLocation] = useState("");
   const [featuredEvents, setFeaturedEvents] = useState(getFeaturedEvents());
   const [recommendedEvents, setRecommendedEvents] = useState(getRecommendedEvents(currentUser.id));
   const [categoryEvents, setCategoryEvents] = useState(getEventsByCategory(categories[0].value));
+  const [bannerLoaded, setBannerLoaded] = useState(false);
+
   const handleLocationSelect = (location: string) => {
     setSelectedLocation(location);
   };
+
   const handleCategoryChange = (categories: EventCategory[]) => {
     setSelectedCategories(categories);
     if (categories.length === 1) {
       setCategoryEvents(getEventsByCategory(categories[0]));
     }
   };
+
   return <div className="min-h-screen">
       <Navbar />
       
       <main className="pt-24 pb-16">
-        {/* Hero Section */}
-        <section className="container mx-auto px-4 pt-8 pb-16">
-          <div className="text-center max-w-3xl mx-auto mb-12 space-y-4">
-            <h1 className="text-4xl sm:text-5xl font-bold tracking-tight">Instant Islamic Events Near You</h1>
-            <p className="text-xl text-muted-foreground">
-              Connect with community events, Umrah trips, lectures, and more
-            </p>
-            
-            <div className="flex flex-col sm:flex-row gap-3 mt-8 justify-center">
-              <LocationSearch onLocationSelect={handleLocationSelect} initialLocation={currentUser.location?.city + ", " + currentUser.location?.country} className="w-full sm:w-64" />
-              <Link to="/events">
-                <Button className="w-full sm:w-auto" icon={<Filter className="w-4 h-4" />}>
-                  Browse All Events
-                </Button>
-              </Link>
+        {/* Hero Section with Banner */}
+        <section className="relative">
+          {/* Banner Image */}
+          <div className="w-full h-[500px] relative overflow-hidden">
+            <div className={cn(
+              "absolute inset-0 bg-gradient-to-b from-background/0 via-background/0 to-background z-10",
+              !bannerLoaded && "animate-pulse bg-muted"
+            )}></div>
+            <img 
+              src="/lovable-uploads/b58af5a3-4dc6-4800-b56b-d650348f2032.png" 
+              alt="Islamic community gathering" 
+              className={cn(
+                "w-full h-full object-cover transition-opacity duration-500",
+                bannerLoaded ? "opacity-100" : "opacity-0"
+              )}
+              onLoad={() => setBannerLoaded(true)}
+            />
+          </div>
+          
+          {/* Content overlay */}
+          <div className="absolute inset-0 z-20 flex items-center justify-center">
+            <div className="container mx-auto px-4">
+              <div className="text-center max-w-3xl mx-auto space-y-4 bg-background/40 backdrop-blur-sm p-8 rounded-2xl">
+                <h1 className="text-4xl sm:text-5xl font-bold tracking-tight">Instant Islamic Events Near You</h1>
+                <p className="text-xl text-muted-foreground">
+                  Connect with community events, Umrah trips, lectures, and more
+                </p>
+                
+                <div className="flex flex-col sm:flex-row gap-3 mt-8 justify-center">
+                  <LocationSearch onLocationSelect={handleLocationSelect} initialLocation={currentUser.location?.city + ", " + currentUser.location?.country} className="w-full sm:w-64" />
+                  <Link to="/events">
+                    <Button className="w-full sm:w-auto" icon={<Filter className="w-4 h-4" />}>
+                      Browse All Events
+                    </Button>
+                  </Link>
+                </div>
+              </div>
             </div>
           </div>
-          
-          {/* Categories */}
-          <div className="mb-12">
-            <CategoryChips selectedCategories={selectedCategories} onChange={handleCategoryChange} singleSelect />
-          </div>
-          
-          {/* Featured Events */}
-          {featuredEvents.length > 0 && <div className="mb-16 animate-slide-up">
-              <FeaturedEvent event={featuredEvents[0]} />
-            </div>}
         </section>
+        
+        {/* Categories Carousel */}
+        <section className="container mx-auto px-4 py-12">
+          <CategoryCarousel 
+            selectedCategories={selectedCategories} 
+            onChange={handleCategoryChange} 
+            singleSelect 
+          />
+        </section>
+        
+        {/* Featured Events */}
+        {featuredEvents.length > 0 && <section className="container mx-auto px-4 mb-16 animate-slide-up">
+            <FeaturedEvent event={featuredEvents[0]} />
+          </section>}
         
         {/* Recommended Events */}
         <section className="container mx-auto px-4 py-8">
@@ -156,9 +189,9 @@ const Index = () => {
             <div>
               <h4 className="text-sm font-semibold mb-4 uppercase tracking-wider">Legal</h4>
               <ul className="space-y-2">
-                <li><a href="#" className="text-muted-foreground hover:text-foreground">Terms of Service</a></li>
-                <li><a href="#" className="text-muted-foreground hover:text-foreground">Privacy Policy</a></li>
-                <li><a href="#" className="text-muted-foreground hover:text-foreground">Cookie Policy</a></li>
+                <li><a href="#" className="text-muted-foreground hover:text-foreground">Terms of Service</Link></li>
+                <li><a href="#" className="text-muted-foreground hover:text-foreground">Privacy Policy</Link></li>
+                <li><a href="#" className="text-muted-foreground hover:text-foreground">Cookie Policy</Link></li>
               </ul>
             </div>
           </div>
@@ -169,4 +202,5 @@ const Index = () => {
       </footer>
     </div>;
 };
+
 export default Index;
