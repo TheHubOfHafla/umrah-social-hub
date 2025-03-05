@@ -234,9 +234,9 @@ const TopicsAndPicks = () => {
   }, [emblaApi, onSelect, startAutoplay, stopAutoplay, handleDragStart, handleDragEnd]);
 
   return (
-    <div className="relative w-full px-4 py-8 overflow-hidden">
+    <div className="relative w-full px-4 py-12 overflow-hidden">
       <div className="max-w-5xl mx-auto">
-        <h2 className="text-2xl font-bold mb-6 text-center bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent animate-pulse-soft">Categories & Our Picks</h2>
+        <h2 className="text-2xl font-bold mb-8 text-center bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent animate-pulse-soft">Categories & Our Picks</h2>
         
         <div 
           className="relative group" 
@@ -245,14 +245,14 @@ const TopicsAndPicks = () => {
         >
           <div className="overflow-hidden" ref={emblaRef}>
             <div className={cn(
-              "flex cursor-grab",
+              "flex cursor-grab py-4",
               isDragging ? "cursor-grabbing" : ""
             )}>
               {topicCards.map((card, index) => (
                 <div 
                   key={index} 
                   className={cn(
-                    "flex-grow-0 flex-shrink-0 basis-1/4 min-w-0 md:basis-1/6 lg:basis-1/8 px-2",
+                    "flex-grow-0 flex-shrink-0 basis-1/4 min-w-0 md:basis-1/6 lg:basis-1/8 px-4 md:px-6",
                     "transition-all duration-500 ease-out",
                     slidesInView.includes(index) 
                       ? "opacity-100 scale-100" 
@@ -277,7 +277,7 @@ const TopicsAndPicks = () => {
             size="icon" 
             onClick={scrollPrev} 
             disabled={prevBtnDisabled}
-            className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-background/70 backdrop-blur-sm border-primary/20 shadow-md hover:bg-primary/10 hover:border-primary/40 transition-all opacity-0 group-hover:opacity-100 hover:opacity-100 focus:opacity-100"
+            className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 z-10 bg-background/70 backdrop-blur-sm border-primary/20 shadow-md hover:bg-primary/10 hover:border-primary/40 transition-all opacity-0 group-hover:opacity-100 hover:opacity-100 focus:opacity-100"
           >
             <ChevronLeft className="h-5 w-5" />
           </Button>
@@ -287,7 +287,7 @@ const TopicsAndPicks = () => {
             size="icon" 
             onClick={scrollNext} 
             disabled={nextBtnDisabled}
-            className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-background/70 backdrop-blur-sm border-primary/20 shadow-md hover:bg-primary/10 hover:border-primary/40 transition-all opacity-0 group-hover:opacity-100 hover:opacity-100 focus:opacity-100"
+            className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 z-10 bg-background/70 backdrop-blur-sm border-primary/20 shadow-md hover:bg-primary/10 hover:border-primary/40 transition-all opacity-0 group-hover:opacity-100 hover:opacity-100 focus:opacity-100"
           >
             <ChevronRight className="h-5 w-5" />
           </Button>
@@ -295,7 +295,7 @@ const TopicsAndPicks = () => {
           <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-background to-transparent opacity-0 pointer-events-none"></div>
         </div>
         
-        <div className="flex justify-center mt-6 space-x-1">
+        <div className="flex justify-center mt-8 space-x-2">
           {topicCards.map((_, index) => (
             <button
               key={index}
