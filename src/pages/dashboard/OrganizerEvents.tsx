@@ -289,7 +289,7 @@ const OrganizerEvents = () => {
             <Button variant="outline" onClick={() => setDeleteDialogOpen(false)}>
               Cancel
             </Button>
-            <Button variant="destructive" onClick={handleDelete}>
+            <Button variant="default" className="bg-red-600 hover:bg-red-700" onClick={handleDelete}>
               Delete
             </Button>
           </DialogFooter>

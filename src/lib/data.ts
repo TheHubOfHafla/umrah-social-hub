@@ -1,3 +1,4 @@
+
 import { Event, EventCategory, User, EventOrganizer, AttendeeType } from '@/types';
 
 export const categories: { value: EventCategory; label: string; }[] = [
@@ -408,4 +409,36 @@ export const getRecommendedEvents = (userId: string): Event[] => {
 
 export const getEventsByAttendeeType = (type: AttendeeType): Event[] => {
   return mockEvents.filter(event => event.attendeeType === type);
+};
+
+// Add the missing exported functions
+export const getUserEvents = (userId: string): Event[] => {
+  // For now, let's return the same as getAttendingEvents
+  return getAttendingEvents(userId);
+};
+
+export const getEventsHistory = (userId: string): Event[] => {
+  // For demonstration purposes, return past events (those with end dates before now)
+  const now = new Date();
+  return mockEvents.filter(event => {
+    const eventEndDate = event.date.end ? new Date(event.date.end) : new Date(event.date.start);
+    return eventEndDate < now && currentUser.eventsAttending?.includes(event.id);
+  });
+};
+
+export const getOrganizerEvents = (organizerId: string): Event[] => {
+  // Return events where the organizer is the current user (for demo purposes)
+  // In a real app, we would filter by organizer ID
+  return mockEvents.filter(event => 
+    event.date.start >= new Date().toISOString()
+  ).slice(0, 5);
+};
+
+export const getOrganizerPastEvents = (organizerId: string): Event[] => {
+  // Return events where the organizer is the current user but in the past
+  const now = new Date();
+  return mockEvents.filter(event => {
+    const eventEndDate = event.date.end ? new Date(event.date.end) : new Date(event.date.start);
+    return eventEndDate < now;
+  }).slice(0, 5);
 };
