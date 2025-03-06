@@ -18,6 +18,8 @@ const CategoryChips = ({
   className,
   singleSelect = false,
 }: CategoryChipsProps) => {
+  const [hoveredCategory, setHoveredCategory] = useState<EventCategory | null>(null);
+
   const handleCategoryClick = (category: EventCategory) => {
     if (singleSelect) {
       onChange([category]);
@@ -38,19 +40,34 @@ const CategoryChips = ({
         <div className="flex space-x-2 py-2">
           {categories.map((category) => {
             const isSelected = selectedCategories.includes(category.value);
+            const isHovered = hoveredCategory === category.value;
+            
             return (
               <button
                 key={category.value}
                 onClick={() => handleCategoryClick(category.value)}
+                onMouseEnter={() => setHoveredCategory(category.value)}
+                onMouseLeave={() => setHoveredCategory(null)}
                 className={cn(
-                  "inline-flex items-center rounded-full px-3 py-1.5 text-sm font-medium transition-colors",
-                  "hover:bg-secondary/80",
+                  "inline-flex items-center rounded-full px-3 py-1.5 text-sm font-medium transition-all duration-300",
+                  "transform hover:scale-105 hover:shadow-md active:scale-95",
+                  "border border-transparent",
                   isSelected
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-secondary text-secondary-foreground"
+                    ? "bg-primary text-primary-foreground shadow-sm"
+                    : "bg-secondary text-secondary-foreground hover:bg-secondary/80",
+                  isHovered && !isSelected && "bg-secondary/90 border-primary/30",
+                  "relative overflow-hidden",
                 )}
               >
-                {category.label}
+                {/* Animated background effect on hover */}
+                <span 
+                  className={cn(
+                    "absolute inset-0 opacity-0 transition-opacity duration-300",
+                    "bg-gradient-to-r from-primary/10 via-secondary/5 to-transparent",
+                    isHovered && !isSelected && "opacity-100"
+                  )}
+                />
+                <span className="relative z-10">{category.label}</span>
               </button>
             );
           })}
