@@ -29,9 +29,17 @@ import UserProfile from "./pages/dashboard/UserProfile";
 import OrganizerProfile from "./pages/dashboard/OrganizerProfile";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
-import { useState, useEffect } from "react";
+import { useState, useEffect, createContext } from "react";
 
 const queryClient = new QueryClient();
+
+// Create a context for authentication
+export const AuthContext = createContext({
+  isAuthenticated: false,
+  userEventsAttending: [] as string[],
+  onRegisterForEvent: (eventId: string) => {},
+  onSignOut: () => {}
+});
 
 const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -60,42 +68,52 @@ const App = () => {
     setUserEventsAttending(updatedEvents);
     localStorage.setItem('user_events', JSON.stringify(updatedEvents));
   };
+  
+  const handleSignOut = () => {
+    localStorage.removeItem('auth_token');
+    localStorage.removeItem('user_events');
+    setIsAuthenticated(false);
+    setUserEventsAttending([]);
+  };
 
   // Create a context value with auth state and event registration
   const contextValue = {
     isAuthenticated,
     userEventsAttending,
-    onRegisterForEvent: handleRegisterForEvent
+    onRegisterForEvent: handleRegisterForEvent,
+    onSignOut: handleSignOut
   };
 
   return (
     <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Navbar isAuthenticated={isAuthenticated} />
-          <Routes>
-            <Route path="/" element={<Index isAuthenticated={isAuthenticated} />} />
-            <Route path="/events" element={<EventsPage />} />
-            <Route path="/events/:eventId" element={<EventDetailPage />} />
-            <Route path="/events/create" element={<CreateEventPage />} />
-            <Route path="/events/:eventId/register" element={<RegisterPage />} />
-            <Route path="/organizers" element={<OrganizersPage />} />
-            <Route path="/login" element={isAuthenticated ? <Navigate to="/profile" /> : <Login onLoginSuccess={handleLogin} />} />
-            <Route path="/signup" element={isAuthenticated ? <Navigate to="/profile" /> : <Signup onSignupSuccess={handleLogin} />} />
-            <Route path="/profile" element={isAuthenticated ? <UserProfile /> : <Navigate to="/login" />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/dashboard/events" element={<UserEvents />} />
-            <Route path="/dashboard/profile" element={<UserProfile />} />
-            <Route path="/organizer" element={<OrganizerDashboard />} />
-            <Route path="/organizer/events" element={<OrganizerEvents />} />
-            <Route path="/organizer/profile" element={<OrganizerProfile />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-          <ChatbotButton />
-        </BrowserRouter>
-      </TooltipProvider>
+      <AuthContext.Provider value={contextValue}>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <Navbar isAuthenticated={isAuthenticated} />
+            <Routes>
+              <Route path="/" element={<Index isAuthenticated={isAuthenticated} />} />
+              <Route path="/events" element={<EventsPage />} />
+              <Route path="/events/:eventId" element={<EventDetailPage />} />
+              <Route path="/events/create" element={<CreateEventPage />} />
+              <Route path="/events/:eventId/register" element={<RegisterPage />} />
+              <Route path="/organizers" element={<OrganizersPage />} />
+              <Route path="/login" element={isAuthenticated ? <Navigate to="/profile" /> : <Login onLoginSuccess={handleLogin} />} />
+              <Route path="/signup" element={isAuthenticated ? <Navigate to="/profile" /> : <Signup onSignupSuccess={handleLogin} />} />
+              <Route path="/profile" element={isAuthenticated ? <UserProfile /> : <Navigate to="/login" />} />
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/dashboard/events" element={<UserEvents />} />
+              <Route path="/dashboard/profile" element={<UserProfile />} />
+              <Route path="/organizer" element={<OrganizerDashboard />} />
+              <Route path="/organizer/events" element={<OrganizerEvents />} />
+              <Route path="/organizer/profile" element={<OrganizerProfile />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+            <ChatbotButton />
+          </BrowserRouter>
+        </TooltipProvider>
+      </AuthContext.Provider>
     </QueryClientProvider>
   );
 };
