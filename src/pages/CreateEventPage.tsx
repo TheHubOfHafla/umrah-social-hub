@@ -6,7 +6,8 @@ import { format } from "date-fns";
 import { 
   CalendarIcon, Clock, MapPin, Users, DollarSign, 
   Image as ImageIcon, Upload, Check, Info, 
-  CircleHelp, ChevronRight, Sparkles 
+  CircleHelp, ChevronRight, Sparkles,
+  Bot, UserCircle2, LightbulbIcon, Edit
 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -66,6 +67,7 @@ const CreateEventPage = () => {
   const [endDate, setEndDate] = useState<Date | undefined>(undefined);
   const [isFree, setIsFree] = useState(false);
   const [activeTab, setActiveTab] = useState("basics");
+  const [creationMode, setCreationMode] = useState<"select" | "manual" | "ai">("select");
   const { toast } = useToast();
   const navigate = useNavigate();
   
@@ -98,6 +100,18 @@ const CreateEventPage = () => {
     }, 1500);
   };
 
+  const handleAIMode = () => {
+    setCreationMode("ai");
+    toast({
+      title: "AI Mode Activated",
+      description: "Let our AI help you create your event quickly.",
+    });
+  };
+
+  const handleManualMode = () => {
+    setCreationMode("manual");
+  };
+
   const isTabComplete = (tab: string) => {
     if (tab === "basics") {
       return !!form.watch("title") && !!form.watch("description") && !!form.watch("category");
@@ -110,12 +124,195 @@ const CreateEventPage = () => {
     return false;
   };
 
+  if (creationMode === "select") {
+    return (
+      <div className="min-h-screen bg-white pt-28 pb-12">
+        <div className="container max-w-6xl mx-auto px-4">
+          <div className="mb-10 text-center">
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-blue-500 bg-clip-text text-transparent">Create Your Event</h1>
+            <p className="text-muted-foreground mt-2 max-w-xl mx-auto">Choose how you'd like to create your event</p>
+          </div>
+          
+          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+            <div 
+              onClick={handleAIMode}
+              className="cursor-pointer group"
+            >
+              <Card className="border border-purple-200 h-full shadow-md hover:shadow-xl transition-all duration-300 hover:border-purple-400 group-hover:translate-y-[-4px]">
+                <CardHeader className="bg-purple-50 rounded-t-lg pb-6">
+                  <div className="mx-auto h-16 w-16 rounded-full bg-purple-100 flex items-center justify-center mb-4">
+                    <LightbulbIcon className="h-8 w-8 text-purple-500" />
+                  </div>
+                  <CardTitle className="text-center text-xl text-purple-700">AI-Assisted Creation</CardTitle>
+                  <CardDescription className="text-center">Let our AI help you create your event quickly</CardDescription>
+                </CardHeader>
+                <CardContent className="pt-6 pb-8 px-6">
+                  <ul className="space-y-3">
+                    <li className="flex items-start">
+                      <Check className="h-5 w-5 text-purple-500 mr-2 mt-0.5 flex-shrink-0" />
+                      <span>Create events in seconds with AI assistance</span>
+                    </li>
+                    <li className="flex items-start">
+                      <Check className="h-5 w-5 text-purple-500 mr-2 mt-0.5 flex-shrink-0" />
+                      <span>Generate descriptions and titles automatically</span>
+                    </li>
+                    <li className="flex items-start">
+                      <Check className="h-5 w-5 text-purple-500 mr-2 mt-0.5 flex-shrink-0" />
+                      <span>Get smart recommendations for your event setup</span>
+                    </li>
+                  </ul>
+                  <div className="mt-8 text-center">
+                    <Button 
+                      variant="default" 
+                      size="lg"
+                      className="bg-gradient-to-r from-purple-600 to-blue-500 hover:from-purple-700 hover:to-blue-600 w-full"
+                    >
+                      <Bot className="mr-2 h-5 w-5" /> Create with AI
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+            
+            <div 
+              onClick={handleManualMode}
+              className="cursor-pointer group"
+            >
+              <Card className="border border-blue-200 h-full shadow-md hover:shadow-xl transition-all duration-300 hover:border-blue-400 group-hover:translate-y-[-4px]">
+                <CardHeader className="bg-blue-50 rounded-t-lg pb-6">
+                  <div className="mx-auto h-16 w-16 rounded-full bg-blue-100 flex items-center justify-center mb-4">
+                    <Edit className="h-8 w-8 text-blue-500" />
+                  </div>
+                  <CardTitle className="text-center text-xl text-blue-700">Manual Creation</CardTitle>
+                  <CardDescription className="text-center">Create your event step by step</CardDescription>
+                </CardHeader>
+                <CardContent className="pt-6 pb-8 px-6">
+                  <ul className="space-y-3">
+                    <li className="flex items-start">
+                      <Check className="h-5 w-5 text-blue-500 mr-2 mt-0.5 flex-shrink-0" />
+                      <span>Full control over every detail of your event</span>
+                    </li>
+                    <li className="flex items-start">
+                      <Check className="h-5 w-5 text-blue-500 mr-2 mt-0.5 flex-shrink-0" />
+                      <span>Step-by-step guided process with helpful tips</span>
+                    </li>
+                    <li className="flex items-start">
+                      <Check className="h-5 w-5 text-blue-500 mr-2 mt-0.5 flex-shrink-0" />
+                      <span>Customize every aspect to make your event unique</span>
+                    </li>
+                  </ul>
+                  <div className="mt-8 text-center">
+                    <Button 
+                      variant="default" 
+                      size="lg"
+                      className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 w-full"
+                    >
+                      <UserCircle2 className="mr-2 h-5 w-5" /> Create Manually
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (creationMode === "ai") {
+    return (
+      <div className="min-h-screen bg-white pt-28 pb-12">
+        <div className="container max-w-6xl mx-auto px-4">
+          <div className="mb-10 text-center">
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-blue-500 bg-clip-text text-transparent">AI-Assisted Event Creation</h1>
+            <p className="text-muted-foreground mt-2 max-w-xl mx-auto">Tell us about your event and our AI will help you create it.</p>
+          </div>
+          
+          <Card className="max-w-2xl mx-auto border-none shadow-lg">
+            <CardHeader className="bg-purple-50 rounded-t-lg">
+              <CardTitle className="flex items-center">
+                <Bot className="mr-2 h-5 w-5 text-purple-500" />
+                Describe Your Event
+              </CardTitle>
+              <CardDescription>Provide a description and let AI handle the rest</CardDescription>
+            </CardHeader>
+            <CardContent className="pt-6 space-y-6">
+              <FormField
+                control={form.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-base font-medium">Tell us about your event</FormLabel>
+                    <FormControl>
+                      <Textarea 
+                        placeholder="Example: I want to host a tech conference in San Francisco next month focusing on AI innovations with around 200 attendees." 
+                        className="min-h-32 text-base" 
+                        {...field} 
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      Include details like type of event, location, date, and expected attendees
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <div className="pt-4 flex justify-between">
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  onClick={() => setCreationMode("select")}
+                >
+                  Back to Options
+                </Button>
+                <Button 
+                  type="button"
+                  className="bg-gradient-to-r from-purple-600 to-blue-500 hover:from-purple-700 hover:to-blue-600"
+                  size="lg"
+                >
+                  Generate Event Details <Sparkles className="ml-2 h-4 w-4" />
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+          
+          <div className="max-w-2xl mx-auto mt-6">
+            <div className="bg-blue-50 p-6 rounded-lg border border-blue-100">
+              <div className="flex items-start">
+                <Info className="text-blue-500 mr-4 mt-1 h-5 w-5 flex-shrink-0" />
+                <div>
+                  <h3 className="font-medium text-blue-700">AI Creation Tips</h3>
+                  <ul className="mt-2 space-y-1 text-sm text-blue-600">
+                    <li>• Be as specific as possible about your event</li>
+                    <li>• Include time, location, and target audience</li>
+                    <li>• Mention any special requirements or features</li>
+                    <li>• You can always edit the AI-generated details later</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-white pt-28 pb-12">
       <div className="container max-w-6xl mx-auto px-4">
         <div className="mb-10 text-center">
           <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-blue-500 bg-clip-text text-transparent">Create Your Event</h1>
           <p className="text-muted-foreground mt-2 max-w-xl mx-auto">Let's bring people together! Fill out the details below to create your amazing event.</p>
+          <div className="mt-4">
+            <Button 
+              variant="outline" 
+              onClick={() => setCreationMode("select")}
+              className="text-purple-600 border-purple-200 hover:bg-purple-50"
+            >
+              Back to Creation Options
+            </Button>
+          </div>
         </div>
         
         <Tabs defaultValue="basics" className="space-y-8" value={activeTab} onValueChange={setActiveTab}>
