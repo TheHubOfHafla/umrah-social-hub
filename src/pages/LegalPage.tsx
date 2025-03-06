@@ -31,7 +31,7 @@ const LegalPage = () => {
   };
 
   return (
-    <PageWrapper withFooter={true}>
+    <PageWrapper withFooter={false}>
       <div className="py-16 md:py-20 min-h-screen bg-background">
         <Container>
           <div className="max-w-4xl mx-auto px-4 md:px-6">
