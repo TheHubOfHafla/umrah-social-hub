@@ -53,9 +53,9 @@ const CategoryChips = ({
                   "transform hover:scale-105 hover:shadow-md active:scale-95",
                   "border border-transparent",
                   isSelected
-                    ? "bg-primary text-primary-foreground shadow-sm"
+                    ? "bg-[#8B5CF6] text-white shadow-sm" // Changed from primary to purple
                     : "bg-secondary text-secondary-foreground hover:bg-secondary/80",
-                  isHovered && !isSelected && "bg-secondary/90 border-primary/30",
+                  isHovered && !isSelected && "bg-secondary/90 border-[#8B5CF6]/30", // Added purple border on hover
                   "relative overflow-hidden",
                 )}
               >
@@ -63,7 +63,7 @@ const CategoryChips = ({
                 <span 
                   className={cn(
                     "absolute inset-0 opacity-0 transition-opacity duration-300",
-                    "bg-gradient-to-r from-primary/10 via-secondary/5 to-transparent",
+                    "bg-gradient-to-r from-[#8B5CF6]/10 via-secondary/5 to-transparent", // Changed from primary to purple
                     isHovered && !isSelected && "opacity-100"
                   )}
                 />

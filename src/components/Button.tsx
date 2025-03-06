@@ -51,7 +51,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         className={cn(
           'font-medium transition-all tracking-tight',
           'active:scale-[0.98]',
-          variant === 'primary' && 'bg-primary text-primary-foreground hover:bg-primary/90',
+          variant === 'primary' && 'bg-[#8B5CF6] text-white hover:bg-[#7C5AE2]', // Changed to purple
           variant === 'subtle' && 'bg-secondary text-secondary-foreground hover:bg-secondary/80',
           variant === 'gradient' && {
             'bg-gradient-warm': gradient === 'warm' || !gradient,
