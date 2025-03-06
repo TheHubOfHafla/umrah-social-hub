@@ -52,6 +52,7 @@ const Signup = ({ onSignupSuccess }: { onSignupSuccess?: () => void }) => {
   const [authError, setAuthError] = useState<string | null>(null);
   const [signupStep, setSignupStep] = useState<'userInfo' | 'verification'>('userInfo');
   const [userData, setUserData] = useState<UserInfoValues | null>(null);
+  const [phoneValidationError, setPhoneValidationError] = useState<string | null>(null);
 
   // Form for user information
   const userInfoForm = useForm<UserInfoValues>({
@@ -142,23 +143,45 @@ const Signup = ({ onSignupSuccess }: { onSignupSuccess?: () => void }) => {
   const handleGoogleSignUp = async () => {
     setIsLoading(true);
     setAuthError(null);
+    setPhoneValidationError(null);
+    
+    // Get the phone number value from the form
+    const phoneNumber = userInfoForm.getValues("phone");
+    
+    // Validate the phone number before proceeding
+    if (!phoneNumber || phoneNumber.length < 10) {
+      setPhoneValidationError("Please enter a valid phone number before signing up with Google");
+      setIsLoading(false);
+      return;
+    }
     
     try {
-      console.log("Signing up with Google");
+      console.log("Signing up with Google using phone:", phoneNumber);
       
+      // Simulate sending verification code
       await new Promise(resolve => setTimeout(resolve, 1500));
       
+      // Generate a random 6-digit code (in a real app, this would be done on the server)
+      const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+      console.log("Verification code generated for Google signup:", verificationCode);
+      
       toast({
-        title: "Welcome!",
-        description: "You have successfully signed up with Google.",
+        title: "Verification code sent!",
+        description: `We've sent a verification code to ${phoneNumber}. In a real app, the code would be ${verificationCode}`,
       });
       
-      // Call the onSignupSuccess callback if provided
-      if (onSignupSuccess) {
-        onSignupSuccess();
-      }
+      // Store partial user data for later submission (without password)
+      setUserData({
+        name: userInfoForm.getValues("name") || "Google User",
+        email: userInfoForm.getValues("email") || "",
+        password: "", // Not needed for Google auth
+        confirmPassword: "",
+        city: userInfoForm.getValues("city") || "",
+        phone: phoneNumber,
+      });
       
-      navigate("/");
+      // Move to verification step
+      setSignupStep('verification');
     } catch (error) {
       console.error("Google sign-up error:", error);
       setAuthError("Failed to sign up with Google. Please try again.");
@@ -279,6 +302,13 @@ const Signup = ({ onSignupSuccess }: { onSignupSuccess?: () => void }) => {
                   )}
                 />
               </div>
+
+              {phoneValidationError && (
+                <Alert variant="destructive" className="mt-2">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription>{phoneValidationError}</AlertDescription>
+                </Alert>
+              )}
 
               <FormField
                 control={userInfoForm.control}
