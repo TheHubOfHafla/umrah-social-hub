@@ -1,8 +1,17 @@
 
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Facebook, Twitter, Instagram, Linkedin, Github } from "lucide-react";
 
 const Footer = () => {
+  const navigate = useNavigate();
+
+  const handleNavigation = (path: string) => {
+    // First navigate to the path
+    navigate(path);
+    // Then scroll to top
+    window.scrollTo(0, 0);
+  };
+
   return (
     <footer className="border-t py-12 bg-secondary/30">
       <div className="container mx-auto px-4">
@@ -33,25 +42,25 @@ const Footer = () => {
           <div>
             <h4 className="text-sm font-semibold mb-4 uppercase tracking-wider">Platform</h4>
             <ul className="space-y-2.5">
-              <li><Link to="/events" className="text-muted-foreground hover:text-foreground transition-colors text-sm">Browse Events</Link></li>
-              <li><Link to="/organizers" className="text-muted-foreground hover:text-foreground transition-colors text-sm">Organizers</Link></li>
-              <li><Link to="/events/create" className="text-muted-foreground hover:text-foreground transition-colors text-sm">Create Event</Link></li>
+              <li><button onClick={() => handleNavigation("/events")} className="text-muted-foreground hover:text-foreground transition-colors text-sm text-left">Browse Events</button></li>
+              <li><button onClick={() => handleNavigation("/organizers")} className="text-muted-foreground hover:text-foreground transition-colors text-sm text-left">Organizers</button></li>
+              <li><button onClick={() => handleNavigation("/events/create")} className="text-muted-foreground hover:text-foreground transition-colors text-sm text-left">Create Event</button></li>
             </ul>
           </div>
           <div>
             <h4 className="text-sm font-semibold mb-4 uppercase tracking-wider">Resources</h4>
             <ul className="space-y-2.5">
-              <li><Link to="/help" className="text-muted-foreground hover:text-foreground transition-colors text-sm">Help Center</Link></li>
-              <li><Link to="/about" className="text-muted-foreground hover:text-foreground transition-colors text-sm">About Us</Link></li>
-              <li><Link to="/contact" className="text-muted-foreground hover:text-foreground transition-colors text-sm">Contact Us</Link></li>
+              <li><button onClick={() => handleNavigation("/help")} className="text-muted-foreground hover:text-foreground transition-colors text-sm text-left">Help Center</button></li>
+              <li><button onClick={() => handleNavigation("/about")} className="text-muted-foreground hover:text-foreground transition-colors text-sm text-left">About Us</button></li>
+              <li><button onClick={() => handleNavigation("/contact")} className="text-muted-foreground hover:text-foreground transition-colors text-sm text-left">Contact Us</button></li>
             </ul>
           </div>
           <div>
             <h4 className="text-sm font-semibold mb-4 uppercase tracking-wider">Legal</h4>
             <ul className="space-y-2.5">
-              <li><Link to="/legal" className="text-muted-foreground hover:text-foreground transition-colors text-sm">Legal Information</Link></li>
-              <li><Link to="/legal?tab=privacy" className="text-muted-foreground hover:text-foreground transition-colors text-sm">Privacy Policy</Link></li>
-              <li><Link to="/legal?tab=cookies" className="text-muted-foreground hover:text-foreground transition-colors text-sm">Cookie Policy</Link></li>
+              <li><button onClick={() => handleNavigation("/legal")} className="text-muted-foreground hover:text-foreground transition-colors text-sm text-left">Legal Information</button></li>
+              <li><button onClick={() => handleNavigation("/legal?tab=privacy")} className="text-muted-foreground hover:text-foreground transition-colors text-sm text-left">Privacy Policy</button></li>
+              <li><button onClick={() => handleNavigation("/legal?tab=cookies")} className="text-muted-foreground hover:text-foreground transition-colors text-sm text-left">Cookie Policy</button></li>
             </ul>
           </div>
         </div>
