@@ -78,11 +78,11 @@ const Navbar = ({ isAuthenticated = true }: { isAuthenticated?: boolean }) => {
           </NavigationMenu>
         </div>
 
-        {/* Center Logo - Enhanced with icon and bolder styling */}
+        {/* Center Logo - Enhanced with larger icon and bolder styling */}
         <div className="absolute left-1/2 transform -translate-x-1/2">
-          <Link to="/" className="flex items-center gap-1.5 group">
-            <Zap className="h-5 w-5 text-primary group-hover:animate-pulse-soft" />
-            <span className="font-heading text-xl tracking-tight text-primary font-bold">EventHub</span>
+          <Link to="/" className="flex items-center gap-2 group">
+            <Zap className="h-7 w-7 text-primary group-hover:animate-pulse-soft" />
+            <span className="font-heading text-2xl tracking-tight text-primary font-bold">EventHub</span>
           </Link>
         </div>
 
