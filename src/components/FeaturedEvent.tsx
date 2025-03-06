@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Event } from "@/types";
 import { cn } from "@/lib/utils";
 import Button from "./Button";
+import TicketAlert from "./TicketAlert";
 
 interface FeaturedEventProps {
   event: Event;
@@ -35,7 +36,12 @@ const FeaturedEvent = ({ event }: FeaturedEventProps) => {
             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
           />
           <div className="absolute bottom-0 left-0 right-0 p-3 md:p-6 z-20 text-white">
-            <Badge className="bg-primary/90 hover:bg-primary mb-2 md:mb-3 transition-all duration-300 group-hover:scale-105 text-xs md:text-sm">Featured Event</Badge>
+            <div className="flex items-center gap-2 mb-2 md:mb-3">
+              <Badge className="bg-primary/90 hover:bg-primary transition-all duration-300 group-hover:scale-105 text-xs md:text-sm">Featured Event</Badge>
+              {event.ticketActivity?.isSellingFast && (
+                <TicketAlert type="selling-fast" className="bg-opacity-80 backdrop-blur-sm" />
+              )}
+            </div>
             <h2 className="text-xl md:text-3xl font-bold mb-1 md:mb-2 group-hover:text-primary-foreground transition-colors duration-300 group-hover:text-shadow-sm line-clamp-2 md:line-clamp-none">
               {event.title}
             </h2>
