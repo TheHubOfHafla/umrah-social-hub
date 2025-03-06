@@ -140,17 +140,23 @@ const EventsPage = () => {
         </p>
       </div>
 
-      <div className="mb-6 max-w-md mx-auto">
-        <form onSubmit={handleSearch}>
-          <div className="relative">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+      <div className="w-full mb-8 relative">
+        <form onSubmit={handleSearch} className="bg-gradient-to-r from-[#F2FBFE] to-[#E6E9FF] dark:from-[#21214B] dark:to-[#171733] p-1.5 rounded-xl shadow-soft">
+          <div className="relative flex items-center overflow-hidden rounded-lg bg-white dark:bg-[#171727] transition-all duration-300 focus-within:ring-2 focus-within:ring-[#8B5CF6]">
+            <Search className="absolute left-3 h-5 w-5 text-muted-foreground" />
             <Input
               type="text"
               placeholder="Search events..."
-              className="pl-8"
+              className="pl-10 py-6 border-0 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 bg-transparent text-base transition-all duration-300"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
+            <Button 
+              type="submit" 
+              className="absolute right-0 h-full px-4 rounded-l-none bg-[#8B5CF6] hover:bg-[#7C5AE2] text-white"
+            >
+              Search
+            </Button>
           </div>
         </form>
       </div>
