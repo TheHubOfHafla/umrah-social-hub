@@ -26,6 +26,8 @@ import {
 } from "@/components/ui/sheet";
 import AttendeeTypeFilter from "@/components/AttendeeTypeFilter";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Container } from "@/components/ui/container";
+import EventsFilter from "@/components/dashboard/organizer/EventsFilter";
 
 const EventsPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -137,24 +139,23 @@ const EventsPage = () => {
         </p>
       </div>
 
+      <div className="mb-6 max-w-md mx-auto">
+        <form onSubmit={handleSearch}>
+          <div className="relative">
+            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+            <Input
+              type="text"
+              placeholder="Search events..."
+              className="pl-8"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+        </form>
+      </div>
+
       <div className="flex flex-col lg:flex-row gap-6">
         <div className={`hidden lg:block ${compactFilters ? 'w-auto' : 'w-64'} space-y-6 transition-all duration-300`}>
-          <div>
-            <h3 className="font-medium mb-3">Search</h3>
-            <form onSubmit={handleSearch}>
-              <div className="relative">
-                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                <Input
-                  type="text"
-                  placeholder="Search events..."
-                  className="pl-8"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
-              </div>
-            </form>
-          </div>
-
           {!compactFilters && (
             <>
               <div>
@@ -224,16 +225,6 @@ const EventsPage = () => {
         </div>
 
         <div className="lg:hidden flex items-center gap-3 mb-4">
-          <div className="relative flex-1">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input
-              type="text"
-              placeholder="Search events..."
-              className="pl-8"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </div>
           <Sheet>
             <SheetTrigger asChild>
               <Button variant="outline" size="icon">
@@ -343,7 +334,8 @@ const EventsPage = () => {
             events={filteredEvents} 
             columns={3}
             showEmpty={true}
-            emptyMessage="No events found matching your filters. Try adjusting your search criteria." 
+            emptyMessage="No events found matching your filters. Try adjusting your search criteria."
+            className="w-full" 
           />
         </div>
       </div>
