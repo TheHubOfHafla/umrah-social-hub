@@ -62,32 +62,37 @@ const OrganizersPage = () => {
                       organizer.organizationType.slice(1);
     
     return (
-      <Card key={organizer.id} className="overflow-hidden hover:shadow-md transition-shadow duration-200">
+      <Card key={organizer.id} className="overflow-hidden transition-all duration-300 hover:shadow-xl hover:border-primary/50 hover:translate-y-[-6px] group">
         <CardHeader className="pb-0">
           <div className="flex items-center gap-4">
-            <Avatar className="h-16 w-16 border-2 border-primary/10">
+            <Avatar className="h-16 w-16 border-2 border-primary/10 transition-transform duration-300 group-hover:scale-105">
               <AvatarImage src={organizer.avatar} alt={organizer.name} />
               <AvatarFallback className="bg-primary/10 text-primary text-xl">
                 {initials}
               </AvatarFallback>
             </Avatar>
             <div>
-              <h3 className="text-xl font-semibold">{organizer.name}</h3>
-              <Badge variant="outline" className="flex items-center gap-1 mt-1">
+              <h3 className="text-xl font-semibold transition-colors duration-300 group-hover:text-primary">{organizer.name}</h3>
+              <Badge variant="outline" className="flex items-center gap-1 mt-1 transition-colors duration-300 group-hover:bg-primary/10">
                 {getOrganizerTypeIcon(organizer.organizationType)}
                 {typeLabel}
               </Badge>
             </div>
           </div>
         </CardHeader>
-        <CardContent className="pt-4">
-          <p className="text-muted-foreground">{organizer.bio}</p>
+        <CardContent className="pt-4 transition-colors duration-300 group-hover:bg-primary/5">
+          <p className="text-muted-foreground transition-colors duration-300 group-hover:text-foreground/90">{organizer.bio}</p>
         </CardContent>
         {organizer.website && (
-          <CardFooter className="border-t pt-4">
-            <Button variant="outline" size="sm" className="gap-1.5 w-full" asChild>
+          <CardFooter className="border-t pt-4 transition-colors duration-300 group-hover:bg-primary/5">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="gap-1.5 w-full transition-all duration-300 group-hover:border-primary/30 group-hover:text-primary" 
+              asChild
+            >
               <a href={organizer.website} target="_blank" rel="noopener noreferrer">
-                Visit Website <ExternalLink className="h-3.5 w-3.5" />
+                Visit Website <ExternalLink className="h-3.5 w-3.5 transition-transform duration-300 group-hover:translate-x-0.5" />
               </a>
             </Button>
           </CardFooter>
@@ -99,7 +104,7 @@ const OrganizersPage = () => {
   return (
     <div className="min-h-screen bg-slate-50 pt-24 pb-12">
       <div className="container mx-auto px-4">
-        <div className="flex flex-col space-y-2 mb-8">
+        <div className="flex flex-col space-y-2 mb-8 animate-fade-in">
           <h1 className="text-3xl font-bold tracking-tight">Organizers</h1>
           <p className="text-muted-foreground text-lg">
             Discover event organizers from the community.
@@ -111,7 +116,7 @@ const OrganizersPage = () => {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground h-4 w-4" />
             <Input 
               placeholder="Search organizers..." 
-              className="pl-9"
+              className="pl-9 transition-all duration-300 focus:border-primary/50 focus:ring-primary/30"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
@@ -119,11 +124,11 @@ const OrganizersPage = () => {
           
           <Tabs defaultValue="all" className="w-full md:w-auto" onValueChange={(value) => setSelectedType(value === "all" ? null : value)}>
             <TabsList className="w-full md:w-auto">
-              <TabsTrigger value="all" className="flex-1 md:flex-initial">All</TabsTrigger>
-              <TabsTrigger value="mosque" className="flex-1 md:flex-initial">Mosques</TabsTrigger>
-              <TabsTrigger value="charity" className="flex-1 md:flex-initial">Charities</TabsTrigger>
-              <TabsTrigger value="company" className="flex-1 md:flex-initial">Companies</TabsTrigger>
-              <TabsTrigger value="scholar" className="flex-1 md:flex-initial">Scholars</TabsTrigger>
+              <TabsTrigger value="all" className="flex-1 md:flex-initial transition-colors duration-300 data-[state=active]:bg-primary data-[state=active]:text-white">All</TabsTrigger>
+              <TabsTrigger value="mosque" className="flex-1 md:flex-initial transition-colors duration-300 data-[state=active]:bg-primary data-[state=active]:text-white">Mosques</TabsTrigger>
+              <TabsTrigger value="charity" className="flex-1 md:flex-initial transition-colors duration-300 data-[state=active]:bg-primary data-[state=active]:text-white">Charities</TabsTrigger>
+              <TabsTrigger value="company" className="flex-1 md:flex-initial transition-colors duration-300 data-[state=active]:bg-primary data-[state=active]:text-white">Companies</TabsTrigger>
+              <TabsTrigger value="scholar" className="flex-1 md:flex-initial transition-colors duration-300 data-[state=active]:bg-primary data-[state=active]:text-white">Scholars</TabsTrigger>
             </TabsList>
           </Tabs>
         </div>
