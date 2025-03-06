@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -29,7 +28,11 @@ import UserProfile from "./pages/dashboard/UserProfile";
 import OrganizerProfile from "./pages/dashboard/OrganizerProfile";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
+import AboutUs from "./pages/AboutUs";
+import HelpCenter from "./pages/HelpCenter";
+import ContactUs from "./pages/ContactUs";
 import { useState, useEffect, createContext } from "react";
+import Footer from "./components/Footer";
 
 const queryClient = new QueryClient();
 
@@ -108,8 +111,14 @@ const App = () => {
               <Route path="/organizer" element={<OrganizerDashboard />} />
               <Route path="/organizer/events" element={<OrganizerEvents />} />
               <Route path="/organizer/profile" element={<OrganizerProfile />} />
+              
+              <Route path="/about" element={<AboutUs />} />
+              <Route path="/help" element={<HelpCenter />} />
+              <Route path="/contact" element={<ContactUs />} />
+              
               <Route path="*" element={<NotFound />} />
             </Routes>
+            <Footer />
             <ChatbotButton />
           </BrowserRouter>
         </TooltipProvider>

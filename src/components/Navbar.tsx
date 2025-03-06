@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { NavigationMenu, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, navigationMenuTriggerStyle } from "@/components/ui/navigation-menu";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Bell, Calendar, ChevronDown, LogIn, Menu, User, UserPlus, X, Plus, UserRound, Zap } from "lucide-react";
+import { Bell, Calendar, ChevronDown, LogIn, Menu, User, UserPlus, X, Plus, UserRound, Zap, HelpCircle, Info, Mail } from "lucide-react";
 import UserAvatar from "./UserAvatar";
 import { currentUser } from "@/lib/data";
 
@@ -24,6 +24,15 @@ const navItems: NavItem[] = [{
 }, {
   label: "Organizers",
   href: "/organizers"
+}, {
+  label: "About",
+  href: "/about"
+}, {
+  label: "Help",
+  href: "/help"
+}, {
+  label: "Contact",
+  href: "/contact"
 }];
 
 // Added new prop to simulate unauthenticated state
