@@ -1,9 +1,8 @@
-
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
-import { Search, Filter } from "lucide-react";
+import { Search, Filter, ChevronUp, ChevronDown } from "lucide-react";
 import { categories, mockEvents } from "@/lib/data";
-import { Event, EventCategory } from "@/types";
+import { Event, EventCategory, AttendeeType } from "@/types";
 import CategoryChips from "@/components/CategoryChips";
 import EventGrid from "@/components/EventGrid";
 import { Input } from "@/components/ui/input";
@@ -35,8 +34,8 @@ const EventsPage = () => {
   const [selectedAttendeeType, setSelectedAttendeeType] = useState<string>("all");
   const [sortBy, setSortBy] = useState<string>("date-asc");
   const [filteredEvents, setFilteredEvents] = useState<Event[]>(mockEvents);
+  const [compactFilters, setCompactFilters] = useState<boolean>(false);
 
-  // Get category from URL params on initial load
   useEffect(() => {
     const categoryParam = searchParams.get("category");
     if (categoryParam) {
@@ -44,11 +43,9 @@ const EventsPage = () => {
     }
   }, [searchParams]);
 
-  // Filter events based on search query, category, and attendee type
   useEffect(() => {
     let filtered = [...mockEvents];
 
-    // Filter by search query
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
       filtered = filtered.filter(
@@ -60,21 +57,18 @@ const EventsPage = () => {
       );
     }
 
-    // Filter by category
     if (selectedCategory !== "all") {
       filtered = filtered.filter((event) =>
         event.categories.includes(selectedCategory as EventCategory)
       );
     }
 
-    // Filter by attendee type
     if (selectedAttendeeType !== "all") {
       filtered = filtered.filter(
         (event) => event.attendeeType === selectedAttendeeType
       );
     }
 
-    // Sort events
     filtered = sortEvents(filtered, sortBy);
 
     setFilteredEvents(filtered);
@@ -130,6 +124,10 @@ const EventsPage = () => {
     setSearchParams(new URLSearchParams());
   };
 
+  const toggleCompactFilters = () => {
+    setCompactFilters(!compactFilters);
+  };
+
   return (
     <div className="container mx-auto px-4 pt-24 pb-8">
       <div className="mb-8">
@@ -140,8 +138,7 @@ const EventsPage = () => {
       </div>
 
       <div className="flex flex-col lg:flex-row gap-6">
-        {/* Sidebar for larger screens */}
-        <div className="hidden lg:block w-64 space-y-6">
+        <div className={`hidden lg:block ${compactFilters ? 'w-auto' : 'w-64'} space-y-6 transition-all duration-300`}>
           <div>
             <h3 className="font-medium mb-3">Search</h3>
             <form onSubmit={handleSearch}>
@@ -158,61 +155,74 @@ const EventsPage = () => {
             </form>
           </div>
 
-          <div>
-            <h3 className="font-medium mb-3">Categories</h3>
-            <div className="space-y-2">
-              <div 
-                className={`cursor-pointer px-3 py-1.5 rounded-md hover:bg-secondary ${
-                  selectedCategory === "all" ? "bg-secondary" : ""
-                }`}
-                onClick={() => handleCategorySelect("all")}
-              >
-                All Categories
-              </div>
-              {categories.map((category) => (
-                <div
-                  key={category.value}
-                  className={`cursor-pointer px-3 py-1.5 rounded-md hover:bg-secondary ${
-                    selectedCategory === category.value ? "bg-secondary" : ""
-                  }`}
-                  onClick={() => handleCategorySelect(category.value)}
-                >
-                  {category.label}
+          {!compactFilters && (
+            <>
+              <div>
+                <div className="flex items-center justify-between">
+                  <h3 className="font-medium mb-3">Categories</h3>
                 </div>
-              ))}
-            </div>
-          </div>
+                <div className="space-y-2">
+                  <div 
+                    className={`cursor-pointer px-3 py-1.5 rounded-md hover:bg-secondary ${
+                      selectedCategory === "all" ? "bg-secondary" : ""
+                    }`}
+                    onClick={() => handleCategorySelect("all")}
+                  >
+                    All Categories
+                  </div>
+                  {categories.map((category) => (
+                    <div
+                      key={category.value}
+                      className={`cursor-pointer px-3 py-1.5 rounded-md hover:bg-secondary ${
+                        selectedCategory === category.value ? "bg-secondary" : ""
+                      }`}
+                      onClick={() => handleCategorySelect(category.value)}
+                    >
+                      {category.label}
+                    </div>
+                  ))}
+                </div>
+              </div>
 
-          <div>
-            <h3 className="font-medium mb-3">Attendee Type</h3>
-            <AttendeeTypeFilter
-              selectedType={selectedAttendeeType as any}
-              onChange={(type) => setSelectedAttendeeType(type || "all")}
-              className="w-full"
-            />
-          </div>
+              <div>
+                <h3 className="font-medium mb-3">Attendee Type</h3>
+                <AttendeeTypeFilter
+                  selectedType={selectedAttendeeType as any}
+                  onChange={(type) => setSelectedAttendeeType(type || "all")}
+                  className="w-full"
+                />
+              </div>
 
-          <div>
-            <h3 className="font-medium mb-3">Sort By</h3>
-            <Select value={sortBy} onValueChange={setSortBy}>
-              <SelectTrigger>
-                <SelectValue placeholder="Sort by" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="date-asc">Date (Soonest first)</SelectItem>
-                <SelectItem value="date-desc">Date (Latest first)</SelectItem>
-                <SelectItem value="price-asc">Price (Low to High)</SelectItem>
-                <SelectItem value="price-desc">Price (High to Low)</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+              <div>
+                <h3 className="font-medium mb-3">Sort By</h3>
+                <Select value={sortBy} onValueChange={setSortBy}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Sort by" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="date-asc">Date (Soonest first)</SelectItem>
+                    <SelectItem value="date-desc">Date (Latest first)</SelectItem>
+                    <SelectItem value="price-asc">Price (Low to High)</SelectItem>
+                    <SelectItem value="price-desc">Price (High to Low)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
 
-          <Button variant="outline" onClick={clearFilters} className="w-full">
-            Clear Filters
+              <Button variant="outline" onClick={clearFilters} className="w-full">
+                Clear Filters
+              </Button>
+            </>
+          )}
+          <Button 
+            variant="ghost" 
+            onClick={toggleCompactFilters}
+            className="w-full text-[#8B5CF6] hover:text-[#7C5AE2] hover:bg-[#8B5CF6]/10"
+          >
+            {compactFilters ? <ChevronDown className="h-4 w-4 mr-1" /> : <ChevronUp className="h-4 w-4 mr-1" />}
+            {compactFilters ? "Show filters" : "Hide filters"}
           </Button>
         </div>
 
-        {/* Filter bar for mobile */}
         <div className="lg:hidden flex items-center gap-3 mb-4">
           <div className="relative flex-1">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -301,7 +311,6 @@ const EventsPage = () => {
           </Sheet>
         </div>
 
-        {/* Main content area */}
         <div className="flex-1">
           <div className="mb-6">
             {selectedCategory !== "all" ? (

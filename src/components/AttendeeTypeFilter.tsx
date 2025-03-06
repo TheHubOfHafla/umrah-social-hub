@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Check, Users, Heart, Shield } from 'lucide-react';
+import { Check, Users, Heart, Shield, ChevronUp, ChevronDown } from 'lucide-react';
 import { 
   DropdownMenu,
   DropdownMenuContent,
@@ -18,6 +18,8 @@ interface AttendeeTypeFilterProps {
   selectedType: AttendeeType | null;
   onChange: (type: AttendeeType | null) => void;
   className?: string;
+  compact?: boolean;
+  onToggleCompact?: () => void;
 }
 
 const attendeeTypes: { value: AttendeeType; label: string; icon: React.ReactNode }[] = [
@@ -43,10 +45,29 @@ const attendeeTypes: { value: AttendeeType; label: string; icon: React.ReactNode
   }
 ];
 
-const AttendeeTypeFilter = ({ selectedType, onChange, className }: AttendeeTypeFilterProps) => {
+const AttendeeTypeFilter = ({ 
+  selectedType, 
+  onChange, 
+  className,
+  compact = false,
+  onToggleCompact
+}: AttendeeTypeFilterProps) => {
   const selectedOption = selectedType 
     ? attendeeTypes.find(type => type.value === selectedType) 
     : null;
+
+  if (compact && onToggleCompact) {
+    return (
+      <Button 
+        variant="ghost" 
+        className="text-[#8B5CF6] hover:text-[#7C5AE2] hover:bg-[#8B5CF6]/10"
+        onClick={onToggleCompact}
+      >
+        <ChevronDown className="h-4 w-4 mr-1" />
+        <span className="text-xs">Show attendee filters</span>
+      </Button>
+    );
+  }
 
   return (
     <DropdownMenu>
