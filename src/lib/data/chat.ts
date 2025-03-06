@@ -1,4 +1,3 @@
-
 import { ChatMessage, EventChatRoom, MessageType } from '@/types';
 import { mockEvents } from './events';
 import { currentUser } from './users';
@@ -152,14 +151,14 @@ export const mockChatRooms: EventChatRoom[] = mockEvents.map(event => ({
   pinnedMessageIds: []
 }));
 
-// Function to get chat messages for an event
-export const getEventChatMessages = (eventId: string): ChatMessage[] => {
+// Function to get chat messages for an event - now returns a Promise
+export const getEventChatMessages = async (eventId: string): Promise<ChatMessage[]> => {
   const chatRoom = mockChatRooms.find(room => room.eventId === eventId);
   return chatRoom?.messages || [];
 };
 
-// Function to add a new message
-export const addChatMessage = (
+// Function to add a new message - now returns a Promise
+export const addChatMessage = async (
   eventId: string, 
   content: string, 
   type: MessageType = 'text',
@@ -167,7 +166,7 @@ export const addChatMessage = (
   isPrivate?: boolean,
   recipientId?: string,
   recipientName?: string
-): ChatMessage => {
+): Promise<ChatMessage> => {
   const chatRoom = mockChatRooms.find(room => room.eventId === eventId);
   
   if (!chatRoom) {
@@ -202,8 +201,8 @@ export const addChatMessage = (
   return newMessage;
 };
 
-// Function to toggle upvote for a question
-export const toggleUpvote = (messageId: string, eventId: string): ChatMessage | undefined => {
+// Function to toggle upvote for a question - now returns a Promise
+export const toggleUpvote = async (messageId: string, eventId: string): Promise<ChatMessage | undefined> => {
   const chatRoom = mockChatRooms.find(room => room.eventId === eventId);
   
   if (!chatRoom) {
@@ -227,16 +226,12 @@ export const toggleUpvote = (messageId: string, eventId: string): ChatMessage | 
   return message;
 };
 
-// Function to pin/unpin a message
-export const togglePinMessage = (messageId: string, eventId: string): string[] => {
+// Function to pin/unpin a message - now returns a Promise
+export const togglePinMessage = async (messageId: string, eventId: string): Promise<string[]> => {
   const chatRoom = mockChatRooms.find(room => room.eventId === eventId);
   
   if (!chatRoom) {
     return [];
-  }
-  
-  if (!chatRoom.pinnedMessageIds) {
-    chatRoom.pinnedMessageIds = [];
   }
   
   const isPinned = chatRoom.pinnedMessageIds.includes(messageId);
@@ -250,8 +245,8 @@ export const togglePinMessage = (messageId: string, eventId: string): string[] =
   return chatRoom.pinnedMessageIds;
 };
 
-// Function to delete a message
-export const deleteMessage = (messageId: string, eventId: string): boolean => {
+// Function to delete a message - now returns a Promise
+export const deleteMessage = async (messageId: string, eventId: string): Promise<boolean> => {
   const chatRoom = mockChatRooms.find(room => room.eventId === eventId);
   
   if (!chatRoom) {

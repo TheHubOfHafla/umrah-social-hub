@@ -3,7 +3,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { format } from 'date-fns';
 import { MessageCircle, Send, ThumbsUp, Pin, Trash2, Bell, Filter, X } from 'lucide-react';
-import { ChatMessage, Event, MessageType } from '@/types';
+import { ChatMessage as ChatMessageType, Event, MessageType } from '@/types';
 import { getEventChatMessages, addChatMessage, toggleUpvote, togglePinMessage, deleteMessage } from '@/lib/data';
 import { currentUser } from '@/lib/data/users';
 import { Input } from '@/components/ui/input';
@@ -21,7 +21,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { useToast } from '@/hooks/use-toast';
-import ChatMessage from './ChatMessage';
+import ChatMessageComponent from './ChatMessage';
 import PinnedMessages from './PinnedMessages';
 import NewAnnouncementForm from './NewAnnouncementForm';
 
@@ -36,7 +36,7 @@ const ChatInterface = ({ event, isOrganizer }: ChatInterfaceProps) => {
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState<MessageType>('text');
-  const [replyTo, setReplyTo] = useState<ChatMessage | null>(null);
+  const [replyTo, setReplyTo] = useState<ChatMessageType | null>(null);
   const [filter, setFilter] = useState<'all' | 'questions' | 'announcements' | 'private'>('all');
   const [showAnnouncementForm, setShowAnnouncementForm] = useState(false);
 
@@ -235,7 +235,10 @@ const ChatInterface = ({ event, isOrganizer }: ChatInterfaceProps) => {
           <TabsTrigger value="pinned">
             Pinned
             <Badge variant="outline" className="ml-1">
-              {messages.filter(m => m.pinnedMessageIds?.includes(m.id)).length || 0}
+              {messages.filter(m => {
+                const chatRoom = mockChatRooms.find(r => r.eventId === event.id);
+                return chatRoom?.pinnedMessageIds.includes(m.id) || false;
+              }).length || 0}
             </Badge>
           </TabsTrigger>
         </TabsList>
@@ -249,7 +252,7 @@ const ChatInterface = ({ event, isOrganizer }: ChatInterfaceProps) => {
             ) : (
               <div className="space-y-4">
                 {filteredMessages.map((msg) => (
-                  <ChatMessage 
+                  <ChatMessageComponent 
                     key={msg.id}
                     message={msg}
                     currentUserId={currentUser.id}
@@ -336,7 +339,10 @@ const ChatInterface = ({ event, isOrganizer }: ChatInterfaceProps) => {
         
         <TabsContent value="pinned" className="flex-1 p-4">
           <PinnedMessages 
-            messages={messages.filter(m => m.pinnedMessageIds?.includes(m.id))}
+            messages={messages.filter(m => {
+              const chatRoom = mockChatRooms.find(r => r.eventId === event.id);
+              return chatRoom?.pinnedMessageIds.includes(m.id) || false;
+            })}
             onUnpin={handleTogglePin}
           />
         </TabsContent>

@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { format } from 'date-fns';
 import { Reply, ThumbsUp, Pin, Trash2, MoreHorizontal, User } from 'lucide-react';
 import { ChatMessage as ChatMessageType } from '@/types';
+import { mockChatRooms } from '@/lib/data/chat';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -45,7 +46,12 @@ const ChatMessage = ({
   
   const isCurrentUser = message.userId === currentUserId;
   const canModerate = isOrganizer || isCurrentUser;
-  const isPinned = message.pinnedMessageIds?.includes(message.id);
+  
+  // Check if the message is pinned
+  const isPinned = (() => {
+    const chatRoom = mockChatRooms.find(room => room.eventId === message.eventId);
+    return chatRoom?.pinnedMessageIds.includes(message.id) || false;
+  })();
   
   // Format the timestamp
   const formattedTime = format(new Date(message.timestamp), 'h:mm a');

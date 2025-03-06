@@ -1,4 +1,3 @@
-
 export type EventCategory = 
   | 'charity'
   | 'community'
@@ -120,5 +119,5 @@ export type EventChatRoom = {
   eventId: string;
   messages: ChatMessage[];
   participants: string[]; // User IDs
-  pinnedMessageIds?: string[]; // IDs of pinned messages
+  pinnedMessageIds: string[]; // IDs of pinned messages
 };
