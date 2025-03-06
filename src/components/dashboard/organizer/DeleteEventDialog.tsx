@@ -22,7 +22,7 @@ const DeleteEventDialog = ({ open, onOpenChange, onConfirm }: DeleteEventDialogP
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
-          <Button variant="default" className="bg-red-600 hover:bg-red-700" onClick={onConfirm}>
+          <Button variant="default" className="bg-[#8B5CF6] hover:bg-[#7C5AE2] active:bg-[#6E59A5]" onClick={onConfirm}>
             Delete
           </Button>
         </DialogFooter>
