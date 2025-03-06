@@ -1,4 +1,3 @@
-
 export type EventCategory = 
   | 'charity'
   | 'community'
@@ -44,6 +43,9 @@ export type User = {
   };
   following?: string[]; // organizer IDs
   eventsAttending?: string[]; // event IDs
+  email?: string; // Added for CRM
+  phone?: string; // Added for CRM
+  signupDate?: string; // Added for CRM
 };
 
 export type EventAttendee = {

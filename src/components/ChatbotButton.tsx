@@ -10,6 +10,10 @@ import {
 } from "@/components/ui/tooltip";
 import Chatbot from "./Chatbot";
 
+// Note: We're adding this comment to signal to the app router that we need a new route
+// In a real implementation, you would add this to your router configuration
+// Route: /admin/crm - Component: CrmDashboard
+
 const ChatbotButton = () => {
   const [isOpen, setIsOpen] = useState(false);
 
