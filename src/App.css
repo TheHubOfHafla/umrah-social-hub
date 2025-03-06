@@ -13,10 +13,10 @@
   transition: filter 300ms;
 }
 .logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
+  filter: drop-shadow(0 0 2em rgba(100, 108, 255, 0.7));
 }
 .logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+  filter: drop-shadow(0 0 2em rgba(97, 218, 251, 0.7));
 }
 
 @keyframes logo-spin {
@@ -36,10 +36,21 @@
 
 .card {
   padding: 1.5em;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: var(--radius);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
 }
 
 .read-the-docs {
-  color: #888;
+  color: rgba(136, 136, 136, 0.9);
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.9rem;
 }
 
 /* Mobile optimizations */

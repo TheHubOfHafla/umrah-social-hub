@@ -1,21 +1,40 @@
 
 import React from "react";
 import Footer from "./Footer";
+import { cn } from "@/lib/utils";
 
 interface PageWrapperProps {
   children: React.ReactNode;
   withFooter?: boolean;
   className?: string;
+  containerClassName?: string;
+  withPadding?: boolean;
+  background?: "default" | "gradient" | "subtle" | "none";
 }
 
 const PageWrapper = ({ 
   children, 
   withFooter = true, 
-  className = "" 
+  className = "",
+  containerClassName = "",
+  withPadding = true,
+  background = "default"
 }: PageWrapperProps) => {
   return (
-    <div className={`flex flex-col min-h-screen ${className}`}>
-      <main className="flex-grow">
+    <div className={cn(
+      "flex flex-col min-h-screen",
+      {
+        "bg-background": background === "default",
+        "bg-gradient-warm": background === "gradient",
+        "bg-secondary/30": background === "subtle",
+      },
+      className
+    )}>
+      <main className={cn(
+        "flex-grow",
+        withPadding && "pt-20 pb-10",
+        containerClassName
+      )}>
         {children}
       </main>
       {withFooter && <Footer />}

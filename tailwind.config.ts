@@ -1,4 +1,3 @@
-
 import type { Config } from "tailwindcss";
 
 export default {
@@ -156,7 +155,9 @@ export default {
 			fontFamily: {
 				sans: ['Poppins', 'Inter', 'system-ui', 'sans-serif'],
 				heading: ['Playfair Display', 'Georgia', 'serif'],
-				body: ['Poppins', 'system-ui', 'sans-serif']
+				body: ['Poppins', 'system-ui', 'sans-serif'],
+				display: ['Montserrat', 'Arial', 'sans-serif'],
+				accent: ['Merriweather', 'Georgia', 'serif']
 			},
 			fontSize: {
 				xs: ['0.75rem', { lineHeight: '1rem' }],
@@ -169,6 +170,20 @@ export default {
 				'4xl': ['2.25rem', { lineHeight: '2.5rem', letterSpacing: '-0.02em' }],
 				'5xl': ['3rem', { lineHeight: '1.16', letterSpacing: '-0.03em' }],
 				'6xl': ['3.75rem', { lineHeight: '1.1', letterSpacing: '-0.03em' }],
+			},
+			boxShadow: {
+				'soft': '0 4px 10px rgba(0, 0, 0, 0.05)',
+				'medium': '0 6px 15px rgba(0, 0, 0, 0.1)',
+				'hard': '0 10px 25px rgba(0, 0, 0, 0.15)',
+				'inner-soft': 'inset 0 2px 4px rgba(0, 0, 0, 0.05)'
+			},
+			backgroundImage: {
+				'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
+				'gradient-conic': 'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
+				'gradient-warm': 'linear-gradient(to right, #ee9ca7, #ffdde1)',
+				'gradient-cool': 'linear-gradient(to right, #243949, #517fa4)',
+				'gradient-earth': 'linear-gradient(to right, #d7d2cc, #304352)',
+				'gradient-sunset': 'linear-gradient(90deg, hsla(29, 92%, 70%, 1), hsla(0, 87%, 73%, 1))'
 			}
 		}
 	},

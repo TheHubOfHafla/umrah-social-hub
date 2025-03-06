@@ -5,12 +5,15 @@ import { cn } from '@/lib/utils';
 import { Loader2 } from 'lucide-react';
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'default' | 'outline' | 'ghost' | 'link' | 'primary' | 'secondary' | 'subtle';
+  variant?: 'default' | 'outline' | 'ghost' | 'link' | 'primary' | 'secondary' | 'subtle' | 'gradient';
   size?: 'sm' | 'md' | 'lg' | 'icon';
   loading?: boolean;
   icon?: React.ReactNode;
   iconPosition?: 'left' | 'right';
   fullWidth?: boolean;
+  rounded?: boolean;
+  gradient?: 'warm' | 'cool' | 'earth' | 'sunset';
+  withShadow?: boolean;
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
@@ -24,12 +27,16 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     icon, 
     iconPosition = 'left',
     fullWidth = false,
+    rounded = false,
+    gradient,
+    withShadow = false,
     ...props 
   }, ref) => {
     // Map our custom variants to shadcn variants
     const shadcnVariant = 
       variant === 'primary' ? 'default' :
       variant === 'subtle' ? 'secondary' :
+      variant === 'gradient' ? 'default' :
       variant;
     
     // Map our size values to shadcn sizes
@@ -46,8 +53,17 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
           'active:scale-[0.98]',
           variant === 'primary' && 'bg-primary text-primary-foreground hover:bg-primary/90',
           variant === 'subtle' && 'bg-secondary text-secondary-foreground hover:bg-secondary/80',
+          variant === 'gradient' && {
+            'bg-gradient-warm': gradient === 'warm' || !gradient,
+            'bg-gradient-cool': gradient === 'cool',
+            'bg-gradient-earth': gradient === 'earth',
+            'bg-gradient-sunset': gradient === 'sunset',
+            'text-white': true,
+          },
+          rounded && 'rounded-full',
           fullWidth && 'w-full',
           loading && 'cursor-not-allowed',
+          withShadow && 'shadow-soft hover:shadow-medium',
           className
         )}
         {...props}

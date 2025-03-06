@@ -1,8 +1,9 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@400;500;600;700&family=Merriweather:wght@300;400;700&display=swap');
 
 @layer base {
   :root {
@@ -15,7 +16,7 @@
     --popover: 0 0% 100%;
     --popover-foreground: 220 20% 15%;
 
-    --primary: 220 40% 50%;
+    --primary: 250 85% 65%;
     --primary-foreground: 0 0% 100%;
 
     --secondary: 210 30% 96%;
@@ -24,7 +25,7 @@
     --muted: 210 30% 96%;
     --muted-foreground: 215 20% 45%;
 
-    --accent: 220 40% 50%;
+    --accent: 220 85% 60%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84% 60%;
@@ -32,7 +33,7 @@
 
     --border: 214 20% 90%;
     --input: 214 20% 90%;
-    --ring: 220 40% 50%;
+    --ring: 220 85% 60%;
 
     --radius: 0.75rem;
 
@@ -56,7 +57,7 @@
     --popover: 222 20% 12%;
     --popover-foreground: 210 40% 98%;
 
-    --primary: 220 40% 50%;
+    --primary: 250 85% 60%;
     --primary-foreground: 0 0% 100%;
 
     --secondary: 217 20% 18%;
@@ -65,7 +66,7 @@
     --muted: 217 20% 18%;
     --muted-foreground: 215 20% 65%;
 
-    --accent: 217 20% 18%;
+    --accent: 220 85% 55%;
     --accent-foreground: 210 40% 98%;
 
     --destructive: 0 62% 30%;
@@ -121,7 +122,7 @@
   }
 
   p {
-    @apply leading-relaxed text-sm sm:text-base text-foreground/90;
+    @apply leading-relaxed text-sm sm:text-base text-foreground/90 font-body;
   }
 
   small {
@@ -139,6 +140,7 @@
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
 }
 
 .glass-dark {
@@ -146,6 +148,7 @@
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
 }
 
 /* Hide scrollbar for Chrome, Safari and Opera */
@@ -185,6 +188,7 @@
 
 ::-webkit-scrollbar-track {
   @apply bg-secondary/50;
+  border-radius: 5px;
 }
 
 ::-webkit-scrollbar-thumb {
@@ -264,6 +268,16 @@
 
 .animate-slide-up {
   animation: slideUp 0.5s ease-out forwards;
+}
+
+/* Card hover effects */
+.card-hover {
+  @apply transition-all duration-300 hover:shadow-medium hover:-translate-y-1;
+}
+
+/* Button animations */
+.btn-hover {
+  @apply transition-all duration-300 hover:shadow-soft active:translate-y-0.5;
 }
 
 /* Responsive container for mobile */

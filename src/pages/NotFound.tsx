@@ -1,6 +1,9 @@
 
 import { useLocation, useNavigate } from "react-router-dom";
 import { useEffect } from "react";
+import { Container } from "@/components/ui/container";
+import Button from "@/components/Button";
+import { Home } from "lucide-react";
 
 const NotFound = () => {
   const location = useLocation();
@@ -22,18 +25,25 @@ const NotFound = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
-      <div className="text-center bg-white p-8 rounded-lg shadow-md max-w-sm w-full">
-        <h1 className="text-5xl font-bold mb-4 text-primary">404</h1>
-        <p className="text-lg text-gray-600 mb-6">Oops! Page not found</p>
-        <p className="text-sm text-gray-500 mb-6">The page you are looking for might have been removed or is temporarily unavailable.</p>
-        <button 
-          onClick={handleNavigateHome}
-          className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90 transition-colors w-full"
-        >
-          Return to Home
-        </button>
-      </div>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-warm px-4">
+      <Container size="sm">
+        <div className="text-center bg-white/90 p-8 rounded-lg shadow-medium max-w-md w-full glass">
+          <h1 className="text-6xl font-bold mb-6 text-primary">404</h1>
+          <p className="text-xl text-gray-700 mb-6 font-medium">Page not found</p>
+          <p className="text-gray-600 mb-8">The page you are looking for might have been removed or is temporarily unavailable.</p>
+          <Button 
+            onClick={handleNavigateHome}
+            variant="primary"
+            size="lg" 
+            fullWidth
+            rounded
+            withShadow
+            icon={<Home />}
+          >
+            Return to Home
+          </Button>
+        </div>
+      </Container>
     </div>
   );
 };
