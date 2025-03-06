@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { NavigationMenu, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, navigationMenuTriggerStyle } from "@/components/ui/navigation-menu";
@@ -30,6 +30,7 @@ const Navbar = ({ isAuthenticated = true }: { isAuthenticated?: boolean }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -47,6 +48,12 @@ const Navbar = ({ isAuthenticated = true }: { isAuthenticated?: boolean }) => {
     ...item,
     active: location.pathname === item.href
   }));
+
+  // New handler for navigation with scroll to top
+  const handleNavigation = (path: string) => {
+    navigate(path);
+    window.scrollTo(0, 0);
+  };
 
   return <header className={cn(
       "fixed top-0 left-0 right-0 z-50 transition-all duration-300", 
@@ -67,9 +74,9 @@ const Navbar = ({ isAuthenticated = true }: { isAuthenticated?: boolean }) => {
                       ? "text-primary font-semibold border-b-2 border-primary" 
                       : "text-foreground/80"
                   )}>
-                    <Link to={item.href}>
+                    <button onClick={() => handleNavigation(item.href)}>
                       {item.label}
-                    </Link>
+                    </button>
                   </NavigationMenuLink>
                 </NavigationMenuItem>)}
             </NavigationMenuList>
@@ -77,20 +84,20 @@ const Navbar = ({ isAuthenticated = true }: { isAuthenticated?: boolean }) => {
         </div>
 
         <div className="absolute left-1/2 transform -translate-x-1/2">
-          <Link to="/" className="flex items-center gap-1 md:gap-2 group">
+          <button onClick={() => handleNavigation("/")} className="flex items-center gap-1 md:gap-2 group">
             <Zap className="h-5 w-5 md:h-7 md:w-7 text-primary group-hover:animate-pulse-soft" />
             <span className="font-heading text-xl md:text-2xl tracking-tight text-primary font-bold">EventHub</span>
-          </Link>
+          </button>
         </div>
 
         <div className="flex items-center">
           <div className="hidden md:flex items-center space-x-2">
-            <Link to="/events/create">
+            <button onClick={() => handleNavigation("/events/create")}>
               <Button className="flex items-center gap-2 bg-primary hover:bg-primary/90 transition-all duration-200 hover:scale-105">
                 <Plus className="h-4 w-4" />
                 Create Event
               </Button>
-            </Link>
+            </button>
             
             {isAuthenticated ? (
               <>
@@ -98,12 +105,12 @@ const Navbar = ({ isAuthenticated = true }: { isAuthenticated?: boolean }) => {
                   <Bell className="h-5 w-5" />
                 </Button>
                 
-                <Link to="/dashboard/profile">
+                <button onClick={() => handleNavigation("/dashboard/profile")}>
                   <Button variant="outline" className="flex items-center gap-2 hover:bg-primary/10 hover:text-primary transition-all duration-200">
                     <UserRound className="h-4 w-4" />
                     My Profile
                   </Button>
-                </Link>
+                </button>
                 
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
@@ -113,35 +120,31 @@ const Navbar = ({ isAuthenticated = true }: { isAuthenticated?: boolean }) => {
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-56">
-                    <Link to="/dashboard">
-                      <DropdownMenuItem className="hover:bg-primary/10 hover:text-primary">
-                        <User className="mr-2 h-4 w-4" />
-                        Dashboard
-                      </DropdownMenuItem>
-                    </Link>
-                    <Link to="/dashboard/events">
-                      <DropdownMenuItem className="hover:bg-primary/10 hover:text-primary">
-                        <Calendar className="mr-2 h-4 w-4" />
-                        My Events
-                      </DropdownMenuItem>
-                    </Link>
+                    <DropdownMenuItem className="hover:bg-primary/10 hover:text-primary" onClick={() => handleNavigation("/dashboard")}>
+                      <User className="mr-2 h-4 w-4" />
+                      Dashboard
+                    </DropdownMenuItem>
+                    <DropdownMenuItem className="hover:bg-primary/10 hover:text-primary" onClick={() => handleNavigation("/dashboard/events")}>
+                      <Calendar className="mr-2 h-4 w-4" />
+                      My Events
+                    </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               </>
             ) : (
               <>
-                <Link to="/login">
+                <button onClick={() => handleNavigation("/login")}>
                   <Button variant="outline" className="flex items-center gap-2">
                     <LogIn className="h-4 w-4" />
                     Sign In
                   </Button>
-                </Link>
-                <Link to="/signup">
+                </button>
+                <button onClick={() => handleNavigation("/signup")}>
                   <Button className="flex items-center gap-2">
                     <UserPlus className="h-4 w-4" />
                     Sign Up
                   </Button>
-                </Link>
+                </button>
               </>
             )}
           </div>
@@ -158,51 +161,53 @@ const Navbar = ({ isAuthenticated = true }: { isAuthenticated?: boolean }) => {
       )}>
         <div className="container py-4">
           <div className="flex flex-col space-y-3">
-            {navigation.map(item => <Link 
-              key={item.href} 
-              to={item.href} 
-              className={cn(
-                "px-4 py-2.5 text-base rounded-md transition-all duration-200 font-medium", 
-                item.active 
-                  ? "bg-primary/10 text-primary font-semibold" 
-                  : "text-foreground/80 hover:bg-primary/10 hover:text-primary"
-              )}
-            >
+            {navigation.map(item => (
+              <button 
+                key={item.href} 
+                onClick={() => handleNavigation(item.href)}
+                className={cn(
+                  "px-4 py-2.5 text-base rounded-md transition-all duration-200 font-medium w-full text-left", 
+                  item.active 
+                    ? "bg-primary/10 text-primary font-semibold" 
+                    : "text-foreground/80 hover:bg-primary/10 hover:text-primary"
+                )}
+              >
                 {item.label}
-              </Link>)}
+              </button>
+            ))}
             
-            <Link to="/events/create" className="px-4 py-2.5 text-base bg-primary text-white rounded-md hover:bg-primary/90 transition-all duration-200 flex items-center">
+            <button onClick={() => handleNavigation("/events/create")} className="px-4 py-2.5 text-base bg-primary text-white rounded-md hover:bg-primary/90 transition-all duration-200 flex items-center w-full">
               <Plus className="mr-2 h-4 w-4" />
               Create Event
-            </Link>
+            </button>
             
             <div className="border-t my-2" />
             
             {isAuthenticated ? (
               <>
-                <Link to="/dashboard/profile" className="px-4 py-2.5 text-base rounded-md hover:bg-primary/10 hover:text-primary transition-all duration-200 flex items-center">
+                <button onClick={() => handleNavigation("/dashboard/profile")} className="px-4 py-2.5 text-base rounded-md hover:bg-primary/10 hover:text-primary transition-all duration-200 flex items-center w-full text-left">
                   <UserRound className="mr-2 h-4 w-4" />
                   My Profile
-                </Link>
-                <Link to="/dashboard" className="px-4 py-2.5 text-base rounded-md hover:bg-primary/10 hover:text-primary transition-all duration-200 flex items-center">
+                </button>
+                <button onClick={() => handleNavigation("/dashboard")} className="px-4 py-2.5 text-base rounded-md hover:bg-primary/10 hover:text-primary transition-all duration-200 flex items-center w-full text-left">
                   <User className="mr-2 h-4 w-4" />
                   Dashboard
-                </Link>
-                <Link to="/dashboard/events" className="px-4 py-2.5 text-base rounded-md hover:bg-primary/10 hover:text-primary transition-all duration-200 flex items-center">
+                </button>
+                <button onClick={() => handleNavigation("/dashboard/events")} className="px-4 py-2.5 text-base rounded-md hover:bg-primary/10 hover:text-primary transition-all duration-200 flex items-center w-full text-left">
                   <Calendar className="mr-2 h-4 w-4" />
                   My Events
-                </Link>
+                </button>
               </>
             ) : (
               <>
-                <Link to="/login" className="px-4 py-2.5 text-base rounded-md hover:bg-primary/10 hover:text-primary transition-all duration-200 flex items-center">
+                <button onClick={() => handleNavigation("/login")} className="px-4 py-2.5 text-base rounded-md hover:bg-primary/10 hover:text-primary transition-all duration-200 flex items-center w-full text-left">
                   <LogIn className="mr-2 h-4 w-4" />
                   Sign In
-                </Link>
-                <Link to="/signup" className="px-4 py-2.5 text-base rounded-md hover:bg-primary/10 hover:text-primary transition-all duration-200 flex items-center">
+                </button>
+                <button onClick={() => handleNavigation("/signup")} className="px-4 py-2.5 text-base rounded-md hover:bg-primary/10 hover:text-primary transition-all duration-200 flex items-center w-full text-left">
                   <UserPlus className="mr-2 h-4 w-4" />
                   Sign Up
-                </Link>
+                </button>
               </>
             )}
           </div>
