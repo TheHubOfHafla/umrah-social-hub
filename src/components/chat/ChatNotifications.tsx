@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Bell } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Event, ChatMessage } from '@/types';
-import { getEventChatMessages } from '@/lib/data';
+import { getEventChatMessages } from '@/lib/data/chat';
 
 interface ChatNotificationsProps {
   event: Event;

@@ -1,18 +1,16 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { format } from 'date-fns';
 import { MessageCircle, Send, ThumbsUp, Pin, Trash2, Bell, Filter, X } from 'lucide-react';
-import { ChatMessage as ChatMessageType, Event, MessageType } from '@/types';
-import { getEventChatMessages, addChatMessage, toggleUpvote, togglePinMessage, deleteMessage, mockChatRooms } from '@/lib/data';
+import { Event, MessageType } from '@/types';
+import { ChatMessage as ChatMessageType } from '@/types';
+import { getEventChatMessages, addChatMessage, toggleUpvote, togglePinMessage, deleteMessage, mockChatRooms } from '@/lib/data/chat';
 import { currentUser } from '@/lib/data/users';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { Separator } from '@/components/ui/separator';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -21,7 +19,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { useToast } from '@/hooks/use-toast';
-import ChatMessageComponent from './ChatMessage';
+import ChatMessage from './ChatMessage';
 import PinnedMessages from './PinnedMessages';
 import NewAnnouncementForm from './NewAnnouncementForm';
 
@@ -235,10 +233,7 @@ const ChatInterface = ({ event, isOrganizer }: ChatInterfaceProps) => {
           <TabsTrigger value="pinned">
             Pinned
             <Badge variant="outline" className="ml-1">
-              {messages.filter(m => {
-                const chatRoom = mockChatRooms.find(r => r.eventId === event.id);
-                return chatRoom?.pinnedMessageIds.includes(m.id) || false;
-              }).length || 0}
+              {mockChatRooms.find(r => r.eventId === event.id)?.pinnedMessageIds.length || 0}
             </Badge>
           </TabsTrigger>
         </TabsList>
@@ -252,7 +247,7 @@ const ChatInterface = ({ event, isOrganizer }: ChatInterfaceProps) => {
             ) : (
               <div className="space-y-4">
                 {filteredMessages.map((msg) => (
-                  <ChatMessageComponent 
+                  <ChatMessage 
                     key={msg.id}
                     message={msg}
                     currentUserId={currentUser.id}

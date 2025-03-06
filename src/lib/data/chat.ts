@@ -1,3 +1,4 @@
+
 import { ChatMessage, EventChatRoom, MessageType } from '@/types';
 import { mockEvents } from './events';
 import { currentUser } from './users';
