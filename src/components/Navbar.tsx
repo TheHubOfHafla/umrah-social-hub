@@ -56,10 +56,8 @@ const Navbar = ({ isAuthenticated = true }: { isAuthenticated?: boolean }) => {
         : "py-3 bg-transparent"
     )}>
       <div className="container flex items-center justify-between">
+        {/* Left Navigation */}
         <div className="flex items-center">
-          <Link to="/" className="font-heading text-xl tracking-tight mr-8 text-primary font-semibold">EventHub</Link>
-
-          {/* Desktop Navigation */}
           <NavigationMenu className="hidden md:flex">
             <NavigationMenuList>
               {navigation.map(item => <NavigationMenuItem key={item.href}>
@@ -80,77 +78,84 @@ const Navbar = ({ isAuthenticated = true }: { isAuthenticated?: boolean }) => {
           </NavigationMenu>
         </div>
 
-        {/* Desktop Actions */}
-        <div className="hidden md:flex items-center space-x-2">
-          {/* Search icon button removed from here */}
-          
-          {/* Create Event Button */}
-          <Link to="/events/create">
-            <Button className="flex items-center gap-2 bg-primary hover:bg-primary/90 transition-all duration-200 hover:scale-105">
-              <Plus className="h-4 w-4" />
-              Create Event
-            </Button>
-          </Link>
-          
-          {isAuthenticated ? (
-            <>
-              <Button variant="ghost" size="icon" className="hover:bg-primary/10 hover:text-primary transition-all duration-200">
-                <Bell className="h-5 w-5" />
-              </Button>
-              
-              {/* My Profile Button */}
-              <Link to="/dashboard/profile">
-                <Button variant="outline" className="flex items-center gap-2 hover:bg-primary/10 hover:text-primary transition-all duration-200">
-                  <UserRound className="h-4 w-4" />
-                  My Profile
-                </Button>
-              </Link>
-              
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="flex items-center gap-2 hover:bg-primary/10 hover:text-primary transition-all duration-200">
-                    <UserAvatar user={currentUser} size="sm" />
-                    <ChevronDown className="h-4 w-4 text-muted-foreground" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56">
-                  <Link to="/dashboard">
-                    <DropdownMenuItem className="hover:bg-primary/10 hover:text-primary">
-                      <User className="mr-2 h-4 w-4" />
-                      Dashboard
-                    </DropdownMenuItem>
-                  </Link>
-                  <Link to="/dashboard/events">
-                    <DropdownMenuItem className="hover:bg-primary/10 hover:text-primary">
-                      <Calendar className="mr-2 h-4 w-4" />
-                      My Events
-                    </DropdownMenuItem>
-                  </Link>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </>
-          ) : (
-            <>
-              <Link to="/login">
-                <Button variant="outline" className="flex items-center gap-2">
-                  <LogIn className="h-4 w-4" />
-                  Sign In
-                </Button>
-              </Link>
-              <Link to="/signup">
-                <Button className="flex items-center gap-2">
-                  <UserPlus className="h-4 w-4" />
-                  Sign Up
-                </Button>
-              </Link>
-            </>
-          )}
+        {/* Center Logo */}
+        <div className="absolute left-1/2 transform -translate-x-1/2">
+          <Link to="/" className="font-heading text-xl tracking-tight text-primary font-semibold">EventHub</Link>
         </div>
 
-        {/* Mobile Menu Button */}
-        <Button variant="ghost" size="icon" className="md:hidden hover:bg-primary/10 hover:text-primary" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
-          {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-        </Button>
+        {/* Right Actions */}
+        <div className="flex items-center">
+          <div className="hidden md:flex items-center space-x-2">
+            {/* Search icon button removed from here */}
+            
+            {/* Create Event Button */}
+            <Link to="/events/create">
+              <Button className="flex items-center gap-2 bg-primary hover:bg-primary/90 transition-all duration-200 hover:scale-105">
+                <Plus className="h-4 w-4" />
+                Create Event
+              </Button>
+            </Link>
+            
+            {isAuthenticated ? (
+              <>
+                <Button variant="ghost" size="icon" className="hover:bg-primary/10 hover:text-primary transition-all duration-200">
+                  <Bell className="h-5 w-5" />
+                </Button>
+                
+                {/* My Profile Button */}
+                <Link to="/dashboard/profile">
+                  <Button variant="outline" className="flex items-center gap-2 hover:bg-primary/10 hover:text-primary transition-all duration-200">
+                    <UserRound className="h-4 w-4" />
+                    My Profile
+                  </Button>
+                </Link>
+                
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" className="flex items-center gap-2 hover:bg-primary/10 hover:text-primary transition-all duration-200">
+                      <UserAvatar user={currentUser} size="sm" />
+                      <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-56">
+                    <Link to="/dashboard">
+                      <DropdownMenuItem className="hover:bg-primary/10 hover:text-primary">
+                        <User className="mr-2 h-4 w-4" />
+                        Dashboard
+                      </DropdownMenuItem>
+                    </Link>
+                    <Link to="/dashboard/events">
+                      <DropdownMenuItem className="hover:bg-primary/10 hover:text-primary">
+                        <Calendar className="mr-2 h-4 w-4" />
+                        My Events
+                      </DropdownMenuItem>
+                    </Link>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </>
+            ) : (
+              <>
+                <Link to="/login">
+                  <Button variant="outline" className="flex items-center gap-2">
+                    <LogIn className="h-4 w-4" />
+                    Sign In
+                  </Button>
+                </Link>
+                <Link to="/signup">
+                  <Button className="flex items-center gap-2">
+                    <UserPlus className="h-4 w-4" />
+                    Sign Up
+                  </Button>
+                </Link>
+              </>
+            )}
+          </div>
+
+          {/* Mobile Menu Button */}
+          <Button variant="ghost" size="icon" className="md:hidden hover:bg-primary/10 hover:text-primary" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+            {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+          </Button>
+        </div>
       </div>
 
       {/* Mobile Menu */}
