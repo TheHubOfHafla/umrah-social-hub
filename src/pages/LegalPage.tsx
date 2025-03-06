@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Container } from "@/components/ui/container";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -30,7 +31,7 @@ const LegalPage = () => {
   };
 
   return (
-    <PageWrapper>
+    <PageWrapper withFooter={true}>
       <div className="py-16 md:py-20 min-h-screen bg-background">
         <Container>
           <div className="max-w-4xl mx-auto px-4 md:px-6">
