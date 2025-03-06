@@ -4,7 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Eye, EyeOff, UserPlus, Mail, Lock, User, AlertCircle, Loader2, Github, MapPin, Phone, ArrowRight } from "lucide-react";
+import { Eye, EyeOff, UserPlus, Mail, Lock, User, AlertCircle, Loader2, Github, MapPin, Phone, ArrowRight, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -18,6 +18,9 @@ import { Input } from "@/components/ui/input";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
+import { EventCategory } from "@/types";
+import { categories } from "@/lib/data/categories";
+import { Badge } from "@/components/ui/badge";
 
 // Basic user information form schema
 const userInfoSchema = z.object({
@@ -39,8 +42,14 @@ const verificationSchema = z.object({
   verificationCode: z.string().min(4, { message: "Please enter the verification code" }),
 });
 
+// Interests schema
+const interestsSchema = z.object({
+  categories: z.array(z.string()).min(1, { message: "Please select at least one interest" }),
+});
+
 type UserInfoValues = z.infer<typeof userInfoSchema>;
 type VerificationValues = z.infer<typeof verificationSchema>;
+type InterestsValues = z.infer<typeof interestsSchema>;
 
 // Add onSignupSuccess prop
 const Signup = ({ onSignupSuccess }: { onSignupSuccess?: () => void }) => {
@@ -50,9 +59,10 @@ const Signup = ({ onSignupSuccess }: { onSignupSuccess?: () => void }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
-  const [signupStep, setSignupStep] = useState<'userInfo' | 'verification'>('userInfo');
-  const [userData, setUserData] = useState<UserInfoValues | null>(null);
+  const [signupStep, setSignupStep] = useState<'userInfo' | 'interests' | 'verification'>('userInfo');
+  const [userData, setUserData] = useState<UserInfoValues & { interests?: EventCategory[] } | null>(null);
   const [phoneValidationError, setPhoneValidationError] = useState<string | null>(null);
+  const [selectedInterests, setSelectedInterests] = useState<EventCategory[]>([]);
 
   // Form for user information
   const userInfoForm = useForm<UserInfoValues>({
@@ -75,12 +85,49 @@ const Signup = ({ onSignupSuccess }: { onSignupSuccess?: () => void }) => {
     },
   });
 
+  // Form for interests
+  const interestsForm = useForm<InterestsValues>({
+    resolver: zodResolver(interestsSchema),
+    defaultValues: {
+      categories: [],
+    },
+  });
+
   const handleUserInfoSubmit = async (values: UserInfoValues) => {
     setIsLoading(true);
     setAuthError(null);
     
     try {
-      console.log("Sending verification code to:", values.phone);
+      console.log("User info submitted:", values);
+      
+      // Store user data for later submission
+      setUserData(values);
+      // Move to interests step
+      setSignupStep('interests');
+    } catch (error) {
+      console.error("User info error:", error);
+      setAuthError("Failed to process user information. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleInterestsSubmit = async (values: InterestsValues) => {
+    setIsLoading(true);
+    setAuthError(null);
+    
+    try {
+      console.log("Interests submitted:", values);
+      
+      // Store user data with interests
+      if (userData) {
+        setUserData({
+          ...userData,
+          interests: selectedInterests as EventCategory[]
+        });
+      }
+      
+      console.log("Sending verification code to:", userData?.phone);
       
       // Simulate sending verification code
       await new Promise(resolve => setTimeout(resolve, 1500));
@@ -91,16 +138,14 @@ const Signup = ({ onSignupSuccess }: { onSignupSuccess?: () => void }) => {
       
       toast({
         title: "Verification code sent!",
-        description: `We've sent a verification code to ${values.phone}. In a real app, the code would be ${verificationCode}`,
+        description: `We've sent a verification code to ${userData?.phone}. In a real app, the code would be ${verificationCode}`,
       });
       
-      // Store user data for later submission
-      setUserData(values);
       // Move to verification step
       setSignupStep('verification');
     } catch (error) {
-      console.error("Verification error:", error);
-      setAuthError("Failed to send verification code. Please try again.");
+      console.error("Interests error:", error);
+      setAuthError("Failed to process interests. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -119,7 +164,7 @@ const Signup = ({ onSignupSuccess }: { onSignupSuccess?: () => void }) => {
       // In a real app, we would validate the code with a backend service
       // For demo purposes, we'll assume the code is correct
       
-      console.log("User signup data:", userData);
+      console.log("User signup data with interests:", userData);
       
       toast({
         title: "Account created!",
@@ -140,6 +185,19 @@ const Signup = ({ onSignupSuccess }: { onSignupSuccess?: () => void }) => {
     }
   };
 
+  const toggleInterest = (category: EventCategory) => {
+    let newInterests: EventCategory[];
+    
+    if (selectedInterests.includes(category)) {
+      newInterests = selectedInterests.filter(c => c !== category);
+    } else {
+      newInterests = [...selectedInterests, category];
+    }
+    
+    setSelectedInterests(newInterests);
+    interestsForm.setValue("categories", newInterests as string[]);
+  };
+
   const handleGoogleSignUp = async () => {
     setIsLoading(true);
     setAuthError(null);
@@ -158,19 +216,7 @@ const Signup = ({ onSignupSuccess }: { onSignupSuccess?: () => void }) => {
     try {
       console.log("Signing up with Google using phone:", phoneNumber);
       
-      // Simulate sending verification code
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      // Generate a random 6-digit code (in a real app, this would be done on the server)
-      const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
-      console.log("Verification code generated for Google signup:", verificationCode);
-      
-      toast({
-        title: "Verification code sent!",
-        description: `We've sent a verification code to ${phoneNumber}. In a real app, the code would be ${verificationCode}`,
-      });
-      
-      // Store partial user data for later submission (without password)
+      // Store partial user data and move to interests step
       setUserData({
         name: userInfoForm.getValues("name") || "Google User",
         email: userInfoForm.getValues("email") || "",
@@ -180,8 +226,7 @@ const Signup = ({ onSignupSuccess }: { onSignupSuccess?: () => void }) => {
         phone: phoneNumber,
       });
       
-      // Move to verification step
-      setSignupStep('verification');
+      setSignupStep('interests');
     } catch (error) {
       console.error("Google sign-up error:", error);
       setAuthError("Failed to sign up with Google. Please try again.");
@@ -210,6 +255,7 @@ const Signup = ({ onSignupSuccess }: { onSignupSuccess?: () => void }) => {
           </Alert>
         )}
 
+        {/* User Info Step */}
         {signupStep === 'userInfo' ? (
           <Form {...userInfoForm}>
             <form onSubmit={userInfoForm.handleSubmit(handleUserInfoSubmit)} className="space-y-6">
@@ -392,7 +438,7 @@ const Signup = ({ onSignupSuccess }: { onSignupSuccess?: () => void }) => {
                 {isLoading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Sending code...
+                    Processing...
                   </>
                 ) : (
                   <>
@@ -401,6 +447,69 @@ const Signup = ({ onSignupSuccess }: { onSignupSuccess?: () => void }) => {
                   </>
                 )}
               </Button>
+            </form>
+          </Form>
+        ) : signupStep === 'interests' ? (
+          <Form {...interestsForm}>
+            <form onSubmit={interestsForm.handleSubmit(handleInterestsSubmit)} className="space-y-6">
+              <div>
+                <FormLabel className="flex items-center mb-3">
+                  <Heart className="mr-2 h-4 w-4 text-primary" />
+                  Select Your Interests
+                </FormLabel>
+                
+                <FormDescription className="text-sm text-muted-foreground mb-4">
+                  Select categories that interest you to personalize your event recommendations.
+                </FormDescription>
+                
+                <div className="flex flex-wrap gap-2">
+                  {categories.map((category) => (
+                    <Badge
+                      key={category.value}
+                      variant={selectedInterests.includes(category.value) ? "default" : "outline"}
+                      className="cursor-pointer text-sm py-1.5 px-2.5"
+                      onClick={() => toggleInterest(category.value)}
+                    >
+                      {category.label}
+                    </Badge>
+                  ))}
+                </div>
+                
+                {interestsForm.formState.errors.categories && (
+                  <p className="text-sm font-medium text-destructive mt-2">
+                    {interestsForm.formState.errors.categories.message}
+                  </p>
+                )}
+              </div>
+
+              <div className="flex gap-3">
+                <Button 
+                  type="button" 
+                  variant="outline"
+                  className="flex-1"
+                  onClick={() => setSignupStep('userInfo')}
+                  disabled={isLoading}
+                >
+                  Back
+                </Button>
+                <Button 
+                  type="submit" 
+                  className="flex-1" 
+                  disabled={isLoading || selectedInterests.length === 0}
+                >
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Processing...
+                    </>
+                  ) : (
+                    <>
+                      <ArrowRight className="mr-2 h-4 w-4" />
+                      Continue
+                    </>
+                  )}
+                </Button>
+              </div>
             </form>
           </Form>
         ) : (
