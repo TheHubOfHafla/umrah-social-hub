@@ -5,14 +5,21 @@ import Footer from "./Footer";
 interface PageWrapperProps {
   children: React.ReactNode;
   withFooter?: boolean;
+  className?: string;
 }
 
-const PageWrapper = ({ children, withFooter = true }: PageWrapperProps) => {
+const PageWrapper = ({ 
+  children, 
+  withFooter = true, 
+  className = "" 
+}: PageWrapperProps) => {
   return (
-    <>
-      {children}
+    <div className={`flex flex-col min-h-screen ${className}`}>
+      <main className="flex-grow">
+        {children}
+      </main>
       {withFooter && <Footer />}
-    </>
+    </div>
   );
 };
 

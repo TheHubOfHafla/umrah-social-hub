@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -51,7 +52,7 @@ const Navbar = ({ isAuthenticated = true }: { isAuthenticated?: boolean }) => {
       "fixed top-0 left-0 right-0 z-50 transition-all duration-300", 
       isScrolled 
         ? "py-2 bg-background/80 backdrop-blur-md shadow-sm" 
-        : "py-3 bg-transparent"
+        : "py-2 md:py-3 bg-transparent"
     )}>
       <div className="container flex items-center justify-between">
         <div className="flex items-center">
@@ -76,9 +77,9 @@ const Navbar = ({ isAuthenticated = true }: { isAuthenticated?: boolean }) => {
         </div>
 
         <div className="absolute left-1/2 transform -translate-x-1/2">
-          <Link to="/" className="flex items-center gap-2 group">
-            <Zap className="h-7 w-7 text-primary group-hover:animate-pulse-soft" />
-            <span className="font-heading text-2xl tracking-tight text-primary font-bold">EventHub</span>
+          <Link to="/" className="flex items-center gap-1 md:gap-2 group">
+            <Zap className="h-5 w-5 md:h-7 md:w-7 text-primary group-hover:animate-pulse-soft" />
+            <span className="font-heading text-xl md:text-2xl tracking-tight text-primary font-bold">EventHub</span>
           </Link>
         </div>
 
@@ -146,22 +147,22 @@ const Navbar = ({ isAuthenticated = true }: { isAuthenticated?: boolean }) => {
           </div>
 
           <Button variant="ghost" size="icon" className="md:hidden hover:bg-primary/10 hover:text-primary" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
-            {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+            {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </Button>
         </div>
       </div>
 
       <div className={cn(
-        "fixed inset-x-0 top-[57px] z-50 h-[calc(100vh-57px)] bg-background/90 backdrop-blur-md transition-transform duration-300 ease-in-out md:hidden", 
+        "fixed inset-x-0 top-[57px] z-50 h-[calc(100vh-57px)] bg-background/95 backdrop-blur-md transition-transform duration-300 ease-in-out md:hidden overflow-y-auto", 
         mobileMenuOpen ? "translate-x-0" : "translate-x-full"
       )}>
         <div className="container py-4">
-          <div className="flex flex-col space-y-4">
+          <div className="flex flex-col space-y-3">
             {navigation.map(item => <Link 
               key={item.href} 
               to={item.href} 
               className={cn(
-                "px-4 py-3 text-lg rounded-md transition-all duration-200 font-medium", 
+                "px-4 py-2.5 text-base rounded-md transition-all duration-200 font-medium", 
                 item.active 
                   ? "bg-primary/10 text-primary font-semibold" 
                   : "text-foreground/80 hover:bg-primary/10 hover:text-primary"
@@ -170,8 +171,8 @@ const Navbar = ({ isAuthenticated = true }: { isAuthenticated?: boolean }) => {
                 {item.label}
               </Link>)}
             
-            <Link to="/events/create" className="px-4 py-3 text-lg bg-primary text-white rounded-md hover:bg-primary/90 transition-all duration-200 flex items-center">
-              <Plus className="mr-2 h-5 w-5" />
+            <Link to="/events/create" className="px-4 py-2.5 text-base bg-primary text-white rounded-md hover:bg-primary/90 transition-all duration-200 flex items-center">
+              <Plus className="mr-2 h-4 w-4" />
               Create Event
             </Link>
             
@@ -179,27 +180,27 @@ const Navbar = ({ isAuthenticated = true }: { isAuthenticated?: boolean }) => {
             
             {isAuthenticated ? (
               <>
-                <Link to="/dashboard/profile" className="px-4 py-3 text-lg rounded-md hover:bg-primary/10 hover:text-primary transition-all duration-200 flex items-center">
-                  <UserRound className="mr-2 h-5 w-5" />
+                <Link to="/dashboard/profile" className="px-4 py-2.5 text-base rounded-md hover:bg-primary/10 hover:text-primary transition-all duration-200 flex items-center">
+                  <UserRound className="mr-2 h-4 w-4" />
                   My Profile
                 </Link>
-                <Link to="/dashboard" className="px-4 py-3 text-lg rounded-md hover:bg-primary/10 hover:text-primary transition-all duration-200 flex items-center">
-                  <User className="mr-2 h-5 w-5" />
+                <Link to="/dashboard" className="px-4 py-2.5 text-base rounded-md hover:bg-primary/10 hover:text-primary transition-all duration-200 flex items-center">
+                  <User className="mr-2 h-4 w-4" />
                   Dashboard
                 </Link>
-                <Link to="/dashboard/events" className="px-4 py-3 text-lg rounded-md hover:bg-primary/10 hover:text-primary transition-all duration-200 flex items-center">
-                  <Calendar className="mr-2 h-5 w-5" />
+                <Link to="/dashboard/events" className="px-4 py-2.5 text-base rounded-md hover:bg-primary/10 hover:text-primary transition-all duration-200 flex items-center">
+                  <Calendar className="mr-2 h-4 w-4" />
                   My Events
                 </Link>
               </>
             ) : (
               <>
-                <Link to="/login" className="px-4 py-3 text-lg rounded-md hover:bg-primary/10 hover:text-primary transition-all duration-200 flex items-center">
-                  <LogIn className="mr-2 h-5 w-5" />
+                <Link to="/login" className="px-4 py-2.5 text-base rounded-md hover:bg-primary/10 hover:text-primary transition-all duration-200 flex items-center">
+                  <LogIn className="mr-2 h-4 w-4" />
                   Sign In
                 </Link>
-                <Link to="/signup" className="px-4 py-3 text-lg rounded-md hover:bg-primary/10 hover:text-primary transition-all duration-200 flex items-center">
-                  <UserPlus className="mr-2 h-5 w-5" />
+                <Link to="/signup" className="px-4 py-2.5 text-base rounded-md hover:bg-primary/10 hover:text-primary transition-all duration-200 flex items-center">
+                  <UserPlus className="mr-2 h-4 w-4" />
                   Sign Up
                 </Link>
               </>

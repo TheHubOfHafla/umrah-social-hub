@@ -96,6 +96,8 @@
     font-feature-settings: "rlig" 1, "calt" 1;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
+    touch-action: manipulation;
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -103,27 +105,27 @@
   }
 
   h1 {
-    @apply text-4xl leading-tight sm:text-5xl lg:text-6xl;
+    @apply text-3xl leading-tight sm:text-4xl lg:text-6xl;
   }
 
   h2 {
-    @apply text-3xl leading-tight sm:text-4xl;
+    @apply text-2xl leading-tight sm:text-3xl lg:text-4xl;
   }
 
   h3 {
-    @apply text-2xl leading-tight sm:text-3xl;
+    @apply text-xl leading-tight sm:text-2xl lg:text-3xl;
   }
 
   h4 {
-    @apply text-xl leading-tight sm:text-2xl;
+    @apply text-lg leading-tight sm:text-xl lg:text-2xl;
   }
 
   p {
-    @apply leading-relaxed text-base text-foreground/90;
+    @apply leading-relaxed text-sm sm:text-base text-foreground/90;
   }
 
   small {
-    @apply text-sm text-muted-foreground;
+    @apply text-xs sm:text-sm text-muted-foreground;
   }
 
   ::selection {
@@ -262,4 +264,71 @@
 
 .animate-slide-up {
   animation: slideUp 0.5s ease-out forwards;
+}
+
+/* Responsive container for mobile */
+.container-mobile {
+  @apply px-4 sm:px-6 w-full;
+}
+
+/* Responsive spacing for mobile */
+.mobile-py {
+  @apply py-4 sm:py-6 md:py-8;
+}
+
+.mobile-px {
+  @apply px-3 sm:px-4 md:px-6;
+}
+
+.mobile-p {
+  @apply p-3 sm:p-4 md:p-6;
+}
+
+.mobile-my {
+  @apply my-4 sm:my-6 md:my-8;
+}
+
+.mobile-mx {
+  @apply mx-3 sm:mx-4 md:mx-6;
+}
+
+.mobile-m {
+  @apply m-3 sm:m-4 md:m-6;
+}
+
+/* Responsive gap for mobile */
+.mobile-gap {
+  @apply gap-3 sm:gap-4 md:gap-6;
+}
+
+/* Additional mobile optimizations */
+@media (max-width: 640px) {
+  .mobile-stack {
+    @apply flex-col;
+  }
+  
+  .mobile-text-center {
+    @apply text-center;
+  }
+  
+  .mobile-full-width {
+    @apply w-full;
+  }
+  
+  .mobile-hidden {
+    @apply hidden;
+  }
+  
+  .mobile-only {
+    @apply block sm:hidden;
+  }
+  
+  .mobile-text-adjust {
+    @apply text-sm;
+  }
+  
+  .mobile-touchable {
+    min-height: 44px;
+    min-width: 44px;
+  }
 }
