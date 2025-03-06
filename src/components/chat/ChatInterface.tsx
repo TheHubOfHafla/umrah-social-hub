@@ -4,7 +4,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { format } from 'date-fns';
 import { MessageCircle, Send, ThumbsUp, Pin, Trash2, Bell, Filter, X } from 'lucide-react';
 import { ChatMessage as ChatMessageType, Event, MessageType } from '@/types';
-import { getEventChatMessages, addChatMessage, toggleUpvote, togglePinMessage, deleteMessage } from '@/lib/data';
+import { getEventChatMessages, addChatMessage, toggleUpvote, togglePinMessage, deleteMessage, mockChatRooms } from '@/lib/data';
 import { currentUser } from '@/lib/data/users';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
