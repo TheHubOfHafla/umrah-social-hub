@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { NavigationMenu, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, navigationMenuTriggerStyle } from "@/components/ui/navigation-menu";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Bell, Calendar, ChevronDown, LogIn, Menu, Search, User, UserPlus, X, Plus, UserRound } from "lucide-react";
+import { Bell, Calendar, ChevronDown, LogIn, Menu, User, UserPlus, X, Plus, UserRound } from "lucide-react";
 import UserAvatar from "./UserAvatar";
 import { currentUser } from "@/lib/data";
 
@@ -82,9 +82,7 @@ const Navbar = ({ isAuthenticated = true }: { isAuthenticated?: boolean }) => {
 
         {/* Desktop Actions */}
         <div className="hidden md:flex items-center space-x-2">
-          <Button variant="ghost" size="icon" className="hover:bg-primary/10 hover:text-primary transition-all duration-200">
-            <Search className="h-5 w-5" />
-          </Button>
+          {/* Search icon button removed from here */}
           
           {/* Create Event Button */}
           <Link to="/events/create">
