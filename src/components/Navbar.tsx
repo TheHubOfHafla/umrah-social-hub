@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { NavigationMenu, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, navigationMenuTriggerStyle } from "@/components/ui/navigation-menu";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Bell, Calendar, ChevronDown, LogIn, Menu, User, UserPlus, X, Plus, UserRound } from "lucide-react";
+import { Bell, Calendar, ChevronDown, LogIn, Menu, User, UserPlus, X, Plus, UserRound, Zap } from "lucide-react";
 import UserAvatar from "./UserAvatar";
 import { currentUser } from "@/lib/data";
 
@@ -78,16 +78,17 @@ const Navbar = ({ isAuthenticated = true }: { isAuthenticated?: boolean }) => {
           </NavigationMenu>
         </div>
 
-        {/* Center Logo */}
+        {/* Center Logo - Enhanced with icon and bolder styling */}
         <div className="absolute left-1/2 transform -translate-x-1/2">
-          <Link to="/" className="font-heading text-xl tracking-tight text-primary font-semibold">EventHub</Link>
+          <Link to="/" className="flex items-center gap-1.5 group">
+            <Zap className="h-5 w-5 text-primary group-hover:animate-pulse-soft" />
+            <span className="font-heading text-xl tracking-tight text-primary font-bold">EventHub</span>
+          </Link>
         </div>
 
         {/* Right Actions */}
         <div className="flex items-center">
           <div className="hidden md:flex items-center space-x-2">
-            {/* Search icon button removed from here */}
-            
             {/* Create Event Button */}
             <Link to="/events/create">
               <Button className="flex items-center gap-2 bg-primary hover:bg-primary/90 transition-all duration-200 hover:scale-105">
