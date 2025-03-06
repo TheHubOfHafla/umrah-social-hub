@@ -1,54 +1,18 @@
 import { useState, useMemo } from "react";
-import { 
-  Users, Filter, Search, Download, Mail, MessageSquare, MoreHorizontal,
-  MapPin, Calendar, Tag, UserIcon
-} from "lucide-react";
+import { Users, Download } from "lucide-react";
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { Checkbox } from "@/components/ui/checkbox";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogDescription, 
-  DialogFooter, 
-  DialogHeader, 
-  DialogTitle,
-  DialogTrigger, 
-} from "@/components/ui/dialog";
-import { Textarea } from "@/components/ui/textarea";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { currentUser } from "@/lib/data/users";
 import { EventCategory, User } from "@/types";
-import UserAvatar from "@/components/UserAvatar";
+import { currentUser } from "@/lib/data/users";
+
+import UserFilters from "@/components/dashboard/crm/UserFilters";
+import SelectedUsersActions from "@/components/dashboard/crm/SelectedUsersActions";
+import UsersTable from "@/components/dashboard/crm/UsersTable";
+import EmailDialog from "@/components/dashboard/crm/EmailDialog";
+import SmsDialog from "@/components/dashboard/crm/SmsDialog";
 
 const mockUsers: User[] = [
   {
@@ -257,6 +221,16 @@ const CrmDashboard = () => {
     });
   };
 
+  const handleEmailUser = (userId: string) => {
+    setSelectedUsers([userId]);
+    setIsEmailDialogOpen(true);
+  };
+
+  const handleSmsUser = (userId: string) => {
+    setSelectedUsers([userId]);
+    setIsSmsDialogOpen(true);
+  };
+
   return (
     <DashboardLayout user={currentUser} type="organizer">
       <div className="space-y-6">
@@ -282,7 +256,6 @@ const CrmDashboard = () => {
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="text-base">
-                <Filter className="inline mr-2 h-4 w-4" />
                 Filters
               </CardTitle>
               <CardDescription>
@@ -290,167 +263,24 @@ const CrmDashboard = () => {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="city-filter">Location</Label>
-                <Select value={selectedCity} onValueChange={setSelectedCity}>
-                  <SelectTrigger id="city-filter" className="w-full">
-                    <SelectValue placeholder="Select city" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {cities.map((city) => (
-                      <SelectItem key={city} value={city}>
-                        <div className="flex items-center">
-                          <MapPin className="mr-2 h-4 w-4 text-muted-foreground" />
-                          {city}
-                        </div>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="category-filter">Event Interest</Label>
-                <Select 
-                  value={selectedCategory || ""}
-                  onValueChange={(value) => setSelectedCategory(value || null)}
-                >
-                  <SelectTrigger id="category-filter" className="w-full">
-                    <SelectValue placeholder="Select category" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="">All Categories</SelectItem>
-                    {categories.map((category) => (
-                      <SelectItem key={category.value} value={category.value}>
-                        <div className="flex items-center">
-                          <Tag className="mr-2 h-4 w-4 text-muted-foreground" />
-                          {category.label}
-                        </div>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="search">Search</Label>
-                <div className="relative">
-                  <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    id="search"
-                    placeholder="Search by name, email, or phone"
-                    className="pl-9"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                  />
-                </div>
-              </div>
+              <UserFilters 
+                selectedCity={selectedCity}
+                setSelectedCity={setSelectedCity}
+                selectedCategory={selectedCategory}
+                setSelectedCategory={setSelectedCategory}
+                searchQuery={searchQuery}
+                setSearchQuery={setSearchQuery}
+                cities={cities}
+                categories={categories}
+              />
 
               <Separator className="my-4" />
               
-              <div className="pt-2">
-                <div className="flex justify-between mb-2">
-                  <span className="text-sm font-medium">Selected Users</span>
-                  <Badge variant="outline">{selectedUsers.length}</Badge>
-                </div>
-
-                <div className="space-x-2">
-                  <Dialog open={isEmailDialogOpen} onOpenChange={setIsEmailDialogOpen}>
-                    <DialogTrigger asChild>
-                      <Button 
-                        size="sm" 
-                        disabled={selectedUsers.length === 0}
-                        className="gap-1.5"
-                      >
-                        <Mail className="h-4 w-4" />
-                        Email
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent className="sm:max-w-[500px]">
-                      <DialogHeader>
-                        <DialogTitle>Send Email Campaign</DialogTitle>
-                        <DialogDescription>
-                          Send an email to {selectedUsers.length} selected users.
-                        </DialogDescription>
-                      </DialogHeader>
-                      <div className="grid gap-4 py-4">
-                        <div className="space-y-2">
-                          <Label htmlFor="email-subject">Subject</Label>
-                          <Input
-                            id="email-subject"
-                            placeholder="Email subject"
-                            value={emailSubject}
-                            onChange={(e) => setEmailSubject(e.target.value)}
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="email-body">Email Content</Label>
-                          <Textarea
-                            id="email-body"
-                            placeholder="Type your email content here..."
-                            value={emailBody}
-                            onChange={(e) => setEmailBody(e.target.value)}
-                            className="min-h-[200px]"
-                          />
-                        </div>
-                      </div>
-                      <DialogFooter>
-                        <Button variant="outline" onClick={() => setIsEmailDialogOpen(false)}>
-                          Cancel
-                        </Button>
-                        <Button onClick={handleSendEmail} disabled={!emailSubject || !emailBody}>
-                          Send Email
-                        </Button>
-                      </DialogFooter>
-                    </DialogContent>
-                  </Dialog>
-
-                  <Dialog open={isSmsDialogOpen} onOpenChange={setIsSmsDialogOpen}>
-                    <DialogTrigger asChild>
-                      <Button 
-                        size="sm" 
-                        variant="outline" 
-                        disabled={selectedUsers.length === 0}
-                        className="gap-1.5"
-                      >
-                        <MessageSquare className="h-4 w-4" />
-                        SMS
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent className="sm:max-w-[500px]">
-                      <DialogHeader>
-                        <DialogTitle>Send SMS Campaign</DialogTitle>
-                        <DialogDescription>
-                          Send an SMS to {selectedUsers.length} selected users.
-                        </DialogDescription>
-                      </DialogHeader>
-                      <div className="grid gap-4 py-4">
-                        <div className="space-y-2">
-                          <Label htmlFor="sms-message">Message</Label>
-                          <Textarea
-                            id="sms-message"
-                            placeholder="Type your SMS message here..."
-                            value={messageText}
-                            onChange={(e) => setMessageText(e.target.value)}
-                            className="min-h-[120px]"
-                          />
-                          <p className="text-xs text-muted-foreground text-right">
-                            {messageText.length}/160 characters
-                          </p>
-                        </div>
-                      </div>
-                      <DialogFooter>
-                        <Button variant="outline" onClick={() => setIsSmsDialogOpen(false)}>
-                          Cancel
-                        </Button>
-                        <Button onClick={handleSendSms} disabled={!messageText}>
-                          Send SMS
-                        </Button>
-                      </DialogFooter>
-                    </DialogContent>
-                  </Dialog>
-                </div>
-              </div>
+              <SelectedUsersActions 
+                selectedUsersCount={selectedUsers.length}
+                openEmailDialog={() => setIsEmailDialogOpen(true)}
+                openSmsDialog={() => setIsSmsDialogOpen(true)}
+              />
             </CardContent>
           </Card>
 
@@ -467,134 +297,37 @@ const CrmDashboard = () => {
               </div>
             </CardHeader>
             <CardContent className="p-0">
-              <ScrollArea className="h-[500px]">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className="w-[40px]">
-                        <Checkbox 
-                          checked={selectedUsers.length === filteredUsers.length && filteredUsers.length > 0}
-                          onCheckedChange={handleSelectAll}
-                        />
-                      </TableHead>
-                      <TableHead>User</TableHead>
-                      <TableHead>Contact</TableHead>
-                      <TableHead>Location</TableHead>
-                      <TableHead>Interests</TableHead>
-                      <TableHead className="text-right">Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {filteredUsers.length === 0 ? (
-                      <TableRow>
-                        <TableCell colSpan={6} className="h-24 text-center">
-                          No users match your filter criteria.
-                        </TableCell>
-                      </TableRow>
-                    ) : (
-                      filteredUsers.map((user) => (
-                        <TableRow key={user.id}>
-                          <TableCell>
-                            <Checkbox 
-                              checked={selectedUsers.includes(user.id)}
-                              onCheckedChange={() => handleSelectUser(user.id)}
-                            />
-                          </TableCell>
-                          <TableCell>
-                            <div className="flex items-center gap-3">
-                              <UserAvatar user={user} className="h-8 w-8" />
-                              <div>
-                                <div className="font-medium">{user.name}</div>
-                                <div className="text-xs text-muted-foreground">
-                                  Joined: {user.signupDate || "N/A"}
-                                </div>
-                              </div>
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <div className="text-sm">
-                              {user.email || "No email"}
-                              <div className="text-xs text-muted-foreground">
-                                {user.phone || "No phone"}
-                              </div>
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <div className="flex items-center text-sm">
-                              <MapPin className="mr-1 h-3 w-3 text-muted-foreground" />
-                              {user.location?.city || "Unknown location"}
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <div className="flex flex-wrap gap-1">
-                              {user.interests && user.interests.length > 0 ? (
-                                user.interests.slice(0, 2).map((interest) => (
-                                  <Badge variant="outline" key={interest} className="text-xs">
-                                    {interest}
-                                  </Badge>
-                                ))
-                              ) : (
-                                <span className="text-xs text-muted-foreground">No interests</span>
-                              )}
-                              {user.interests && user.interests.length > 2 && (
-                                <Badge variant="outline" className="text-xs">
-                                  +{user.interests.length - 2} more
-                                </Badge>
-                              )}
-                            </div>
-                          </TableCell>
-                          <TableCell className="text-right">
-                            <DropdownMenu>
-                              <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" size="icon">
-                                  <MoreHorizontal className="h-4 w-4" />
-                                </Button>
-                              </DropdownMenuTrigger>
-                              <DropdownMenuContent align="end">
-                                <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                <DropdownMenuItem
-                                  onClick={() => {
-                                    setSelectedUsers([user.id]);
-                                    setIsEmailDialogOpen(true);
-                                  }}
-                                >
-                                  <Mail className="mr-2 h-4 w-4" />
-                                  Email User
-                                </DropdownMenuItem>
-                                <DropdownMenuItem
-                                  onClick={() => {
-                                    setSelectedUsers([user.id]);
-                                    setIsSmsDialogOpen(true);
-                                  }}
-                                >
-                                  <MessageSquare className="mr-2 h-4 w-4" />
-                                  SMS User
-                                </DropdownMenuItem>
-                                <DropdownMenuSeparator />
-                                <DropdownMenuItem
-                                  onClick={() => {
-                                    console.log("View user profile:", user);
-                                    toast({
-                                      title: "User Profile",
-                                      description: `Viewing profile for ${user.name}`,
-                                    });
-                                  }}
-                                >
-                                  <UserIcon className="mr-2 h-4 w-4" />
-                                  View Profile
-                                </DropdownMenuItem>
-                              </DropdownMenuContent>
-                            </DropdownMenu>
-                          </TableCell>
-                        </TableRow>
-                      ))
-                    )}
-                  </TableBody>
-                </Table>
-              </ScrollArea>
+              <UsersTable 
+                users={filteredUsers}
+                selectedUsers={selectedUsers}
+                onSelectUser={handleSelectUser}
+                onSelectAll={handleSelectAll}
+                onEmailUser={handleEmailUser}
+                onSmsUser={handleSmsUser}
+              />
             </CardContent>
           </Card>
         </div>
+
+        <EmailDialog 
+          isOpen={isEmailDialogOpen}
+          onOpenChange={setIsEmailDialogOpen}
+          recipientCount={selectedUsers.length}
+          emailSubject={emailSubject}
+          setEmailSubject={setEmailSubject}
+          emailBody={emailBody}
+          setEmailBody={setEmailBody}
+          onSendEmail={handleSendEmail}
+        />
+
+        <SmsDialog 
+          isOpen={isSmsDialogOpen}
+          onOpenChange={setIsSmsDialogOpen}
+          recipientCount={selectedUsers.length}
+          messageText={messageText}
+          setMessageText={setMessageText}
+          onSendSms={handleSendSms}
+        />
       </div>
     </DashboardLayout>
   );
