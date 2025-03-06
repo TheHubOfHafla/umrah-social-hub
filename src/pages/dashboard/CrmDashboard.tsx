@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
 import { 
   Users, Filter, Search, Download, Mail, MessageSquare, MoreHorizontal,
-  MapPin, Calendar, Tag, User
+  MapPin, Calendar, Tag, UserIcon
 } from "lucide-react";
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -580,7 +580,7 @@ const CrmDashboard = () => {
                                     });
                                   }}
                                 >
-                                  <User className="mr-2 h-4 w-4" />
+                                  <UserIcon className="mr-2 h-4 w-4" />
                                   View Profile
                                 </DropdownMenuItem>
                               </DropdownMenuContent>
