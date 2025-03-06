@@ -1,12 +1,13 @@
 
-import { useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 
 import { getEventById, getRelatedEvents } from "@/lib/data/queries";
 import { Event } from "@/types";
 import Button from "@/components/Button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 // Event detail components
 import EventHeader from "@/components/event-detail/EventHeader";
@@ -14,14 +15,31 @@ import EventImage from "@/components/event-detail/EventImage";
 import EventTicketCard from "@/components/event-detail/EventTicketCard";
 import EventDetailTabs from "@/components/event-detail/EventDetailTabs";
 import RelatedEvents from "@/components/event-detail/RelatedEvents";
+import ChatInterface from "@/components/chat/ChatInterface";
+import ChatNotifications from "@/components/chat/ChatNotifications";
+import { currentUser } from "@/lib/data";
 
 const EventDetailPage = () => {
   const { eventId } = useParams<{ eventId: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
+  
+  // Check for tab query parameter
+  const queryParams = new URLSearchParams(location.search);
+  const tabFromQuery = queryParams.get('tab');
+  
+  const [activeTab, setActiveTab] = useState<string>(tabFromQuery === 'chat' ? 'chat' : 'details');
   
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [eventId]);
+
+  // Update active tab when query param changes
+  useEffect(() => {
+    if (tabFromQuery === 'chat') {
+      setActiveTab('chat');
+    }
+  }, [tabFromQuery]);
 
   const { data: event, isLoading: isEventLoading, error } = useQuery({
     queryKey: ['event', eventId],
@@ -34,6 +52,18 @@ const EventDetailPage = () => {
     queryFn: () => getRelatedEvents(event as Event),
     enabled: !!event,
   });
+
+  // Check if current user is an organizer
+  const isOrganizer = event?.organizer?.id === currentUser.id;
+  
+  // Check if current user is attending
+  const isAttending = currentUser.eventsAttending?.includes(event?.id || '');
+
+  // Handle tab change
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
+    navigate(`/events/${eventId}${value === 'chat' ? '?tab=chat' : ''}`);
+  };
 
   if (error) {
     return (
@@ -55,6 +85,9 @@ const EventDetailPage = () => {
 
   return (
     <>
+      {/* Show notifications for event chat */}
+      {(isAttending || isOrganizer) && <ChatNotifications event={event} />}
+      
       <div className="relative w-full bg-muted/30 pt-6 md:pt-12 pb-8">
         <div className="absolute inset-0 overflow-hidden bg-muted">
           <div 
@@ -79,7 +112,34 @@ const EventDetailPage = () => {
       </div>
       
       <div className="container mx-auto px-4 py-8">
-        <EventDetailTabs event={event} />
+        <Tabs defaultValue="details" value={activeTab} onValueChange={handleTabChange}>
+          <TabsList className="mb-6">
+            <TabsTrigger value="details">Details</TabsTrigger>
+            <TabsTrigger value="chat" disabled={!isAttending && !isOrganizer}>
+              Chat {!isAttending && !isOrganizer && "(Register to access)"}
+            </TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="details">
+            <EventDetailTabs event={event} />
+          </TabsContent>
+          
+          <TabsContent value="chat">
+            {isAttending || isOrganizer ? (
+              <ChatInterface event={event} isOrganizer={isOrganizer} />
+            ) : (
+              <div className="border rounded-lg p-8 text-center">
+                <h3 className="text-lg font-medium mb-2">Join the conversation</h3>
+                <p className="text-muted-foreground mb-4">
+                  Register for this event to access the chat and connect with other attendees.
+                </p>
+                <Button onClick={() => navigate(`/events/${event.id}/register`)}>
+                  Register Now
+                </Button>
+              </div>
+            )}
+          </TabsContent>
+        </Tabs>
       </div>
       
       <div className="container mx-auto px-4 pb-12">

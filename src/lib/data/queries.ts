@@ -102,3 +102,37 @@ export const getOrganizerPastEvents = (organizerId: string): Event[] => {
     return eventEndDate < now && event.organizer.id === organizerId;
   }).slice(0, 5);
 };
+
+/**
+ * Register a user for an event
+ */
+export const registerForEvent = (eventId: string): boolean => {
+  // In a real app, this would make an API call
+  if (!currentUser.eventsAttending) {
+    currentUser.eventsAttending = [];
+  }
+  
+  if (!currentUser.eventsAttending.includes(eventId)) {
+    currentUser.eventsAttending.push(eventId);
+    
+    // Add the user to the event's attendees list
+    const event = mockEvents.find(e => e.id === eventId);
+    if (event) {
+      if (!event.attendees) {
+        event.attendees = [];
+      }
+      
+      event.attendees.push({
+        userId: currentUser.id,
+        name: currentUser.name,
+        avatar: currentUser.avatar,
+        purchaseDate: new Date().toISOString()
+      });
+    }
+    
+    return true;
+  }
+  
+  return false;
+};
+

@@ -35,17 +35,37 @@ const queryClient = new QueryClient();
 
 const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [userEventsAttending, setUserEventsAttending] = useState<string[]>([]);
   
   useEffect(() => {
     const token = localStorage.getItem('auth_token');
     if (token) {
       setIsAuthenticated(true);
+      
+      // Load user's events (this is a mock, in a real app would be from API)
+      const savedEvents = localStorage.getItem('user_events');
+      if (savedEvents) {
+        setUserEventsAttending(JSON.parse(savedEvents));
+      }
     }
   }, []);
 
   const handleLogin = () => {
     localStorage.setItem('auth_token', 'user-is-logged-in');
     setIsAuthenticated(true);
+  };
+  
+  const handleRegisterForEvent = (eventId: string) => {
+    const updatedEvents = [...userEventsAttending, eventId];
+    setUserEventsAttending(updatedEvents);
+    localStorage.setItem('user_events', JSON.stringify(updatedEvents));
+  };
+
+  // Create a context value with auth state and event registration
+  const contextValue = {
+    isAuthenticated,
+    userEventsAttending,
+    onRegisterForEvent: handleRegisterForEvent
   };
 
   return (

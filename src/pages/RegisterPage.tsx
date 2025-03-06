@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { ChevronLeft, Calendar, MapPin, Clock, Info, CreditCard, Check } from "lucide-react";
 
-import { getEventById } from "@/lib/data/queries";
+import { getEventById, registerForEvent } from "@/lib/data/queries";
 import Button from "@/components/Button";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -37,6 +37,11 @@ const RegisterPage = () => {
     
     // Simulate form submission with a timeout
     setTimeout(() => {
+      // Register the user for the event
+      if (event) {
+        registerForEvent(event.id);
+      }
+      
       setIsSubmitting(false);
       setConfirmationOpen(true);
     }, 1500);

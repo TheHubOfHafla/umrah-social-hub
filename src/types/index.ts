@@ -1,3 +1,4 @@
+
 export type EventCategory = 
   | 'charity'
   | 'community'
@@ -92,4 +93,32 @@ export type Event = {
   isFree: boolean;
   price?: number; // Starting price if multiple ticket types
   ticketActivity?: TicketActivity;
+};
+
+// Chat related types
+export type MessageType = 'text' | 'announcement' | 'question' | 'system';
+
+export type ChatMessage = {
+  id: string;
+  eventId: string;
+  userId: string;
+  userName: string;
+  userAvatar: string;
+  content: string;
+  type: MessageType;
+  timestamp: string; // ISO format
+  isOrganizer: boolean;
+  parentId?: string; // For replies
+  upvotes?: number; // For questions
+  userUpvoted?: boolean; // If the current user has upvoted
+  isPrivate?: boolean; // For private messages
+  recipientId?: string; // For private messages
+  recipientName?: string; // For private messages
+};
+
+export type EventChatRoom = {
+  eventId: string;
+  messages: ChatMessage[];
+  participants: string[]; // User IDs
+  pinnedMessageIds?: string[]; // IDs of pinned messages
 };
