@@ -1,11 +1,12 @@
 
-import { Users, Tag } from "lucide-react";
+import { Users, Tag, Check } from "lucide-react";
 import { Event, EventTicketType } from "@/types";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import Button from "@/components/Button";
 import AttendeesList from "@/components/AttendeesList";
 import { useNavigate } from "react-router-dom";
+import { currentUser } from "@/lib/data";
 
 interface EventTicketCardProps {
   event: Event;
@@ -13,6 +14,9 @@ interface EventTicketCardProps {
 
 const EventTicketCard = ({ event }: EventTicketCardProps) => {
   const navigate = useNavigate();
+  
+  // Check if current user is already attending this event
+  const isAlreadyRegistered = currentUser.eventsAttending?.includes(event.id);
   
   const soldPercentage = event.ticketTypes 
     ? Math.min(
@@ -86,14 +90,21 @@ const EventTicketCard = ({ event }: EventTicketCardProps) => {
           <Separator className="my-6" />
         )}
         
-        <Button 
-          fullWidth 
-          size="lg" 
-          className="mb-4 transition-transform hover:scale-[1.02] active:scale-[0.98]"
-          onClick={handleRegisterClick}
-        >
-          {event.isFree ? 'Register Now' : 'Book Tickets'}
-        </Button>
+        {isAlreadyRegistered ? (
+          <div className="bg-primary/10 text-primary rounded-lg p-4 mb-4 flex items-center justify-center gap-2">
+            <Check className="h-5 w-5" />
+            <span className="font-medium">You're registered for this event</span>
+          </div>
+        ) : (
+          <Button 
+            fullWidth 
+            size="lg" 
+            className="mb-4 transition-transform hover:scale-[1.02] active:scale-[0.98]"
+            onClick={handleRegisterClick}
+          >
+            {event.isFree ? 'Register Now' : 'Book Tickets'}
+          </Button>
+        )}
         
         {event.attendees && event.attendees.length > 0 && (
           <div className="mt-6">

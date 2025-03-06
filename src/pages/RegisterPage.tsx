@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { ChevronLeft, Calendar, MapPin, Clock, Info, CreditCard, Check } from "lucide-react";
 
 import { getEventById, registerForEvent } from "@/lib/data/queries";
+import { currentUser } from "@/lib/data";
 import Button from "@/components/Button";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -30,6 +31,16 @@ const RegisterPage = () => {
     queryFn: () => getEventById(eventId || ''),
     enabled: !!eventId,
   });
+
+  useEffect(() => {
+    if (event && currentUser.eventsAttending?.includes(event.id)) {
+      toast({
+        title: "Already registered",
+        description: "You're already registered for this event.",
+      });
+      navigate(`/events/${eventId}`);
+    }
+  }, [event, eventId, navigate, toast]);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
