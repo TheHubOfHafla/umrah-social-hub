@@ -1,11 +1,10 @@
-
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { NavigationMenu, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, navigationMenuTriggerStyle } from "@/components/ui/navigation-menu";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Bell, Calendar, ChevronDown, LogIn, Menu, User, UserPlus, X, Plus, UserRound, Zap, HelpCircle, Info, Mail } from "lucide-react";
+import { Bell, Calendar, ChevronDown, LogIn, Menu, User, UserPlus, X, Plus, UserRound, Zap } from "lucide-react";
 import UserAvatar from "./UserAvatar";
 import { currentUser } from "@/lib/data";
 
@@ -24,18 +23,8 @@ const navItems: NavItem[] = [{
 }, {
   label: "Organizers",
   href: "/organizers"
-}, {
-  label: "About",
-  href: "/about"
-}, {
-  label: "Help",
-  href: "/help"
-}, {
-  label: "Contact",
-  href: "/contact"
 }];
 
-// Added new prop to simulate unauthenticated state
 const Navbar = ({ isAuthenticated = true }: { isAuthenticated?: boolean }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -65,7 +54,6 @@ const Navbar = ({ isAuthenticated = true }: { isAuthenticated?: boolean }) => {
         : "py-3 bg-transparent"
     )}>
       <div className="container flex items-center justify-between">
-        {/* Left Navigation */}
         <div className="flex items-center">
           <NavigationMenu className="hidden md:flex">
             <NavigationMenuList>
@@ -87,7 +75,6 @@ const Navbar = ({ isAuthenticated = true }: { isAuthenticated?: boolean }) => {
           </NavigationMenu>
         </div>
 
-        {/* Center Logo - Enhanced with larger icon and bolder styling */}
         <div className="absolute left-1/2 transform -translate-x-1/2">
           <Link to="/" className="flex items-center gap-2 group">
             <Zap className="h-7 w-7 text-primary group-hover:animate-pulse-soft" />
@@ -95,10 +82,8 @@ const Navbar = ({ isAuthenticated = true }: { isAuthenticated?: boolean }) => {
           </Link>
         </div>
 
-        {/* Right Actions */}
         <div className="flex items-center">
           <div className="hidden md:flex items-center space-x-2">
-            {/* Create Event Button */}
             <Link to="/events/create">
               <Button className="flex items-center gap-2 bg-primary hover:bg-primary/90 transition-all duration-200 hover:scale-105">
                 <Plus className="h-4 w-4" />
@@ -112,7 +97,6 @@ const Navbar = ({ isAuthenticated = true }: { isAuthenticated?: boolean }) => {
                   <Bell className="h-5 w-5" />
                 </Button>
                 
-                {/* My Profile Button */}
                 <Link to="/dashboard/profile">
                   <Button variant="outline" className="flex items-center gap-2 hover:bg-primary/10 hover:text-primary transition-all duration-200">
                     <UserRound className="h-4 w-4" />
@@ -161,14 +145,12 @@ const Navbar = ({ isAuthenticated = true }: { isAuthenticated?: boolean }) => {
             )}
           </div>
 
-          {/* Mobile Menu Button */}
           <Button variant="ghost" size="icon" className="md:hidden hover:bg-primary/10 hover:text-primary" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
             {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
           </Button>
         </div>
       </div>
 
-      {/* Mobile Menu */}
       <div className={cn(
         "fixed inset-x-0 top-[57px] z-50 h-[calc(100vh-57px)] bg-background/90 backdrop-blur-md transition-transform duration-300 ease-in-out md:hidden", 
         mobileMenuOpen ? "translate-x-0" : "translate-x-full"
@@ -188,7 +170,6 @@ const Navbar = ({ isAuthenticated = true }: { isAuthenticated?: boolean }) => {
                 {item.label}
               </Link>)}
             
-            {/* Create Event Button for Mobile */}
             <Link to="/events/create" className="px-4 py-3 text-lg bg-primary text-white rounded-md hover:bg-primary/90 transition-all duration-200 flex items-center">
               <Plus className="mr-2 h-5 w-5" />
               Create Event
@@ -198,7 +179,6 @@ const Navbar = ({ isAuthenticated = true }: { isAuthenticated?: boolean }) => {
             
             {isAuthenticated ? (
               <>
-                {/* Updated to show My Profile link in mobile menu */}
                 <Link to="/dashboard/profile" className="px-4 py-3 text-lg rounded-md hover:bg-primary/10 hover:text-primary transition-all duration-200 flex items-center">
                   <UserRound className="mr-2 h-5 w-5" />
                   My Profile
