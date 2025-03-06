@@ -1,11 +1,24 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Container } from "@/components/ui/container";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
+import { useLocation } from "react-router-dom";
 
 const LegalPage = () => {
+  const location = useLocation();
   const [activeTab, setActiveTab] = useState("terms");
+  
+  useEffect(() => {
+    // Extract tab parameter from URL query string
+    const searchParams = new URLSearchParams(location.search);
+    const tabParam = searchParams.get("tab");
+    
+    // Set the active tab based on URL parameter if it's valid
+    if (tabParam && ["terms", "privacy", "cookies"].includes(tabParam)) {
+      setActiveTab(tabParam);
+    }
+  }, [location.search]);
 
   return (
     <div className="py-12 min-h-screen">
@@ -17,7 +30,7 @@ const LegalPage = () => {
             when using EventHub services.
           </p>
 
-          <Tabs defaultValue="terms" value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             <TabsList className="w-full grid grid-cols-3 mb-8">
               <TabsTrigger value="terms">Terms of Service</TabsTrigger>
               <TabsTrigger value="privacy">Privacy Policy</TabsTrigger>
