@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -26,6 +27,7 @@ import UserEvents from "./pages/dashboard/UserEvents";
 import OrganizerEvents from "./pages/dashboard/OrganizerEvents";
 import UserProfile from "./pages/dashboard/UserProfile";
 import OrganizerProfile from "./pages/dashboard/OrganizerProfile";
+import CrmDashboard from "./pages/dashboard/CrmDashboard";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import { useState, useEffect } from "react";
@@ -70,6 +72,7 @@ const App = () => {
             <Route path="/organizer" element={<OrganizerDashboard />} />
             <Route path="/organizer/events" element={<OrganizerEvents />} />
             <Route path="/organizer/profile" element={<OrganizerProfile />} />
+            <Route path="/admin/crm" element={<CrmDashboard />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
           <ChatbotButton />

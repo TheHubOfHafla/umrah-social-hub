@@ -1,4 +1,3 @@
-
 import { useState, useMemo } from "react";
 import { 
   Users, Filter, Search, Download, Mail, MessageSquare, MoreHorizontal,
@@ -47,11 +46,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { currentUser } from "@/lib/data";
+import { currentUser } from "@/lib/data/users";
 import { EventCategory, User } from "@/types";
 import UserAvatar from "@/components/UserAvatar";
 
-// Mock users data (in a real app, this would come from your database)
 const mockUsers: User[] = [
   {
     id: "user1",
@@ -130,10 +128,8 @@ const mockUsers: User[] = [
   },
 ];
 
-// Define cities for filtering
 const cities = ["All Cities", "London", "Manchester", "Birmingham", "Leeds"];
 
-// Define categories for filtering from our EventCategory type
 const categories: { value: EventCategory; label: string }[] = [
   { value: "charity", label: "Charity" },
   { value: "community", label: "Community" },
@@ -159,22 +155,18 @@ const CrmDashboard = () => {
   const [isEmailDialogOpen, setIsEmailDialogOpen] = useState<boolean>(false);
   const [isSmsDialogOpen, setIsSmsDialogOpen] = useState<boolean>(false);
 
-  // Apply filters to users
   const filteredUsers = useMemo(() => {
     return mockUsers.filter((user) => {
-      // Filter by search query
       const matchesSearch = 
         searchQuery === "" || 
         user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         user.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
         user.phone?.includes(searchQuery);
       
-      // Filter by city
       const matchesCity = 
         selectedCity === "All Cities" || 
         user.location?.city === selectedCity;
       
-      // Filter by interest category
       const matchesCategory = 
         !selectedCategory || 
         user.interests?.includes(selectedCategory as EventCategory);
@@ -183,7 +175,6 @@ const CrmDashboard = () => {
     });
   }, [searchQuery, selectedCity, selectedCategory]);
 
-  // Handle selecting all users
   const handleSelectAll = () => {
     if (selectedUsers.length === filteredUsers.length) {
       setSelectedUsers([]);
@@ -192,7 +183,6 @@ const CrmDashboard = () => {
     }
   };
 
-  // Handle selecting individual user
   const handleSelectUser = (userId: string) => {
     if (selectedUsers.includes(userId)) {
       setSelectedUsers(selectedUsers.filter(id => id !== userId));
@@ -201,12 +191,10 @@ const CrmDashboard = () => {
     }
   };
 
-  // Get selected users data
   const getSelectedUsersData = () => {
     return mockUsers.filter(user => selectedUsers.includes(user.id));
   };
 
-  // Handle sending email
   const handleSendEmail = () => {
     const recipients = getSelectedUsersData();
     console.log("Sending email to:", recipients);
@@ -223,7 +211,6 @@ const CrmDashboard = () => {
     setEmailBody("");
   };
 
-  // Handle sending SMS
   const handleSendSms = () => {
     const recipients = getSelectedUsersData();
     console.log("Sending SMS to:", recipients);
@@ -238,7 +225,6 @@ const CrmDashboard = () => {
     setMessageText("");
   };
 
-  // Export user data as CSV
   const exportCsv = () => {
     const users = selectedUsers.length > 0 ? getSelectedUsersData() : filteredUsers;
     const headers = ["Name", "Email", "Phone", "City", "Interests", "Signup Date"];
@@ -272,7 +258,7 @@ const CrmDashboard = () => {
   };
 
   return (
-    <DashboardLayout user={currentUser} type="admin">
+    <DashboardLayout user={currentUser} type="organizer">
       <div className="space-y-6">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
@@ -587,7 +573,6 @@ const CrmDashboard = () => {
                                 <DropdownMenuSeparator />
                                 <DropdownMenuItem
                                   onClick={() => {
-                                    // View user profile - in a real app this would navigate to a user detail page
                                     console.log("View user profile:", user);
                                     toast({
                                       title: "User Profile",
