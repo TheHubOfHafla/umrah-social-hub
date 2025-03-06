@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
 import { 
   Users, Filter, Search, Download, Mail, MessageSquare, MoreHorizontal,
-  MapPin, Calendar, Tag
+  MapPin, Calendar, Tag, User
 } from "lucide-react";
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
