@@ -18,7 +18,16 @@ const LegalPage = () => {
     if (tabParam && ["terms", "privacy", "cookies"].includes(tabParam)) {
       setActiveTab(tabParam);
     }
+    
+    // Scroll to the top of the page when component mounts or tab changes
+    window.scrollTo(0, 0);
   }, [location.search]);
+
+  // Also scroll to top when tab changes via UI
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
+    window.scrollTo(0, 0);
+  };
 
   return (
     <PageWrapper>
@@ -31,7 +40,7 @@ const LegalPage = () => {
               when using EventHub services.
             </p>
 
-            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
               <TabsList className="w-full grid grid-cols-3 mb-8">
                 <TabsTrigger value="terms">Terms of Service</TabsTrigger>
                 <TabsTrigger value="privacy">Privacy Policy</TabsTrigger>
