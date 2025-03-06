@@ -1,5 +1,5 @@
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -16,10 +16,12 @@ import { EventCategory } from "@/types";
 import { categories } from "@/lib/data";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
+import { AuthContext } from "@/App";
 
 const UserProfile = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { onSignOut } = useContext(AuthContext);
   
   useEffect(() => {
     document.title = "My Profile | Islamic Social";
@@ -38,9 +40,8 @@ const UserProfile = () => {
   };
   
   const handleSignOut = () => {
-    // Clear auth token and user data from localStorage
-    localStorage.removeItem('auth_token');
-    localStorage.removeItem('user_events');
+    // Call the sign out function from context
+    onSignOut();
     
     // Show success toast
     toast({
