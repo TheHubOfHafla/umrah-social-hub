@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Search, Filter, ChevronUp, ChevronDown } from "lucide-react";
@@ -154,9 +155,9 @@ const EventsPage = () => {
         </form>
       </div>
 
-      <div className="flex flex-col lg:flex-row gap-6">
-        <div className={`hidden lg:block ${compactFilters ? 'w-auto' : 'w-64'} space-y-6 transition-all duration-300`}>
-          {!compactFilters && (
+      <div className={`flex flex-col ${!compactFilters ? 'lg:flex-row' : ''} gap-6`}>
+        {!compactFilters && (
+          <div className="hidden lg:block w-64 space-y-6 transition-all duration-300">
             <>
               <div>
                 <div className="flex items-center justify-between">
@@ -213,18 +214,10 @@ const EventsPage = () => {
                 Clear Filters
               </Button>
             </>
-          )}
-          <Button 
-            variant="ghost" 
-            onClick={toggleCompactFilters}
-            className="w-full text-[#8B5CF6] hover:text-[#7C5AE2] hover:bg-[#8B5CF6]/10"
-          >
-            {compactFilters ? <ChevronDown className="h-4 w-4 mr-1" /> : <ChevronUp className="h-4 w-4 mr-1" />}
-            {compactFilters ? "Show filters" : "Hide filters"}
-          </Button>
-        </div>
-
-        <div className="lg:hidden flex items-center gap-3 mb-4">
+          </div>
+        )}
+        
+        <div className="lg:hidden flex justify-between items-center gap-3 mb-4">
           <Sheet>
             <SheetTrigger asChild>
               <Button variant="outline" size="icon">
@@ -300,33 +293,68 @@ const EventsPage = () => {
               </SheetFooter>
             </SheetContent>
           </Sheet>
+          
+          <Button 
+            variant="ghost" 
+            onClick={toggleCompactFilters}
+            className="ml-auto text-[#8B5CF6] hover:text-[#7C5AE2] hover:bg-[#8B5CF6]/10"
+          >
+            {compactFilters ? <ChevronDown className="h-4 w-4 mr-1" /> : <ChevronUp className="h-4 w-4 mr-1" />}
+            {compactFilters ? "Show filters" : "Hide filters"}
+          </Button>
         </div>
 
-        <div className="flex-1">
-          <div className="mb-6">
-            {selectedCategory !== "all" ? (
-              <h2 className="text-xl font-semibold mb-4 capitalize">
-                {selectedCategory} Events ({filteredEvents.length})
-              </h2>
-            ) : (
-              <div>
-                <h2 className="text-xl font-semibold mb-4">
-                  All Events ({filteredEvents.length})
+        <div className={`${compactFilters ? 'w-full' : 'flex-1'}`}>
+          <div className="mb-6 flex items-center justify-between">
+            <div>
+              {selectedCategory !== "all" ? (
+                <h2 className="text-xl font-semibold mb-4 capitalize">
+                  {selectedCategory} Events ({filteredEvents.length})
                 </h2>
-                <ScrollArea className="w-full whitespace-nowrap mb-6">
-                  <CategoryChips
-                    selectedCategories={[selectedCategory !== "all" ? selectedCategory as EventCategory : null].filter(Boolean) as EventCategory[]}
-                    onChange={(categories) => {
-                      if (categories.length > 0) {
-                        handleCategorySelect(categories[0]);
-                      } else {
-                        handleCategorySelect("all");
-                      }
-                    }}
-                    singleSelect={true}
-                  />
-                </ScrollArea>
+              ) : (
+                <div>
+                  <h2 className="text-xl font-semibold mb-4">
+                    All Events ({filteredEvents.length})
+                  </h2>
+                  <ScrollArea className="w-full whitespace-nowrap mb-6">
+                    <CategoryChips
+                      selectedCategories={[selectedCategory !== "all" ? selectedCategory as EventCategory : null].filter(Boolean) as EventCategory[]}
+                      onChange={(categories) => {
+                        if (categories.length > 0) {
+                          handleCategorySelect(categories[0]);
+                        } else {
+                          handleCategorySelect("all");
+                        }
+                      }}
+                      singleSelect={true}
+                    />
+                  </ScrollArea>
+                </div>
+              )}
+            </div>
+            
+            {!compactFilters && (
+              <div className="hidden lg:block">
+                <Button 
+                  variant="ghost" 
+                  onClick={toggleCompactFilters}
+                  className="text-[#8B5CF6] hover:text-[#7C5AE2] hover:bg-[#8B5CF6]/10"
+                >
+                  <ChevronUp className="h-4 w-4 mr-1" />
+                  Hide filters
+                </Button>
               </div>
+            )}
+            
+            {compactFilters && (
+              <Button 
+                variant="ghost" 
+                onClick={toggleCompactFilters}
+                className="text-[#8B5CF6] hover:text-[#7C5AE2] hover:bg-[#8B5CF6]/10"
+              >
+                <ChevronDown className="h-4 w-4 mr-1" />
+                Show filters
+              </Button>
             )}
           </div>
 
