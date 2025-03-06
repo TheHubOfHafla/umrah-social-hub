@@ -1,5 +1,5 @@
 
-import { ChatMessage, EventChatRoom } from '@/types';
+import { ChatMessage, EventChatRoom, MessageType } from '@/types';
 import { mockEvents } from './events';
 import { currentUser } from './users';
 
@@ -55,7 +55,7 @@ const createMockChatMessages = (eventId: string, count: number = 15): ChatMessag
   
   // Random participant messages
   const attendees = event.attendees || [];
-  const questions = [
+  const questionsList = [
     'What time should we arrive?',
     'Is there parking available at the venue?',
     'Will there be food provided?',
@@ -73,7 +73,7 @@ const createMockChatMessages = (eventId: string, count: number = 15): ChatMessag
     let content = '';
     
     if (isQuestion) {
-      content = questions[Math.floor(Math.random() * questions.length)];
+      content = questionsList[Math.floor(Math.random() * questionsList.length)];
     } else {
       const phrases = [
         'Looking forward to this event!',
@@ -82,7 +82,7 @@ const createMockChatMessages = (eventId: string, count: number = 15): ChatMessag
         'See you all there!',
         'This will be my first time attending.',
         'The topic sounds interesting.',
-        'I've been to previous events by this organizer, they're great!'
+        "I've been to previous events by this organizer, they're great!"
       ];
       content = phrases[Math.floor(Math.random() * phrases.length)];
     }
@@ -106,18 +106,18 @@ const createMockChatMessages = (eventId: string, count: number = 15): ChatMessag
   }
   
   // Add organizer responses to questions
-  const questions = messages.filter(m => m.type === 'question');
+  const questionsMessages = messages.filter(m => m.type === 'question');
   
-  questions.forEach(question => {
+  questionsMessages.forEach(question => {
     const shouldAnswer = Math.random() > 0.3;
     
     if (shouldAnswer) {
       const answers = [
         `Great question! ${Math.random() > 0.5 ? 'Yes, definitely.' : 'No, unfortunately not.'}`,
-        'Thanks for asking. We'll address this during the event.',
+        "Thanks for asking. We'll address this during the event.",
         'Please check the event details for this information.',
-        'We'll be sending out more information about this soon.',
-        'Good point - we've updated the event description with this information.'
+        "We'll be sending out more information about this soon.",
+        "Good point - we've updated the event description with this information."
       ];
       
       messages.push({
