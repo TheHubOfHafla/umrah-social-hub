@@ -1,28 +1,22 @@
 
-import { useState, useRef, useEffect } from 'react';
+import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { format } from 'date-fns';
-import { MessageCircle, Send, ThumbsUp, Pin, Trash2, Bell, Filter, X } from 'lucide-react';
-import { ChatMessage as ChatMessageType, Event, MessageType } from '@/types';
-import { getEventChatMessages, addChatMessage, toggleUpvote, togglePinMessage, deleteMessage, mockChatRooms } from '@/lib/data';
+import { MessageCircle, X } from 'lucide-react';
+import { Event, ChatMessage as ChatMessageType, MessageType } from '@/types';
+import { 
+  getEventChatMessages, 
+  addChatMessage, 
+  toggleUpvote, 
+  togglePinMessage, 
+  deleteMessage, 
+  mockChatRooms 
+} from '@/lib/data/chat';
 import { currentUser } from '@/lib/data/users';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { Separator } from '@/components/ui/separator';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import { useToast } from '@/hooks/use-toast';
-import ChatMessageComponent from './ChatMessage';
-import PinnedMessages from './PinnedMessages';
+import ChatFilterControls from './ChatFilterControls';
+import ChatMessageList from './ChatMessageList';
+import ChatMessageInput from './ChatMessageInput';
+import ChatTabs from './ChatTabs';
 import NewAnnouncementForm from './NewAnnouncementForm';
 
 interface ChatInterfaceProps {
@@ -33,8 +27,6 @@ interface ChatInterfaceProps {
 const ChatInterface = ({ event, isOrganizer }: ChatInterfaceProps) => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const scrollAreaRef = useRef<HTMLDivElement>(null);
-  const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState<MessageType>('text');
   const [replyTo, setReplyTo] = useState<ChatMessageType | null>(null);
   const [filter, setFilter] = useState<'all' | 'questions' | 'announcements' | 'private'>('all');
@@ -66,15 +58,8 @@ const ChatInterface = ({ event, isOrganizer }: ChatInterfaceProps) => {
     ),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['eventChat', event.id] });
-      setMessage('');
       setReplyTo(null);
       setMessageType('text');
-
-      if (scrollAreaRef.current) {
-        setTimeout(() => {
-          scrollAreaRef.current?.scrollTo({ top: scrollAreaRef.current.scrollHeight, behavior: 'smooth' });
-        }, 100);
-      }
     }
   });
 
@@ -108,13 +93,6 @@ const ChatInterface = ({ event, isOrganizer }: ChatInterfaceProps) => {
     }
   });
 
-  // Auto-scroll to bottom when messages change
-  useEffect(() => {
-    if (scrollAreaRef.current) {
-      scrollAreaRef.current.scrollTop = scrollAreaRef.current.scrollHeight;
-    }
-  }, [messages]);
-
   // Filter messages based on the current filter
   const filteredMessages = messages.filter(msg => {
     if (filter === 'all') return true;
@@ -125,14 +103,12 @@ const ChatInterface = ({ event, isOrganizer }: ChatInterfaceProps) => {
   });
 
   // Handle sending a message
-  const handleSendMessage = (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!message.trim()) return;
+  const handleSendMessage = (content: string, type: MessageType) => {
+    if (!content.trim()) return;
     
     addMessageMutation.mutate({ 
-      content: message, 
-      type: messageType,
+      content, 
+      type,
       parentId: replyTo?.id,
       isPrivate: false
     });
@@ -149,204 +125,50 @@ const ChatInterface = ({ event, isOrganizer }: ChatInterfaceProps) => {
 
   // Handle sending a private message
   const handleSendPrivateMessage = (recipientId: string, recipientName: string) => {
-    if (!message.trim()) return;
-    
-    addMessageMutation.mutate({ 
-      content: message, 
-      type: 'text',
-      isPrivate: true,
-      recipientId,
-      recipientName
-    });
+    // This would be implemented when selecting a recipient for private messages
   };
 
-  // Handle upvoting a question
-  const handleToggleUpvote = (messageId: string) => {
-    toggleUpvoteMutation.mutate(messageId);
-  };
-
-  // Handle pinning a message
-  const handleTogglePin = (messageId: string) => {
-    togglePinMutation.mutate(messageId);
-  };
-
-  // Handle deleting a message
-  const handleDeleteMessage = (messageId: string) => {
-    deleteMessageMutation.mutate(messageId);
-  };
-
-  // Cancel reply
-  const cancelReply = () => {
-    setReplyTo(null);
+  // Handle initiating private reply
+  const handlePrivateReply = (message: ChatMessageType) => {
+    setReplyTo(message);
+    setMessageType('text');
   };
 
   return (
     <div className="flex flex-col h-[600px] border rounded-lg overflow-hidden bg-white">
-      <div className="p-4 border-b flex items-center justify-between bg-primary/5">
-        <div className="flex items-center">
-          <MessageCircle className="h-5 w-5 mr-2 text-primary" />
-          <h3 className="font-semibold">Event Chat</h3>
-          <Badge variant="outline" className="ml-2">
-            {messages.length} messages
-          </Badge>
-        </div>
-        
-        <div className="flex items-center gap-2">
-          {isOrganizer && (
-            <Button 
-              size="sm" 
-              variant="outline"
-              onClick={() => setShowAnnouncementForm(true)}
-            >
-              <Bell className="h-4 w-4 mr-1" />
-              Announcement
-            </Button>
-          )}
-          
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button size="sm" variant="outline">
-                <Filter className="h-4 w-4 mr-1" />
-                Filter
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => setFilter('all')}>
-                All Messages
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setFilter('questions')}>
-                Questions Only
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setFilter('announcements')}>
-                Announcements
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => setFilter('private')}>
-                Private Messages
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-      </div>
+      <ChatFilterControls 
+        onFilterChange={setFilter}
+        onAnnouncementClick={() => setShowAnnouncementForm(true)}
+        isOrganizer={isOrganizer}
+        messageCount={messages.length}
+      />
       
-      <Tabs defaultValue="chat" className="flex-1 flex flex-col">
-        <TabsList className="px-4 py-2 border-b justify-start">
-          <TabsTrigger value="chat">Chat</TabsTrigger>
-          <TabsTrigger value="pinned">
-            Pinned
-            <Badge variant="outline" className="ml-1">
-              {messages.filter(m => {
-                const chatRoom = mockChatRooms.find(r => r.eventId === event.id);
-                return chatRoom?.pinnedMessageIds.includes(m.id) || false;
-              }).length || 0}
-            </Badge>
-          </TabsTrigger>
-        </TabsList>
+      <ChatTabs 
+        eventId={event.id}
+        messages={messages}
+        onUnpin={(messageId) => togglePinMutation.mutate(messageId)}
+      >
+        <ChatMessageList 
+          messages={filteredMessages}
+          currentUserId={currentUser.id}
+          isOrganizer={isOrganizer}
+          onReply={setReplyTo}
+          onUpvote={(messageId) => toggleUpvoteMutation.mutate(messageId)}
+          onPin={(messageId) => togglePinMutation.mutate(messageId)}
+          onDelete={(messageId) => deleteMessageMutation.mutate(messageId)}
+          onPrivateReply={handlePrivateReply}
+        />
         
-        <TabsContent value="chat" className="flex-1 flex flex-col p-0">
-          <ScrollArea ref={scrollAreaRef} className="flex-1 p-4">
-            {filteredMessages.length === 0 ? (
-              <div className="h-full flex items-center justify-center text-muted-foreground">
-                No messages yet. Start the conversation!
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {filteredMessages.map((msg) => (
-                  <ChatMessageComponent 
-                    key={msg.id}
-                    message={msg}
-                    currentUserId={currentUser.id}
-                    isOrganizer={isOrganizer}
-                    onReply={() => setReplyTo(msg)}
-                    onUpvote={() => handleToggleUpvote(msg.id)}
-                    onPin={() => handleTogglePin(msg.id)}
-                    onDelete={() => handleDeleteMessage(msg.id)}
-                    onPrivateReply={() => {
-                      setMessageType('text');
-                      setMessage(`@${msg.userName} `);
-                    }}
-                  />
-                ))}
-              </div>
-            )}
-          </ScrollArea>
-          
-          {replyTo && (
-            <div className="px-4 pt-2 flex items-center text-sm bg-muted/50">
-              <div className="flex-1">
-                Replying to <span className="font-medium">{replyTo.userName}</span>: {replyTo.content.substring(0, 50)}{replyTo.content.length > 50 ? '...' : ''}
-              </div>
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                className="h-6 w-6 p-0" 
-                onClick={cancelReply}
-              >
-                <X className="h-4 w-4" />
-              </Button>
-            </div>
-          )}
-          
-          <form 
-            onSubmit={handleSendMessage} 
-            className="p-4 border-t flex items-center gap-2"
-          >
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button 
-                  type="button" 
-                  variant="outline" 
-                  size="icon" 
-                  className="shrink-0"
-                >
-                  {messageType === 'text' && <MessageCircle className="h-4 w-4" />}
-                  {messageType === 'question' && <ThumbsUp className="h-4 w-4" />}
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="start">
-                <DropdownMenuItem onClick={() => setMessageType('text')}>
-                  <MessageCircle className="h-4 w-4 mr-2" />
-                  Regular Message
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setMessageType('question')}>
-                  <ThumbsUp className="h-4 w-4 mr-2" />
-                  Ask a Question
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-            
-            <Input
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              placeholder={
-                messageType === 'question' 
-                  ? "Ask a question..." 
-                  : "Type your message..."
-              }
-              className="flex-1"
-            />
-            
-            <Button 
-              type="submit" 
-              size="icon" 
-              disabled={!message.trim()} 
-              className="shrink-0"
-            >
-              <Send className="h-4 w-4" />
-            </Button>
-          </form>
-        </TabsContent>
-        
-        <TabsContent value="pinned" className="flex-1 p-4">
-          <PinnedMessages 
-            messages={messages.filter(m => {
-              const chatRoom = mockChatRooms.find(r => r.eventId === event.id);
-              return chatRoom?.pinnedMessageIds.includes(m.id) || false;
-            })}
-            onUnpin={handleTogglePin}
-          />
-        </TabsContent>
-      </Tabs>
+        <ChatMessageInput 
+          onSendMessage={handleSendMessage}
+          replyingTo={replyTo ? {
+            id: replyTo.id,
+            userName: replyTo.userName,
+            content: replyTo.content
+          } : null}
+          onCancelReply={() => setReplyTo(null)}
+        />
+      </ChatTabs>
 
       {showAnnouncementForm && (
         <NewAnnouncementForm 
