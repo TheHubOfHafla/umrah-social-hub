@@ -13,6 +13,7 @@ import {
 } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import ChatbotButton from "./components/ChatbotButton";
+import PageWrapper from "./components/PageWrapper";
 import Index from "./pages/Index";
 import EventsPage from "./pages/EventsPage";
 import EventDetailPage from "./pages/EventDetailPage";
@@ -32,7 +33,6 @@ import AboutUs from "./pages/AboutUs";
 import HelpCenter from "./pages/HelpCenter";
 import ContactUs from "./pages/ContactUs";
 import { useState, useEffect, createContext } from "react";
-import Footer from "./components/Footer";
 
 const queryClient = new QueryClient();
 
@@ -97,28 +97,97 @@ const App = () => {
             <Navbar isAuthenticated={isAuthenticated} />
             <Routes>
               <Route path="/" element={<Index isAuthenticated={isAuthenticated} />} />
-              <Route path="/events" element={<EventsPage />} />
-              <Route path="/events/:eventId" element={<EventDetailPage />} />
-              <Route path="/events/create" element={<CreateEventPage />} />
-              <Route path="/events/:eventId/register" element={<RegisterPage />} />
-              <Route path="/organizers" element={<OrganizersPage />} />
-              <Route path="/login" element={isAuthenticated ? <Navigate to="/profile" /> : <Login onLoginSuccess={handleLogin} />} />
-              <Route path="/signup" element={isAuthenticated ? <Navigate to="/profile" /> : <Signup onSignupSuccess={handleLogin} />} />
-              <Route path="/profile" element={isAuthenticated ? <UserProfile /> : <Navigate to="/login" />} />
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/dashboard/events" element={<UserEvents />} />
-              <Route path="/dashboard/profile" element={<UserProfile />} />
-              <Route path="/organizer" element={<OrganizerDashboard />} />
-              <Route path="/organizer/events" element={<OrganizerEvents />} />
-              <Route path="/organizer/profile" element={<OrganizerProfile />} />
-              
-              <Route path="/about" element={<AboutUs />} />
-              <Route path="/help" element={<HelpCenter />} />
-              <Route path="/contact" element={<ContactUs />} />
-              
-              <Route path="*" element={<NotFound />} />
+              <Route path="/events" element={
+                <PageWrapper>
+                  <EventsPage />
+                </PageWrapper>
+              } />
+              <Route path="/events/:eventId" element={
+                <PageWrapper>
+                  <EventDetailPage />
+                </PageWrapper>
+              } />
+              <Route path="/events/create" element={
+                <PageWrapper>
+                  <CreateEventPage />
+                </PageWrapper>
+              } />
+              <Route path="/events/:eventId/register" element={
+                <PageWrapper>
+                  <RegisterPage />
+                </PageWrapper>
+              } />
+              <Route path="/organizers" element={
+                <PageWrapper>
+                  <OrganizersPage />
+                </PageWrapper>
+              } />
+              <Route path="/login" element={
+                <PageWrapper>
+                  {isAuthenticated ? <Navigate to="/profile" /> : <Login onLoginSuccess={handleLogin} />}
+                </PageWrapper>
+              } />
+              <Route path="/signup" element={
+                <PageWrapper>
+                  {isAuthenticated ? <Navigate to="/profile" /> : <Signup onSignupSuccess={handleLogin} />}
+                </PageWrapper>
+              } />
+              <Route path="/profile" element={
+                <PageWrapper>
+                  {isAuthenticated ? <UserProfile /> : <Navigate to="/login" />}
+                </PageWrapper>
+              } />
+              <Route path="/dashboard" element={
+                <PageWrapper>
+                  <Dashboard />
+                </PageWrapper>
+              } />
+              <Route path="/dashboard/events" element={
+                <PageWrapper>
+                  <UserEvents />
+                </PageWrapper>
+              } />
+              <Route path="/dashboard/profile" element={
+                <PageWrapper>
+                  <UserProfile />
+                </PageWrapper>
+              } />
+              <Route path="/organizer" element={
+                <PageWrapper>
+                  <OrganizerDashboard />
+                </PageWrapper>
+              } />
+              <Route path="/organizer/events" element={
+                <PageWrapper>
+                  <OrganizerEvents />
+                </PageWrapper>
+              } />
+              <Route path="/organizer/profile" element={
+                <PageWrapper>
+                  <OrganizerProfile />
+                </PageWrapper>
+              } />
+              <Route path="/about" element={
+                <PageWrapper>
+                  <AboutUs />
+                </PageWrapper>
+              } />
+              <Route path="/help" element={
+                <PageWrapper>
+                  <HelpCenter />
+                </PageWrapper>
+              } />
+              <Route path="/contact" element={
+                <PageWrapper>
+                  <ContactUs />
+                </PageWrapper>
+              } />
+              <Route path="*" element={
+                <PageWrapper>
+                  <NotFound />
+                </PageWrapper>
+              } />
             </Routes>
-            <Footer />
             <ChatbotButton />
           </BrowserRouter>
         </TooltipProvider>
