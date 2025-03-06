@@ -59,7 +59,7 @@ const HeroBanner = ({ user, onLocationSelect, isAuthenticated = true }: HeroBann
               Instant Islamic Events Near You
             </h1>
             <p className={cn(
-              "text-xl font-heading text-[#D946EF] max-w-2xl mx-auto text-pretty transition-all duration-700 delay-200",
+              "text-xl font-accent text-[#1A1F2C] font-bold max-w-2xl mx-auto text-pretty transition-all duration-700 delay-200",
               contentVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
             )}>
               Connect with community events, Umrah trips, lectures, and more
@@ -89,7 +89,7 @@ const HeroBanner = ({ user, onLocationSelect, isAuthenticated = true }: HeroBann
                 "mt-6 pt-4 border-t border-primary/20 transition-all duration-700 delay-400",
                 contentVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
               )}>
-                <p className="font-sans text-[#F97316] text-lg mb-3 font-semibold">Create an account to track events, get personalized recommendations, and more</p>
+                <p className="font-display text-[#1A1F2C] text-lg mb-3 font-bold">Create an account to track events, get personalized recommendations, and more</p>
                 <Link to="/signup">
                   <Button 
                     variant="outline" 
