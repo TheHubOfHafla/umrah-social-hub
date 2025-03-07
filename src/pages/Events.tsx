@@ -23,7 +23,6 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
 
-// Helper function to filter events
 const filterEvents = (
   events: Event[],
   searchQuery: string,
@@ -33,25 +32,20 @@ const filterEvents = (
   isFreeOnly: boolean
 ): Event[] => {
   return events.filter(event => {
-    // Search query
     const matchesSearch = searchQuery === "" || 
       event.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       event.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
       event.organizer.name.toLowerCase().includes(searchQuery.toLowerCase());
     
-    // Categories
     const matchesCategory = selectedCategories.length === 0 ||
       selectedCategories.some(cat => event.categories.includes(cat));
     
-    // Location
     const matchesLocation = selectedLocation === "" ||
       `${event.location.city}, ${event.location.country}`.includes(selectedLocation);
     
-    // Date
     const matchesDate = !selectedDate ||
       format(new Date(event.date.start), "yyyy-MM-dd") === format(selectedDate, "yyyy-MM-dd");
     
-    // Free only
     const matchesFree = !isFreeOnly || event.isFree;
     
     return matchesSearch && matchesCategory && matchesLocation && matchesDate && matchesFree;
@@ -70,7 +64,6 @@ const Events = () => {
   const [filteredEvents, setFilteredEvents] = useState<Event[]>(mockEvents);
   const [activeTab, setActiveTab] = useState("all");
   
-  // Parse query parameters on mount
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
     const categoryParam = searchParams.get("category");
@@ -80,7 +73,6 @@ const Events = () => {
     }
   }, [location.search]);
   
-  // Filter events when filters change
   useEffect(() => {
     let result = filterEvents(
       mockEvents,
@@ -91,7 +83,6 @@ const Events = () => {
       isFreeOnly
     );
     
-    // Sort events
     if (sortBy === "date") {
       result = [...result].sort((a, b) => 
         new Date(a.date.start).getTime() - new Date(b.date.start).getTime()
@@ -104,7 +95,6 @@ const Events = () => {
       });
     }
     
-    // Handle tabs
     if (activeTab === "attending") {
       result = result.filter(event => 
         currentUser.eventsAttending?.includes(event.id)
@@ -137,6 +127,10 @@ const Events = () => {
     selectedDate !== undefined || 
     isFreeOnly;
   
+  const handleSearch = (query: string) => {
+    setSearchQuery(query);
+  };
+  
   return (
     <div className="min-h-screen">
       <Navbar />
@@ -164,7 +158,6 @@ const Events = () => {
             </Tabs>
           </div>
           
-          {/* Search and Filter */}
           <div className="bg-secondary/40 rounded-lg p-4 mb-8">
             <div className="flex flex-col md:flex-row gap-4 mb-4">
               <div className="relative flex-1">
@@ -179,6 +172,7 @@ const Events = () => {
               
               <div className="flex gap-2">
                 <EventSearch
+                  onSearch={handleSearch}
                   onLocationSelect={setSelectedLocation}
                   initialLocation={selectedLocation}
                   className="w-full md:w-48"
@@ -265,7 +259,6 @@ const Events = () => {
             </div>
           </div>
           
-          {/* Results */}
           <div className="mb-4">
             <h2 className="text-lg font-medium">
               {filteredEvents.length} {filteredEvents.length === 1 ? 'event' : 'events'} found
