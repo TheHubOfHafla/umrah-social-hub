@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -134,13 +135,13 @@ const Navbar = ({ isAuthenticated = true }: { isAuthenticated?: boolean }) => {
                 <button onClick={() => handleNavigation("/login")}>
                   <Button variant="outline" size="sm" className="flex items-center gap-1 hover:bg-primary/10 hover:text-primary transition-all duration-200 text-xs md:text-sm">
                     <LogIn className="h-3 w-3 md:h-4 md:w-4" />
-                    <span className="hidden xs:inline sm:inline">Sign In</span>
+                    <span className="hidden md:inline">Sign In</span>
                   </Button>
                 </button>
                 <button onClick={() => handleNavigation("/signup")}>
                   <Button size="sm" className="flex items-center gap-1 bg-primary hover:bg-primary/90 transition-all duration-200 hover:scale-105 text-xs md:text-sm">
                     <UserPlus className="h-3 w-3 md:h-4 md:w-4" />
-                    <span className="hidden xs:inline sm:inline">Sign Up</span>
+                    <span className="hidden md:inline">Sign Up</span>
                   </Button>
                 </button>
               </div>
