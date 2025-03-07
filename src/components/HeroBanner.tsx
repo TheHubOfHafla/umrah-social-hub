@@ -6,6 +6,7 @@ import { Filter, UserPlus } from "lucide-react";
 import Button from "@/components/Button";
 import LocationSearch from "@/components/LocationSearch";
 import { User } from "@/types";
+import { motion } from "framer-motion";
 
 interface HeroBannerProps {
   user?: User;
@@ -63,11 +64,17 @@ const HeroBanner = ({ user, onLocationSelect, isAuthenticated = true }: HeroBann
               "flex flex-col sm:flex-row gap-3 mt-8 justify-center transition-all duration-700 delay-300",
               contentVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
             )}>
-              <LocationSearch 
-                onLocationSelect={onLocationSelect} 
-                initialLocation={user?.location ? `${user.location.city}, ${user.location.country}` : "London, United Kingdom"} 
-                className="w-full sm:w-64" 
-              />
+              <motion.div 
+                className="w-full sm:w-72"
+                whileHover={{ scale: 1.02 }}
+                transition={{ type: "spring", stiffness: 400, damping: 10 }}
+              >
+                <LocationSearch 
+                  onLocationSelect={onLocationSelect} 
+                  initialLocation={user?.location ? `${user.location.city}, ${user.location.country}` : "London, United Kingdom"} 
+                  className="w-full" 
+                />
+              </motion.div>
               <Link to="/events">
                 <Button 
                   className="w-full sm:w-auto hover:scale-105 transition-transform duration-300" 
