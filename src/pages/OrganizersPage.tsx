@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Search, Filter, UserRound, Building, LandmarkIcon, HeartHandshake, Users, ExternalLink, ChevronDown } from "lucide-react";
@@ -18,14 +17,12 @@ const OrganizersPage = () => {
   const [selectedType, setSelectedType] = useState<string | null>(null);
   const [isSearchFocused, setIsSearchFocused] = useState(false);
 
-  // Get organizers data
   const { data: organizersData, isLoading } = useQuery({
     queryKey: ["organizers"],
     queryFn: () => Promise.resolve(organizers),
     initialData: organizers,
   });
 
-  // Filter organizers based on search query and selected type
   const filteredOrganizers = organizersData.filter((organizer) => {
     const matchesSearch = organizer.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
                           (organizer.bio && organizer.bio.toLowerCase().includes(searchQuery.toLowerCase()));
@@ -52,7 +49,6 @@ const OrganizersPage = () => {
     }
   };
 
-  // Animation variants for staggered list
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -134,7 +130,6 @@ const OrganizersPage = () => {
                   Visit Website 
                   <ExternalLink className="h-3.5 w-3.5 transition-transform duration-300 group-hover:translate-x-0.5" />
                   
-                  {/* Subtle hover effect */}
                   <span className="absolute inset-0 bg-primary/5 transform scale-x-0 transition-transform duration-300 origin-left group-hover:scale-x-100 -z-10"></span>
                 </a>
               </Button>
@@ -145,7 +140,6 @@ const OrganizersPage = () => {
     );
   };
 
-  // Scrolling animation
   useEffect(() => {
     const handleScroll = () => {
       const cards = document.querySelectorAll('.organizer-card');
@@ -160,7 +154,6 @@ const OrganizersPage = () => {
     };
 
     window.addEventListener('scroll', handleScroll);
-    // Trigger once on mount
     setTimeout(handleScroll, 300);
     
     return () => window.removeEventListener('scroll', handleScroll);
@@ -261,7 +254,7 @@ const OrganizersPage = () => {
                     className="flex-1 md:flex-initial transition-all duration-300 data-[state=active]:bg-primary data-[state=active]:text-white rounded-md flex items-center gap-1"
                   >
                     <UserRound className="h-3.5 w-3.5 hidden md:inline" />
-                    <span>Scholars</span>
+                    <span>Speakers</span>
                   </TabsTrigger>
                   <TabsTrigger 
                     value="individual" 
