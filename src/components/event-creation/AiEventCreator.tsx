@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
@@ -158,7 +159,7 @@ const AiEventCreator = () => {
       // Get selected category name
       const categoryName = eventCategories.find(c => c.id === selectedCategory)?.name || "Event";
       
-      // Generate placeholder event
+      // Generate placeholder event - fixing the type error on line 189 by converting to string
       const event = {
         title: `${categoryName} - ${new Date().toLocaleDateString()}`,
         description: eventDetails,
@@ -180,13 +181,13 @@ const AiEventCreator = () => {
 
       setGeneratedEvent(event);
       
-      // Prefill the edit form
+      // Prefill the edit form - Convert capacity to string for the form
       editForm.setValue("title", event.title);
       editForm.setValue("description", event.description);
       editForm.setValue("location", event.location.name);
       editForm.setValue("city", event.location.city);
       editForm.setValue("date", event.date.start.toLocaleDateString());
-      editForm.setValue("capacity", event.capacity);
+      editForm.setValue("capacity", String(event.capacity)); // Fix: Convert to string
       editForm.setValue("price", event.price);
       
       setTimeout(() => {
