@@ -65,7 +65,7 @@ const EventSearch = ({
               value={searchTerm || "Search events..."}
               readOnly={!isOpen}
               onClick={() => setIsOpen(true)}
-              className={cn(a
+              className={cn(
                 "w-full pl-10 pr-4 cursor-pointer transition-all duration-300",
                 "border-purple-200 hover:border-purple-400",
                 "bg-background/80 backdrop-blur-sm",
