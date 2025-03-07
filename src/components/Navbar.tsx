@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -49,7 +48,6 @@ const Navbar = ({ isAuthenticated = true }: { isAuthenticated?: boolean }) => {
     active: location.pathname === item.href
   }));
 
-  // New handler for navigation with scroll to top
   const handleNavigation = (path: string) => {
     navigate(path);
     window.scrollTo(0, 0);
@@ -67,12 +65,11 @@ const Navbar = ({ isAuthenticated = true }: { isAuthenticated?: boolean }) => {
             <NavigationMenuList>
               {navigation.map(item => <NavigationMenuItem key={item.href}>
                   <NavigationMenuLink asChild className={cn(
-                    navigationMenuTriggerStyle(), 
-                    "bg-transparent font-medium text-base tracking-wide transition-all duration-200",
+                    "px-4 py-2 text-base font-medium tracking-wide transition-all duration-200 rounded-md",
                     "hover:text-primary hover:bg-primary/10 hover:scale-105",
                     item.active 
                       ? "text-primary font-semibold border-b-2 border-primary" 
-                      : "text-foreground/80"
+                      : "text-foreground/80 bg-transparent"
                   )}>
                     <button onClick={() => handleNavigation(item.href)}>
                       {item.label}
