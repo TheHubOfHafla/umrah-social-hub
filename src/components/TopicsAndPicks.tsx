@@ -1,6 +1,5 @@
-
 import { useState, useEffect, useCallback, useRef } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { EventCategory } from "@/types";
 import { categories } from "@/lib/data";
 import { cn } from "@/lib/utils";
@@ -32,11 +31,18 @@ interface TopicCardProps {
 
 const TopicCard = ({ title, category, icon, className, style, isActive }: TopicCardProps) => {
   const [isHovered, setIsHovered] = useState(false);
+  const navigate = useNavigate();
+  
+  const handleCategoryClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    navigate(`/events?category=${category}`);
+    window.scrollTo(0, 0);
+  };
   
   return (
-    <Link 
-      to={`/events?category=${category}`} 
-      className="block text-center"
+    <div 
+      className="block text-center cursor-pointer"
+      onClick={handleCategoryClick}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -65,7 +71,7 @@ const TopicCard = ({ title, category, icon, className, style, isActive }: TopicC
           isHovered ? "text-primary" : ""
         )}>{title}</span>
       </div>
-    </Link>
+    </div>
   );
 };
 

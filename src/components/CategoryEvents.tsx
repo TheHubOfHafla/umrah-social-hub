@@ -1,5 +1,5 @@
 
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import { Event, EventCategory } from "@/types";
 import EventGrid from "@/components/EventGrid";
@@ -11,6 +11,13 @@ interface CategoryEventsProps {
 }
 
 const CategoryEvents = ({ category, events }: CategoryEventsProps) => {
+  const navigate = useNavigate();
+
+  const handleViewAll = () => {
+    navigate(`/events?category=${category}`);
+    window.scrollTo(0, 0);
+  };
+
   return (
     <section className="container mx-auto px-4 py-8">
       <div className="flex items-center justify-between mb-6">
@@ -22,21 +29,21 @@ const CategoryEvents = ({ category, events }: CategoryEventsProps) => {
             Browse {category} events in your area
           </p>
         </div>
-        <Link to={`/events?category=${category}`} className="hidden sm:block">
+        <button onClick={handleViewAll} className="hidden sm:block">
           <Button variant="ghost" icon={<ArrowRight className="ml-1 h-4 w-4" />} iconPosition="right">
             View all
           </Button>
-        </Link>
+        </button>
       </div>
       
       <EventGrid events={events} columns={3} />
       
       <div className="text-center mt-8 sm:hidden">
-        <Link to={`/events?category=${category}`}>
+        <button onClick={handleViewAll}>
           <Button variant="outline">
             View All {category} Events
           </Button>
-        </Link>
+        </button>
       </div>
     </section>
   );
