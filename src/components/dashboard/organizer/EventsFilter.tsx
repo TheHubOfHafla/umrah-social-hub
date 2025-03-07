@@ -1,5 +1,5 @@
 
-import { Search, ChevronUp, ChevronDown } from "lucide-react";
+import { Search, ChevronUp, ChevronDown, BarChart3, PieChart } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { EventCategory } from "@/types";
@@ -15,6 +15,8 @@ interface EventsFilterProps {
   setCategoryFilter: (category: EventCategory | "all") => void;
   compact?: boolean;
   onToggleCompact?: () => void;
+  viewMode?: 'list' | 'chart';
+  onViewModeChange?: (mode: 'list' | 'chart') => void;
 }
 
 const EventsFilter = ({
@@ -24,6 +26,8 @@ const EventsFilter = ({
   setCategoryFilter,
   compact = false,
   onToggleCompact,
+  viewMode = 'list',
+  onViewModeChange
 }: EventsFilterProps) => {
   const [isFocused, setIsFocused] = useState(false);
 
@@ -84,6 +88,39 @@ const EventsFilter = ({
               ))}
             </SelectContent>
           </Select>
+        )}
+        
+        {onViewModeChange && (
+          <div className="flex rounded-md border overflow-hidden">
+            <Button
+              variant="ghost"
+              size="sm"
+              className={`px-3 py-1.5 rounded-none transition-all ${viewMode === 'list' ? 'bg-[#8B5CF6]/10 text-[#8B5CF6]' : 'text-muted-foreground'}`}
+              onClick={() => onViewModeChange('list')}
+            >
+              <motion.div
+                whileTap={{ scale: 0.95 }}
+                className="flex items-center"
+              >
+                <BarChart3 className="h-4 w-4 mr-1" />
+                <span className="text-xs">List</span>
+              </motion.div>
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              className={`px-3 py-1.5 rounded-none transition-all ${viewMode === 'chart' ? 'bg-[#8B5CF6]/10 text-[#8B5CF6]' : 'text-muted-foreground'}`}
+              onClick={() => onViewModeChange('chart')}
+            >
+              <motion.div
+                whileTap={{ scale: 0.95 }}
+                className="flex items-center"
+              >
+                <PieChart className="h-4 w-4 mr-1" />
+                <span className="text-xs">Charts</span>
+              </motion.div>
+            </Button>
+          </div>
         )}
         
         {onToggleCompact && (
