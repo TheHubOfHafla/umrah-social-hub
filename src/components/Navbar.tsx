@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -60,7 +61,8 @@ const Navbar = ({ isAuthenticated = true }: { isAuthenticated?: boolean }) => {
         : "py-2 md:py-3 bg-transparent"
     )}>
       <div className="container flex items-center justify-between">
-        <div className="flex items-center">
+        {/* Left side nav menu */}
+        <div className="hidden md:flex items-center">
           <NavigationMenu className="hidden md:flex">
             <NavigationMenuList>
               {navigation.map(item => <NavigationMenuItem key={item.href}>
@@ -80,14 +82,16 @@ const Navbar = ({ isAuthenticated = true }: { isAuthenticated?: boolean }) => {
           </NavigationMenu>
         </div>
 
-        <div className="absolute left-1/2 transform -translate-x-1/2">
+        {/* Logo (centered on mobile, left-aligned after nav on larger screens) */}
+        <div className="flex-1 md:flex-none flex justify-center md:justify-start">
           <button onClick={() => handleNavigation("/")} className="flex items-center gap-1 md:gap-2 group">
             <Zap className="h-5 w-5 md:h-7 md:w-7 text-primary group-hover:animate-pulse-soft" />
             <span className="font-heading text-xl md:text-2xl tracking-tight text-primary font-bold">EventHub</span>
           </button>
         </div>
 
-        <div className="flex items-center">
+        {/* Right side actions */}
+        <div className="flex items-center space-x-2">
           <div className="hidden md:flex items-center space-x-2">
             <button onClick={() => handleNavigation("/events/create")}>
               <Button className="flex items-center gap-2 bg-primary hover:bg-primary/90 transition-all duration-200 hover:scale-105">
@@ -105,7 +109,7 @@ const Navbar = ({ isAuthenticated = true }: { isAuthenticated?: boolean }) => {
                 <button onClick={() => handleNavigation("/dashboard/profile")}>
                   <Button variant="outline" className="flex items-center gap-2 hover:bg-primary/10 hover:text-primary transition-all duration-200">
                     <UserRound className="h-4 w-4" />
-                    My Profile
+                    <span className="hidden lg:inline">My Profile</span>
                   </Button>
                 </button>
                 
@@ -133,13 +137,13 @@ const Navbar = ({ isAuthenticated = true }: { isAuthenticated?: boolean }) => {
                 <button onClick={() => handleNavigation("/login")}>
                   <Button variant="outline" className="flex items-center gap-2 hover:bg-primary/10 hover:text-primary transition-all duration-200">
                     <LogIn className="h-4 w-4" />
-                    Sign In
+                    <span className="hidden sm:inline">Sign In</span>
                   </Button>
                 </button>
                 <button onClick={() => handleNavigation("/signup")}>
                   <Button className="flex items-center gap-2 bg-primary hover:bg-primary/90 transition-all duration-200 hover:scale-105">
                     <UserPlus className="h-4 w-4" />
-                    Sign Up
+                    <span className="hidden sm:inline">Sign Up</span>
                   </Button>
                 </button>
               </>
