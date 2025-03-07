@@ -15,6 +15,7 @@ const ChatbotButton = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
+  const [hasBounced, setHasBounced] = useState(false);
 
   // Delay showing the button for better UX
   useEffect(() => {
@@ -24,6 +25,21 @@ const ChatbotButton = () => {
     
     return () => clearTimeout(timer);
   }, []);
+
+  // Add initial bounce animation after a delay
+  useEffect(() => {
+    if (isVisible && !hasBounced) {
+      const bounceTimer = setTimeout(() => {
+        setIsAnimating(true);
+        setTimeout(() => {
+          setIsAnimating(false);
+          setHasBounced(true);
+        }, 1000);
+      }, 3000);
+      
+      return () => clearTimeout(bounceTimer);
+    }
+  }, [isVisible, hasBounced]);
 
   const handleToggleChat = () => {
     setIsAnimating(true);
@@ -52,11 +68,13 @@ const ChatbotButton = () => {
                 onClick={handleToggleChat}
                 size="icon"
                 className={cn(
-                  "h-11 w-11 sm:h-14 sm:w-14 rounded-full shadow-lg transition-all duration-300",
+                  "h-12 w-12 sm:h-14 sm:w-14 rounded-full shadow-lg transition-all duration-300",
                   isOpen ? "bg-secondary hover:bg-secondary/90" : "bg-primary hover:bg-primary/90",
                   isAnimating && "animate-pulse",
-                  "hover:scale-110"
+                  !isOpen && !hasBounced && "animate-bounce",
+                  "hover:scale-110 focus:scale-110 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2"
                 )}
+                aria-label={isOpen ? "Close chat" : "Open chat"}
               >
                 {isOpen ? (
                   <X className="h-5 w-5 sm:h-6 sm:w-6" />
