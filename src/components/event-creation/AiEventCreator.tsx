@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
@@ -7,7 +6,8 @@ import { z } from "zod";
 import { 
   Bot, Edit, CheckCircle, ArrowRight, 
   Loader2, Sparkles, AlertTriangle, 
-  PenLine, Send, RefreshCw, FileImage
+  PenLine, Send, RefreshCw, FileImage,
+  Camera, Image, Upload
 } from "lucide-react";
 import {
   Card,
@@ -29,6 +29,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -68,6 +69,7 @@ type CreationStage =
   | "add-details" 
   | "generating" 
   | "review" 
+  | "edit-details" 
   | "complete";
 
 const AiEventCreator = () => {
@@ -77,6 +79,7 @@ const AiEventCreator = () => {
   const [generatedEvent, setGeneratedEvent] = useState<any>(null);
   const [progress, setProgress] = useState(0);
   const [showLaunchConfirmation, setShowLaunchConfirmation] = useState(false);
+  const [bannerPreview, setBannerPreview] = useState<string | null>(null);
   const progressIntervalRef = useRef<number | null>(null);
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -95,6 +98,19 @@ const AiEventCreator = () => {
     defaultValues: {
       details: "",
     },
+  });
+
+  // Form for editing event details
+  const editForm = useForm({
+    defaultValues: {
+      title: "",
+      description: "",
+      location: "",
+      city: "",
+      date: "",
+      capacity: "",
+      price: 0,
+    }
   });
 
   // Handle category selection
@@ -164,6 +180,15 @@ const AiEventCreator = () => {
 
       setGeneratedEvent(event);
       
+      // Prefill the edit form
+      editForm.setValue("title", event.title);
+      editForm.setValue("description", event.description);
+      editForm.setValue("location", event.location.name);
+      editForm.setValue("city", event.location.city);
+      editForm.setValue("date", event.date.start.toLocaleDateString());
+      editForm.setValue("capacity", event.capacity);
+      editForm.setValue("price", event.price);
+      
       setTimeout(() => {
         setStage("review");
         toast({
@@ -185,6 +210,21 @@ const AiEventCreator = () => {
 
   // Launch event handler
   const handleLaunchEvent = () => {
+    // Check if banner image exists
+    if (!bannerPreview) {
+      toast({
+        title: "Banner Required",
+        description: "Please upload a banner image before launching your event.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    // Update the generated event with the banner
+    if (generatedEvent) {
+      generatedEvent.image = bannerPreview;
+    }
+    
     setStage("complete");
     toast({
       title: "Event Created Successfully!",
@@ -196,13 +236,24 @@ const AiEventCreator = () => {
     }, 2000);
   };
 
-  // Edit event handler - navigate to manual creation with prefilled data
+  // Navigate to detailed edit page
   const handleEditEvent = () => {
-    navigate("/events/create", { state: { event: generatedEvent } });
+    if (generatedEvent) {
+      generatedEvent.image = bannerPreview || "";
+      navigate("/events/create", { state: { event: generatedEvent } });
+    }
   };
 
   // Show launch confirmation dialog
   const handleShowLaunchConfirmation = () => {
+    if (!bannerPreview) {
+      toast({
+        title: "Banner Required",
+        description: "Please upload a banner image before launching your event.",
+        variant: "destructive",
+      });
+      return;
+    }
     setShowLaunchConfirmation(true);
   };
 
@@ -213,8 +264,68 @@ const AiEventCreator = () => {
     setEventDetails("");
     setGeneratedEvent(null);
     setProgress(0);
+    setBannerPreview(null);
     categoryForm.reset();
     detailsForm.reset();
+    editForm.reset();
+  };
+
+  // Toggle to edit mode in the review stage
+  const handleToggleEditMode = () => {
+    setStage(stage === "review" ? "edit-details" : "review");
+  };
+
+  // Handle inline edits and update the generatedEvent
+  const handleEditSubmit = (data: any) => {
+    if (generatedEvent) {
+      const updatedEvent = {
+        ...generatedEvent,
+        title: data.title,
+        description: data.description,
+        location: {
+          ...generatedEvent.location,
+          name: data.location,
+          city: data.city,
+        },
+        capacity: parseInt(data.capacity),
+        price: parseFloat(data.price),
+        image: bannerPreview,
+      };
+      
+      setGeneratedEvent(updatedEvent);
+      setStage("review");
+      
+      toast({
+        title: "Changes Saved",
+        description: "Your event details have been updated.",
+      });
+    }
+  };
+
+  // Handle banner image upload
+  const handleBannerUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      // In a real app, you would upload this file to your server
+      // For now, we'll just create a local URL for preview
+      const imageUrl = URL.createObjectURL(file);
+      setBannerPreview(imageUrl);
+      
+      toast({
+        title: "Banner Uploaded",
+        description: "Your event banner has been uploaded successfully.",
+      });
+    }
+  };
+
+  // Select a sample banner
+  const selectSampleBanner = (imageUrl: string) => {
+    setBannerPreview(imageUrl);
+    
+    toast({
+      title: "Banner Selected",
+      description: "Sample banner has been selected for your event.",
+    });
   };
 
   // Get selected category info
@@ -236,12 +347,12 @@ const AiEventCreator = () => {
         <div className="flex justify-between items-center">
           <div className={cn(
             "flex flex-col items-center",
-            (stage === "select-category" || stage === "add-details" || stage === "generating" || stage === "review" || stage === "complete") 
+            (stage === "select-category" || stage === "add-details" || stage === "generating" || stage === "review" || stage === "edit-details" || stage === "complete") 
               ? "text-purple-700" : "text-gray-400"
           )}>
             <div className={cn(
               "h-10 w-10 rounded-full flex items-center justify-center mb-2 transition-all duration-300",
-              (stage === "select-category" || stage === "add-details" || stage === "generating" || stage === "review" || stage === "complete") 
+              (stage === "select-category" || stage === "add-details" || stage === "generating" || stage === "review" || stage === "edit-details" || stage === "complete") 
                 ? "bg-purple-100 text-purple-700 border-2 border-purple-700"
                 : "bg-gray-100 text-gray-400 border-2 border-gray-200"
             )}>
@@ -259,12 +370,12 @@ const AiEventCreator = () => {
           
           <div className={cn(
             "flex flex-col items-center",
-            (stage === "add-details" || stage === "generating" || stage === "review" || stage === "complete") 
+            (stage === "add-details" || stage === "generating" || stage === "review" || stage === "edit-details" || stage === "complete") 
               ? "text-purple-700" : "text-gray-400"
           )}>
             <div className={cn(
               "h-10 w-10 rounded-full flex items-center justify-center mb-2 transition-all duration-300",
-              (stage === "add-details" || stage === "generating" || stage === "review" || stage === "complete") 
+              (stage === "add-details" || stage === "generating" || stage === "review" || stage === "edit-details" || stage === "complete") 
                 ? "bg-purple-100 text-purple-700 border-2 border-purple-700"
                 : "bg-gray-100 text-gray-400 border-2 border-gray-200"
             )}>
@@ -282,17 +393,17 @@ const AiEventCreator = () => {
           
           <div className={cn(
             "flex flex-col items-center",
-            (stage === "generating" || stage === "review" || stage === "complete") 
+            (stage === "generating" || stage === "review" || stage === "edit-details" || stage === "complete") 
               ? "text-purple-700" : "text-gray-400"
           )}>
             <div className={cn(
               "h-10 w-10 rounded-full flex items-center justify-center mb-2 transition-all duration-300",
-              (stage === "generating" || stage === "review" || stage === "complete") 
+              (stage === "generating" || stage === "review" || stage === "edit-details" || stage === "complete") 
                 ? "bg-purple-100 text-purple-700 border-2 border-purple-700"
                 : "bg-gray-100 text-gray-400 border-2 border-gray-200"
             )}>
               {stage === "generating" ? <Loader2 className="h-5 w-5 animate-spin" /> : 
-               (stage === "review" || stage === "complete" ? <CheckCircle className="h-5 w-5" /> : "3")}
+               (stage === "review" || stage === "edit-details" || stage === "complete" ? <CheckCircle className="h-5 w-5" /> : "3")}
             </div>
             <span className="text-xs sm:text-sm font-medium">Generate</span>
           </div>
@@ -306,12 +417,12 @@ const AiEventCreator = () => {
           
           <div className={cn(
             "flex flex-col items-center",
-            (stage === "review" || stage === "complete") 
+            (stage === "review" || stage === "edit-details" || stage === "complete") 
               ? "text-purple-700" : "text-gray-400"
           )}>
             <div className={cn(
               "h-10 w-10 rounded-full flex items-center justify-center mb-2 transition-all duration-300",
-              (stage === "review" || stage === "complete") 
+              (stage === "review" || stage === "edit-details" || stage === "complete") 
                 ? "bg-purple-100 text-purple-700 border-2 border-purple-700"
                 : "bg-gray-100 text-gray-400 border-2 border-gray-200"
             )}>
@@ -501,6 +612,179 @@ const AiEventCreator = () => {
         </Card>
       )}
 
+      {/* Edit Details Inline */}
+      {stage === "edit-details" && generatedEvent && (
+        <Card className="border-purple-200 shadow-lg transition-all duration-300 hover:shadow-xl animate-fade-in">
+          <CardHeader className="bg-purple-50 border-b border-purple-100">
+            <div className="flex items-center space-x-2">
+              <div className="h-8 w-8 rounded-full bg-purple-200 flex items-center justify-center">
+                <Edit className="h-5 w-5 text-purple-700" />
+              </div>
+              <div>
+                <CardTitle className="text-xl text-purple-900">Edit Your Event</CardTitle>
+                <CardDescription>Make changes to your {getSelectedCategoryInfo()?.name}</CardDescription>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent className="pt-6">
+            <form onSubmit={editForm.handleSubmit(handleEditSubmit)} className="space-y-6">
+              <div className="space-y-4">
+                <div>
+                  <Label htmlFor="title" className="text-base font-medium">Event Title</Label>
+                  <Input
+                    id="title"
+                    className="mt-1"
+                    {...editForm.register("title")}
+                  />
+                </div>
+                
+                <div>
+                  <Label htmlFor="description" className="text-base font-medium">Description</Label>
+                  <Textarea
+                    id="description"
+                    className="mt-1 min-h-[100px]"
+                    {...editForm.register("description")}
+                  />
+                </div>
+                
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="location" className="text-base font-medium">Location</Label>
+                    <Input
+                      id="location"
+                      className="mt-1"
+                      {...editForm.register("location")}
+                    />
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="city" className="text-base font-medium">City</Label>
+                    <Input
+                      id="city"
+                      className="mt-1"
+                      {...editForm.register("city")}
+                    />
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="date" className="text-base font-medium">Date</Label>
+                    <Input
+                      id="date"
+                      className="mt-1"
+                      {...editForm.register("date")}
+                    />
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="capacity" className="text-base font-medium">Capacity</Label>
+                    <Input
+                      id="capacity"
+                      type="number"
+                      className="mt-1"
+                      {...editForm.register("capacity")}
+                    />
+                  </div>
+                </div>
+                
+                <div>
+                  <Label htmlFor="price" className="text-base font-medium">Price ($)</Label>
+                  <Input
+                    id="price"
+                    type="number"
+                    step="0.01"
+                    className="mt-1"
+                    {...editForm.register("price")}
+                  />
+                </div>
+                
+                <div className="pt-4 mt-4 border-t border-gray-200">
+                  <Label className="text-base font-medium block mb-2">Banner Image</Label>
+                  
+                  {bannerPreview ? (
+                    <div className="mb-3 relative rounded-lg overflow-hidden border border-purple-200">
+                      <img 
+                        src={bannerPreview} 
+                        alt="Event banner preview" 
+                        className="w-full h-[200px] object-cover"
+                      />
+                      <div className="absolute inset-0 bg-black/60 opacity-0 hover:opacity-100 flex items-center justify-center transition-opacity duration-200">
+                        <Button 
+                          type="button"
+                          className="bg-purple-600 hover:bg-purple-700 text-white"
+                          onClick={() => document.getElementById('event-banner-edit')?.click()}
+                        >
+                          <Camera className="mr-2 h-4 w-4" /> Change Image
+                        </Button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="border-2 border-dashed border-purple-200 rounded-lg p-6 text-center hover:bg-purple-50 transition-colors cursor-pointer mb-3"
+                      onClick={() => document.getElementById('event-banner-edit')?.click()}
+                    >
+                      <Upload className="h-8 w-8 mx-auto mb-2 text-purple-500" />
+                      <p className="text-sm text-gray-600">Click to upload your event banner</p>
+                      <p className="text-xs text-gray-500 mt-1">Recommended size: 1200 x 630 pixels</p>
+                    </div>
+                  )}
+                  
+                  <input 
+                    type="file" 
+                    className="hidden" 
+                    id="event-banner-edit"
+                    accept="image/*"
+                    onChange={handleBannerUpload}
+                  />
+                  
+                  {!bannerPreview && (
+                    <div>
+                      <p className="text-sm font-medium mb-2">Or choose a sample banner:</p>
+                      <div className="grid grid-cols-3 gap-2">
+                        <img 
+                          src="https://images.unsplash.com/photo-1605810230434-7631ac76ec81" 
+                          alt="Sample banner 1" 
+                          className="h-20 w-full object-cover rounded-md cursor-pointer border-2 hover:border-purple-500 transition-all"
+                          onClick={() => selectSampleBanner("https://images.unsplash.com/photo-1605810230434-7631ac76ec81")}
+                        />
+                        <img 
+                          src="https://images.unsplash.com/photo-1487058792275-0ad4aaf24ca7" 
+                          alt="Sample banner 2" 
+                          className="h-20 w-full object-cover rounded-md cursor-pointer border-2 hover:border-purple-500 transition-all"
+                          onClick={() => selectSampleBanner("https://images.unsplash.com/photo-1487058792275-0ad4aaf24ca7")}
+                        />
+                        <img 
+                          src="https://images.unsplash.com/photo-1519389950473-47ba0277781c" 
+                          alt="Sample banner 3" 
+                          className="h-20 w-full object-cover rounded-md cursor-pointer border-2 hover:border-purple-500 transition-all"
+                          onClick={() => selectSampleBanner("https://images.unsplash.com/photo-1519389950473-47ba0277781c")}
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+              
+              <div className="flex justify-between pt-4">
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  onClick={() => setStage("review")}
+                >
+                  Cancel
+                </Button>
+                <Button 
+                  type="submit"
+                  className="bg-gradient-to-r from-purple-600 to-purple-400 hover:from-purple-700 hover:to-purple-500 text-white"
+                >
+                  Save Changes
+                </Button>
+              </div>
+            </form>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Review & Launch */}
       {stage === "review" && generatedEvent && (
         <Card className="border-purple-200 shadow-lg transition-all duration-300 hover:shadow-xl animate-fade-in">
@@ -556,25 +840,88 @@ const AiEventCreator = () => {
                 </div>
               </div>
               
+              <div className="pt-4 border-t border-gray-200">
+                <h3 className="font-medium text-lg mb-3">Event Banner</h3>
+                
+                {bannerPreview ? (
+                  <div className="mb-3 relative rounded-lg overflow-hidden border border-purple-200">
+                    <img 
+                      src={bannerPreview} 
+                      alt="Event banner preview" 
+                      className="w-full h-[200px] object-cover"
+                    />
+                    <div className="absolute inset-0 bg-black/60 opacity-0 hover:opacity-100 flex items-center justify-center transition-opacity duration-200">
+                      <Button 
+                        type="button"
+                        className="bg-purple-600 hover:bg-purple-700 text-white"
+                        onClick={() => document.getElementById('event-banner-review')?.click()}
+                      >
+                        <Camera className="mr-2 h-4 w-4" /> Change Image
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="border-2 border-dashed border-purple-200 rounded-lg p-6 text-center hover:bg-purple-50 transition-colors cursor-pointer mb-3"
+                    onClick={() => document.getElementById('event-banner-review')?.click()}
+                  >
+                    <Upload className="h-8 w-8 mx-auto mb-2 text-purple-500" />
+                    <p className="text-sm text-gray-600">Upload your event banner <span className="text-red-500 font-bold">*</span></p>
+                    <p className="text-xs text-gray-500 mt-1">Events with images get more attendees!</p>
+                    <Button 
+                      type="button"
+                      variant="outline" 
+                      className="mt-3 text-purple-600 border-purple-200 hover:bg-purple-50"
+                    >
+                      <FileImage className="mr-2 h-4 w-4" /> Upload Image
+                    </Button>
+                  </div>
+                )}
+                
+                <input 
+                  type="file" 
+                  className="hidden" 
+                  id="event-banner-review"
+                  accept="image/*"
+                  onChange={handleBannerUpload}
+                />
+                
+                {!bannerPreview && (
+                  <div>
+                    <p className="text-sm font-medium mb-2">Or choose a sample banner:</p>
+                    <div className="grid grid-cols-3 gap-2">
+                      <img 
+                        src="https://images.unsplash.com/photo-1605810230434-7631ac76ec81" 
+                        alt="Sample banner 1" 
+                        className="h-20 w-full object-cover rounded-md cursor-pointer border-2 hover:border-purple-500 transition-all"
+                        onClick={() => selectSampleBanner("https://images.unsplash.com/photo-1605810230434-7631ac76ec81")}
+                      />
+                      <img 
+                        src="https://images.unsplash.com/photo-1487058792275-0ad4aaf24ca7" 
+                        alt="Sample banner 2" 
+                        className="h-20 w-full object-cover rounded-md cursor-pointer border-2 hover:border-purple-500 transition-all"
+                        onClick={() => selectSampleBanner("https://images.unsplash.com/photo-1487058792275-0ad4aaf24ca7")}
+                      />
+                      <img 
+                        src="https://images.unsplash.com/photo-1519389950473-47ba0277781c" 
+                        alt="Sample banner 3" 
+                        className="h-20 w-full object-cover rounded-md cursor-pointer border-2 hover:border-purple-500 transition-all"
+                        onClick={() => selectSampleBanner("https://images.unsplash.com/photo-1519389950473-47ba0277781c")}
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+              
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                 <div className="flex items-start">
                   <Bot className="text-blue-500 mr-3 mt-0.5 h-5 w-5 flex-shrink-0" />
                   <div className="text-sm text-blue-800">
                     <p className="font-medium">AI Notes:</p>
                     <p className="mt-1">
-                      I've generated basic event details based on your inputs. You should edit this event to add a banner 
-                      image before launching. This will make your event more attractive to attendees.
+                      I've generated basic event details based on your inputs. You can edit these details directly using the "Edit Details" button below.
                     </p>
                   </div>
                 </div>
-              </div>
-              
-              <div className="border-2 border-dashed border-purple-200 rounded-lg p-4 text-center bg-purple-50/50">
-                <FileImage className="h-10 w-10 text-purple-400 mx-auto mb-2" />
-                <p className="text-sm text-purple-700">
-                  <span className="font-medium">Note:</span> Don't forget to add a banner/flyer image 
-                  when you edit this event. Events with images get more attendees!
-                </p>
               </div>
             </div>
           </CardContent>
@@ -588,7 +935,7 @@ const AiEventCreator = () => {
                 <RefreshCw className="mr-2 h-4 w-4" /> Reset
               </Button>
               <Button 
-                onClick={handleEditEvent}
+                onClick={handleToggleEditMode}
                 variant="default"
                 className="bg-purple-600 hover:bg-purple-700 text-white flex-1 sm:flex-initial"
               >
@@ -598,6 +945,7 @@ const AiEventCreator = () => {
             <Button 
               onClick={handleShowLaunchConfirmation}
               className="bg-gradient-to-r from-purple-600 to-purple-400 hover:from-purple-700 hover:to-purple-500 text-white transition-all duration-300 hover:scale-[1.02] font-medium w-full sm:w-auto"
+              disabled={!bannerPreview}
             >
               Launch Event <Send className="ml-2 h-4 w-4" />
             </Button>
@@ -609,10 +957,10 @@ const AiEventCreator = () => {
       <AlertDialog open={showLaunchConfirmation} onOpenChange={setShowLaunchConfirmation}>
         <AlertDialogContent className="border border-purple-200">
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-purple-900">Are you sure?</AlertDialogTitle>
+            <AlertDialogTitle className="text-purple-900">Are you ready to launch?</AlertDialogTitle>
             <AlertDialogDescription>
-              You haven't edited your event yet. Events with complete details and banner images get more attendees.
-              Would you like to edit your event before launching?
+              Your event looks great! You can launch it now or make additional edits. 
+              Do you want to proceed with launching the event?
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="mt-4">
@@ -620,16 +968,16 @@ const AiEventCreator = () => {
               Cancel
             </AlertDialogCancel>
             <AlertDialogAction
-              onClick={handleEditEvent}
+              onClick={handleToggleEditMode}
               className="bg-purple-600 text-white hover:bg-purple-700"
             >
-              Edit Event
+              Edit More Details
             </AlertDialogAction>
             <AlertDialogAction
               onClick={handleLaunchEvent}
               className="bg-gradient-to-r from-purple-600 to-purple-400 hover:from-purple-700 hover:to-purple-500 text-white"
             >
-              Launch Anyway
+              Launch Now
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
