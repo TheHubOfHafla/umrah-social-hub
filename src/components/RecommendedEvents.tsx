@@ -10,6 +10,9 @@ interface RecommendedEventsProps {
 }
 
 const RecommendedEvents = ({ events }: RecommendedEventsProps) => {
+  // Make sure we only display up to 9 events (3x3 grid)
+  const displayEvents = events.slice(0, 9);
+  
   return (
     <section className="container mx-auto px-4 py-8">
       <div className="flex items-center justify-between mb-6">
@@ -24,7 +27,7 @@ const RecommendedEvents = ({ events }: RecommendedEventsProps) => {
         </Link>
       </div>
       
-      <EventGrid events={events} columns={4} />
+      <EventGrid events={displayEvents} columns={3} />
       
       <div className="text-center mt-8 sm:hidden">
         <Link to="/events">

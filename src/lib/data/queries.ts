@@ -1,4 +1,3 @@
-
 import { Event, EventCategory, AttendeeType } from '@/types';
 import { mockEvents } from './events';
 import { currentUser } from './users';
@@ -49,7 +48,7 @@ export const getRecommendedEvents = (userId: string): Event[] => {
       event.categories.some(cat => user.interests?.includes(cat)) &&
       !user.eventsAttending?.includes(event.id)
     )
-    .slice(0, 4);
+    .slice(0, 9);
 };
 
 export const getEventsByAttendeeType = (type: AttendeeType): Event[] => {
@@ -135,4 +134,3 @@ export const registerForEvent = (eventId: string): boolean => {
   
   return false;
 };
-
