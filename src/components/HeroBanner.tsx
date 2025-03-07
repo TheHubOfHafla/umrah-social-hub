@@ -67,27 +67,29 @@ const HeroBanner = ({ user, onLocationSelect, isAuthenticated = true }: HeroBann
             </h1>
             
             <div className={cn(
-              "flex flex-col sm:flex-row gap-3 mt-8 justify-center transition-all duration-700 delay-300",
+              "transition-all duration-700 delay-300",
               contentVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
             )}>
               <motion.div 
-                className="w-full sm:w-72"
+                className="flex flex-col sm:flex-row items-center gap-2 w-full max-w-md mx-auto"
                 whileHover={{ scale: 1.02 }}
                 transition={{ type: "spring", stiffness: 400, damping: 10 }}
               >
-                <EventSearch 
-                  onSearch={handleSearch}
-                  className="w-full" 
-                />
+                <div className="w-full relative">
+                  <EventSearch 
+                    onSearch={handleSearch}
+                    className="w-full rounded-r-none sm:rounded-r-none"
+                  />
+                </div>
+                <Link to="/events" className="w-full sm:w-auto">
+                  <Button 
+                    className="w-full sm:w-auto hover:scale-105 transition-transform duration-300 rounded-l-none sm:rounded-l-none border-l-0" 
+                    icon={<Filter className="w-4 h-4" />}
+                  >
+                    Browse
+                  </Button>
+                </Link>
               </motion.div>
-              <Link to="/events">
-                <Button 
-                  className="w-full sm:w-auto hover:scale-105 transition-transform duration-300" 
-                  icon={<Filter className="w-4 h-4" />}
-                >
-                  Browse All Events
-                </Button>
-              </Link>
             </div>
             
             {!isAuthenticated && (
