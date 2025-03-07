@@ -1,5 +1,7 @@
+
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { Link } from "react-router-dom";
 import { Search, Filter, UserRound, Building, LandmarkIcon, HeartHandshake, Users, ExternalLink, ChevronDown } from "lucide-react";
 
 import { organizers } from "@/lib/data/organizers";
@@ -92,50 +94,53 @@ const OrganizersPage = () => {
         transition={{ delay: index * 0.05 }}
         whileHover={{ y: -8, scale: 1.02 }}
       >
-        <Card className="overflow-hidden transition-all duration-300 hover:shadow-xl hover:border-primary/50 group">
-          <CardHeader className="pb-0">
-            <div className="flex items-center gap-4">
-              <Avatar className="h-16 w-16 border-2 border-primary/10 transition-transform duration-300 group-hover:scale-105 group-hover:border-primary/30">
-                <AvatarImage src={organizer.avatar} alt={organizer.name} />
-                <AvatarFallback className="bg-primary/10 text-primary text-xl">
-                  {initials}
-                </AvatarFallback>
-              </Avatar>
-              <div>
-                <h3 className="text-xl font-semibold transition-colors duration-300 group-hover:text-primary">{organizer.name}</h3>
-                <Badge variant="outline" className="flex items-center gap-1 mt-1 transition-colors duration-300 group-hover:bg-primary/10 group-hover:border-primary/30">
-                  {getOrganizerTypeIcon(organizer.organizationType)}
-                  {typeLabel}
-                </Badge>
+        <Link to={`/organizers/${organizer.id}`} className="block">
+          <Card className="overflow-hidden transition-all duration-300 hover:shadow-xl hover:border-primary/50 group">
+            <CardHeader className="pb-0">
+              <div className="flex items-center gap-4">
+                <Avatar className="h-16 w-16 border-2 border-primary/10 transition-transform duration-300 group-hover:scale-105 group-hover:border-primary/30">
+                  <AvatarImage src={organizer.avatar} alt={organizer.name} />
+                  <AvatarFallback className="bg-primary/10 text-primary text-xl">
+                    {initials}
+                  </AvatarFallback>
+                </Avatar>
+                <div>
+                  <h3 className="text-xl font-semibold transition-colors duration-300 group-hover:text-primary">{organizer.name}</h3>
+                  <Badge variant="outline" className="flex items-center gap-1 mt-1 transition-colors duration-300 group-hover:bg-primary/10 group-hover:border-primary/30">
+                    {getOrganizerTypeIcon(organizer.organizationType)}
+                    {typeLabel}
+                  </Badge>
+                </div>
               </div>
-            </div>
-          </CardHeader>
-          <CardContent className="pt-4 transition-colors duration-300 group-hover:bg-primary/5">
-            <p className="text-muted-foreground transition-colors duration-300 group-hover:text-foreground/90">{organizer.bio}</p>
-          </CardContent>
-          {organizer.website && (
-            <CardFooter className="border-t pt-4 transition-colors duration-300 group-hover:bg-primary/5">
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="gap-1.5 w-full transition-all duration-300 group-hover:border-primary/30 group-hover:text-primary relative overflow-hidden" 
-                asChild
-              >
-                <a 
-                  href={organizer.website} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="relative z-10"
+            </CardHeader>
+            <CardContent className="pt-4 transition-colors duration-300 group-hover:bg-primary/5">
+              <p className="text-muted-foreground transition-colors duration-300 group-hover:text-foreground/90">{organizer.bio}</p>
+            </CardContent>
+            {organizer.website && (
+              <CardFooter className="border-t pt-4 transition-colors duration-300 group-hover:bg-primary/5">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="gap-1.5 w-full transition-all duration-300 group-hover:border-primary/30 group-hover:text-primary relative overflow-hidden" 
+                  asChild
                 >
-                  Visit Website 
-                  <ExternalLink className="h-3.5 w-3.5 transition-transform duration-300 group-hover:translate-x-0.5" />
-                  
-                  <span className="absolute inset-0 bg-primary/5 transform scale-x-0 transition-transform duration-300 origin-left group-hover:scale-x-100 -z-10"></span>
-                </a>
-              </Button>
-            </CardFooter>
-          )}
-        </Card>
+                  <a 
+                    href={organizer.website} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="relative z-10"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    Visit Website 
+                    <ExternalLink className="h-3.5 w-3.5 transition-transform duration-300 group-hover:translate-x-0.5" />
+                    
+                    <span className="absolute inset-0 bg-primary/5 transform scale-x-0 transition-transform duration-300 origin-left group-hover:scale-x-100 -z-10"></span>
+                  </a>
+                </Button>
+              </CardFooter>
+            )}
+          </Card>
+        </Link>
       </motion.div>
     );
   };
