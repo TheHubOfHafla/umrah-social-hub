@@ -7,7 +7,7 @@ import { z } from "zod";
 import { 
   Bot, Edit, CheckCircle, ArrowRight, 
   Loader2, Sparkles, AlertTriangle, 
-  PenLine, Send, RefreshCw
+  PenLine, Send, RefreshCw, FileImage
 } from "lucide-react";
 import {
   Card,
@@ -29,6 +29,16 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 
@@ -66,6 +76,7 @@ const AiEventCreator = () => {
   const [eventDetails, setEventDetails] = useState("");
   const [generatedEvent, setGeneratedEvent] = useState<any>(null);
   const [progress, setProgress] = useState(0);
+  const [showLaunchConfirmation, setShowLaunchConfirmation] = useState(false);
   const progressIntervalRef = useRef<number | null>(null);
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -185,9 +196,14 @@ const AiEventCreator = () => {
     }, 2000);
   };
 
-  // Edit event handler
+  // Edit event handler - navigate to manual creation with prefilled data
   const handleEditEvent = () => {
     navigate("/events/create", { state: { event: generatedEvent } });
+  };
+
+  // Show launch confirmation dialog
+  const handleShowLaunchConfirmation = () => {
+    setShowLaunchConfirmation(true);
   };
 
   // Reset the process
@@ -546,11 +562,19 @@ const AiEventCreator = () => {
                   <div className="text-sm text-blue-800">
                     <p className="font-medium">AI Notes:</p>
                     <p className="mt-1">
-                      I've generated basic event details based on your inputs. You can launch this event as is, 
-                      or choose to edit it for more customization.
+                      I've generated basic event details based on your inputs. You should edit this event to add a banner 
+                      image before launching. This will make your event more attractive to attendees.
                     </p>
                   </div>
                 </div>
+              </div>
+              
+              <div className="border-2 border-dashed border-purple-200 rounded-lg p-4 text-center bg-purple-50/50">
+                <FileImage className="h-10 w-10 text-purple-400 mx-auto mb-2" />
+                <p className="text-sm text-purple-700">
+                  <span className="font-medium">Note:</span> Don't forget to add a banner/flyer image 
+                  when you edit this event. Events with images get more attendees!
+                </p>
               </div>
             </div>
           </CardContent>
@@ -565,14 +589,14 @@ const AiEventCreator = () => {
               </Button>
               <Button 
                 onClick={handleEditEvent}
-                variant="outline"
-                className="border-purple-200 bg-white text-purple-700 hover:bg-purple-50 flex-1 sm:flex-initial"
+                variant="default"
+                className="bg-purple-600 hover:bg-purple-700 text-white flex-1 sm:flex-initial"
               >
                 <Edit className="mr-2 h-4 w-4" /> Edit Details
               </Button>
             </div>
             <Button 
-              onClick={handleLaunchEvent}
+              onClick={handleShowLaunchConfirmation}
               className="bg-gradient-to-r from-purple-600 to-purple-400 hover:from-purple-700 hover:to-purple-500 text-white transition-all duration-300 hover:scale-[1.02] font-medium w-full sm:w-auto"
             >
               Launch Event <Send className="ml-2 h-4 w-4" />
@@ -580,6 +604,36 @@ const AiEventCreator = () => {
           </CardFooter>
         </Card>
       )}
+
+      {/* Launch Confirmation Dialog */}
+      <AlertDialog open={showLaunchConfirmation} onOpenChange={setShowLaunchConfirmation}>
+        <AlertDialogContent className="border border-purple-200">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-purple-900">Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              You haven't edited your event yet. Events with complete details and banner images get more attendees.
+              Would you like to edit your event before launching?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="mt-4">
+            <AlertDialogCancel className="border-purple-200 text-purple-700 hover:bg-purple-50 hover:text-purple-900">
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleEditEvent}
+              className="bg-purple-600 text-white hover:bg-purple-700"
+            >
+              Edit Event
+            </AlertDialogAction>
+            <AlertDialogAction
+              onClick={handleLaunchEvent}
+              className="bg-gradient-to-r from-purple-600 to-purple-400 hover:from-purple-700 hover:to-purple-500 text-white"
+            >
+              Launch Anyway
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {/* Complete */}
       {stage === "complete" && (

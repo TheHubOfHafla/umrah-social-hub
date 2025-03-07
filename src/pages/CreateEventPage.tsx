@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -8,7 +7,7 @@ import {
   CalendarIcon, Clock, MapPin, Users, DollarSign, 
   Image as ImageIcon, Upload, Check, Info, 
   CircleHelp, ChevronRight, Sparkles,
-  Bot, UserCircle2, LightbulbIcon, Edit
+  Bot, UserCircle2, LightbulbIcon, Edit, FileImage
 } from "lucide-react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -59,7 +58,7 @@ const eventFormSchema = z.object({
   isFree: z.boolean().default(false),
   price: z.number().optional(),
   capacity: z.number().optional(),
-  image: z.string().optional(),
+  image: z.string().min(1, { message: "Event banner/flyer is required" }),
 });
 
 type EventFormValues = z.infer<typeof eventFormSchema>;
@@ -70,6 +69,7 @@ const CreateEventPage = () => {
   const [isFree, setIsFree] = useState(false);
   const [activeTab, setActiveTab] = useState("basics");
   const [creationMode, setCreationMode] = useState<"select" | "manual" | "ai">("select");
+  const [bannerPreview, setBannerPreview] = useState<string | null>(null);
   const { toast } = useToast();
   const navigate = useNavigate();
   const location = useLocation();
@@ -90,6 +90,7 @@ const CreateEventPage = () => {
       },
       isFree: false,
       category: "",
+      image: "",
     }
   });
   
@@ -125,6 +126,23 @@ const CreateEventPage = () => {
     setCreationMode("manual");
   };
 
+  const handleBannerUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      // In a real app, you would upload this file to your server
+      // For now, we'll just create a local URL for preview
+      const imageUrl = URL.createObjectURL(file);
+      setBannerPreview(imageUrl);
+      form.setValue("image", imageUrl);
+    }
+  };
+
+  // Function to select a sample banner
+  const selectSampleBanner = (imageUrl: string) => {
+    setBannerPreview(imageUrl);
+    form.setValue("image", imageUrl);
+  };
+
   const isTabComplete = (tab: string) => {
     if (tab === "basics") {
       return !!form.watch("title") && !!form.watch("description") && !!form.watch("category");
@@ -132,7 +150,7 @@ const CreateEventPage = () => {
       const location = form.watch("location");
       return !!location.name && !!location.address && !!location.city && !!location.country;
     } else if (tab === "details") {
-      return !!form.watch("date.start");
+      return !!form.watch("date.start") && !!form.watch("image");
     }
     return false;
   };
@@ -611,6 +629,97 @@ const CreateEventPage = () => {
                     </div>
                     
                     <div className="space-y-4">
+                      <FormField
+                        control={form.control}
+                        name="image"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-base font-medium">
+                              Event Banner/Flyer <span className="text-red-500">*</span>
+                            </FormLabel>
+                            <FormDescription>
+                              Upload an eye-catching banner to attract more attendees. Events with images receive 2x more interest.
+                            </FormDescription>
+                            
+                            {bannerPreview ? (
+                              <div className="mt-2 rounded-lg overflow-hidden border border-purple-200 relative group">
+                                <img 
+                                  src={bannerPreview} 
+                                  alt="Event banner preview" 
+                                  className="w-full h-[200px] object-cover"
+                                />
+                                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity duration-200">
+                                  <Button 
+                                    type="button"
+                                    variant="default"
+                                    className="bg-purple-600 hover:bg-purple-700"
+                                    onClick={() => document.getElementById('event-banner')?.click()}
+                                  >
+                                    <Edit className="mr-2 h-4 w-4" /> Change Banner
+                                  </Button>
+                                </div>
+                              </div>
+                            ) : (
+                              <div 
+                                className="border-2 border-dashed border-purple-200 rounded-lg p-8 text-center hover:bg-purple-50 transition-colors cursor-pointer"
+                                onClick={() => document.getElementById('event-banner')?.click()}
+                              >
+                                <div className="mx-auto h-16 w-16 rounded-full bg-purple-100 flex items-center justify-center mb-4">
+                                  <FileImage className="h-6 w-6 text-purple-500" />
+                                </div>
+                                <h4 className="text-base font-medium text-gray-700">Upload event banner/flyer</h4>
+                                <p className="text-sm text-gray-500 mt-1">
+                                  Drag and drop or click to browse
+                                </p>
+                                <input 
+                                  type="file" 
+                                  className="hidden" 
+                                  id="event-banner"
+                                  accept="image/*"
+                                  onChange={handleBannerUpload}
+                                />
+                                <Button
+                                  type="button" 
+                                  className="mt-4 bg-purple-600 hover:bg-purple-700 text-white"
+                                >
+                                  Select File
+                                </Button>
+                              </div>
+                            )}
+                            
+                            <FormMessage />
+                            
+                            {!bannerPreview && (
+                              <div className="mt-4">
+                                <p className="text-sm font-medium mb-2">Or choose a sample banner:</p>
+                                <div className="grid grid-cols-3 gap-2">
+                                  <img 
+                                    src="https://images.unsplash.com/photo-1605810230434-7631ac76ec81" 
+                                    alt="Sample banner 1" 
+                                    className="h-20 w-full object-cover rounded-md cursor-pointer border-2 hover:border-purple-500 transition-all"
+                                    onClick={() => selectSampleBanner("https://images.unsplash.com/photo-1605810230434-7631ac76ec81")}
+                                  />
+                                  <img 
+                                    src="https://images.unsplash.com/photo-1487058792275-0ad4aaf24ca7" 
+                                    alt="Sample banner 2" 
+                                    className="h-20 w-full object-cover rounded-md cursor-pointer border-2 hover:border-purple-500 transition-all"
+                                    onClick={() => selectSampleBanner("https://images.unsplash.com/photo-1487058792275-0ad4aaf24ca7")}
+                                  />
+                                  <img 
+                                    src="https://images.unsplash.com/photo-1519389950473-47ba0277781c" 
+                                    alt="Sample banner 3" 
+                                    className="h-20 w-full object-cover rounded-md cursor-pointer border-2 hover:border-purple-500 transition-all"
+                                    onClick={() => selectSampleBanner("https://images.unsplash.com/photo-1519389950473-47ba0277781c")}
+                                  />
+                                </div>
+                              </div>
+                            )}
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+
+                    <div className="space-y-4">
                       <FormLabel className="text-base font-medium">Pricing</FormLabel>
                       <div className="flex items-center space-x-2 p-4 bg-gray-50 rounded-md">
                         <input
@@ -654,23 +763,6 @@ const CreateEventPage = () => {
                       )}
                     </div>
                     
-                    <div className="space-y-4">
-                      <FormLabel className="text-base font-medium">Event Image</FormLabel>
-                      <div className="border-2 border-dashed border-purple-200 rounded-lg p-8 text-center hover:bg-purple-50 transition-colors cursor-pointer">
-                        <div className="mx-auto h-16 w-16 rounded-full bg-purple-100 flex items-center justify-center mb-4">
-                          <Upload className="h-6 w-6 text-purple-500" />
-                        </div>
-                        <h4 className="text-base font-medium text-gray-700">Upload event image</h4>
-                        <p className="text-sm text-gray-500 mt-1">
-                          Drag and drop or click to browse
-                        </p>
-                        <input type="file" className="hidden" id="event-image" />
-                        <label htmlFor="event-image" className="mt-4 inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-white bg-primary rounded-md hover:bg-primary/90 cursor-pointer">
-                          Select File
-                        </label>
-                      </div>
-                    </div>
-                    
                     <div className="pt-6 flex justify-between">
                       <Button 
                         type="button" 
@@ -696,7 +788,7 @@ const CreateEventPage = () => {
                     <div>
                       <h3 className="font-medium text-yellow-700">Almost Done!</h3>
                       <p className="mt-1 text-sm text-yellow-600">
-                        Events with images receive 2x more interest from potential attendees. Make sure to add a compelling image!
+                        Don't forget to add your event banner/flyer. Events with attractive visuals receive significantly more attendees.
                       </p>
                     </div>
                   </div>

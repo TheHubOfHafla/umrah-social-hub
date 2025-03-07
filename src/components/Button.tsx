@@ -15,6 +15,8 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   gradient?: 'warm' | 'cool' | 'earth' | 'sunset' | 'purple';
   withShadow?: boolean;
   withHoverEffect?: boolean;
+  withPulse?: boolean;
+  withRipple?: boolean;
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
@@ -32,6 +34,8 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     gradient,
     withShadow = false,
     withHoverEffect = false,
+    withPulse = false,
+    withRipple = false,
     ...props 
   }, ref) => {
     // Map our custom variants to shadcn variants
@@ -51,7 +55,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         size={shadcnSize}
         disabled={loading || disabled}
         className={cn(
-          'font-medium transition-all tracking-tight',
+          'font-medium transition-all tracking-tight relative overflow-hidden',
           'active:scale-[0.98]',
           variant === 'primary' && 'bg-[#8B5CF6] text-white hover:bg-[#7C5AE2]',
           variant === 'subtle' && 'bg-secondary text-secondary-foreground hover:bg-secondary/80',
@@ -69,19 +73,25 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
           withShadow && 'shadow-soft hover:shadow-medium',
           withHoverEffect && 'transition-transform duration-200 hover:scale-105',
           withHoverEffect && variant === 'gradient' && 'hover:from-purple-700 hover:to-purple-500',
+          withPulse && 'animate-pulse',
           className
         )}
         {...props}
       >
+        {withRipple && (
+          <span className="absolute inset-0 overflow-hidden rounded-lg">
+            <span className="ripple-effect" />
+          </span>
+        )}
         {loading && (
           <Loader2 className="mr-2 h-4 w-4 animate-spin" />
         )}
         {!loading && icon && iconPosition === 'left' && (
-          <span className="mr-2">{icon}</span>
+          <span className="mr-2 animate-fadeIn">{icon}</span>
         )}
-        {children}
+        <span className="animate-fadeIn">{children}</span>
         {!loading && icon && iconPosition === 'right' && (
-          <span className="ml-2">{icon}</span>
+          <span className="ml-2 animate-fadeIn">{icon}</span>
         )}
       </ShadcnButton>
     );
