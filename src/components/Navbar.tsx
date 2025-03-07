@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -61,7 +60,6 @@ const Navbar = ({ isAuthenticated = true }: { isAuthenticated?: boolean }) => {
         : "py-2 md:py-3 bg-transparent"
     )}>
       <div className="container flex items-center justify-between">
-        {/* Left side navigation items */}
         <div className="flex items-center flex-shrink-0">
           <NavigationMenu className="hidden md:flex">
             <NavigationMenuList>
@@ -82,7 +80,6 @@ const Navbar = ({ isAuthenticated = true }: { isAuthenticated?: boolean }) => {
           </NavigationMenu>
         </div>
 
-        {/* Logo in center */}
         <div className="absolute left-1/2 transform -translate-x-1/2 z-10">
           <button onClick={() => handleNavigation("/")} className="flex items-center gap-1 md:gap-2 group">
             <Zap className="h-5 w-5 md:h-6 md:w-6 text-primary group-hover:animate-pulse-soft" />
@@ -90,7 +87,6 @@ const Navbar = ({ isAuthenticated = true }: { isAuthenticated?: boolean }) => {
           </button>
         </div>
 
-        {/* Right side buttons */}
         <div className="flex items-center ml-auto flex-shrink-0">
           <div className="hidden md:flex items-center space-x-1 lg:space-x-2">
             <button onClick={() => handleNavigation("/events/create")}>
@@ -134,20 +130,20 @@ const Navbar = ({ isAuthenticated = true }: { isAuthenticated?: boolean }) => {
                 </DropdownMenu>
               </>
             ) : (
-              <>
+              <div className="flex items-center gap-1.5">
                 <button onClick={() => handleNavigation("/login")}>
                   <Button variant="outline" size="sm" className="flex items-center gap-1 hover:bg-primary/10 hover:text-primary transition-all duration-200 text-xs md:text-sm">
                     <LogIn className="h-3 w-3 md:h-4 md:w-4" />
-                    <span className="hidden sm:inline">Sign In</span>
+                    <span className="hidden xs:inline sm:inline">Sign In</span>
                   </Button>
                 </button>
                 <button onClick={() => handleNavigation("/signup")}>
                   <Button size="sm" className="flex items-center gap-1 bg-primary hover:bg-primary/90 transition-all duration-200 hover:scale-105 text-xs md:text-sm">
                     <UserPlus className="h-3 w-3 md:h-4 md:w-4" />
-                    <span className="hidden sm:inline">Sign Up</span>
+                    <span className="hidden xs:inline sm:inline">Sign Up</span>
                   </Button>
                 </button>
-              </>
+              </div>
             )}
           </div>
 
@@ -157,7 +153,6 @@ const Navbar = ({ isAuthenticated = true }: { isAuthenticated?: boolean }) => {
         </div>
       </div>
 
-      {/* Mobile menu */}
       <div className={cn(
         "fixed inset-x-0 top-[57px] z-50 h-[calc(100vh-57px)] bg-background/95 backdrop-blur-md transition-transform duration-300 ease-in-out md:hidden overflow-y-auto", 
         mobileMenuOpen ? "translate-x-0" : "translate-x-full"
