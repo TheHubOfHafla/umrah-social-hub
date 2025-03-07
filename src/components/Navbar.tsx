@@ -134,13 +134,13 @@ const Navbar = ({ isAuthenticated = true }: { isAuthenticated?: boolean }) => {
             ) : (
               <>
                 <button onClick={() => handleNavigation("/login")}>
-                  <Button variant="outline" className="flex items-center gap-2">
+                  <Button variant="outline" className="flex items-center gap-2 hover:bg-primary/10 hover:text-primary transition-all duration-200">
                     <LogIn className="h-4 w-4" />
                     Sign In
                   </Button>
                 </button>
                 <button onClick={() => handleNavigation("/signup")}>
-                  <Button className="flex items-center gap-2">
+                  <Button className="flex items-center gap-2 bg-primary hover:bg-primary/90 transition-all duration-200 hover:scale-105">
                     <UserPlus className="h-4 w-4" />
                     Sign Up
                   </Button>
