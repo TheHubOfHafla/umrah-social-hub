@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
@@ -29,7 +28,6 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { AlertTriangle } from "lucide-react";
 
-// Event categories for selection
 const eventCategoryOptions: { value: EventCategory; label: string }[] = [
   { value: "charity", label: "Charity" },
   { value: "community", label: "Community" },
@@ -43,7 +41,6 @@ const eventCategoryOptions: { value: EventCategory; label: string }[] = [
   { value: "other", label: "Other" },
 ];
 
-// Form schema
 const eventFormSchema = z.object({
   title: z.string().min(3, { message: "Title must be at least 3 characters" }),
   shortDescription: z.string().min(10, { message: "Short description must be at least 10 characters" }),
@@ -61,10 +58,8 @@ const eventFormSchema = z.object({
   categories: z.array(z.string()).min(1, { message: "Select at least one category" }),
 });
 
-// Types
 type EventFormValues = z.infer<typeof eventFormSchema>;
 
-// Convert from prefilled event to form values
 const convertToFormValues = (event: any): EventFormValues => {
   return {
     title: event.title || "",
@@ -85,7 +80,6 @@ const convertToFormValues = (event: any): EventFormValues => {
   };
 };
 
-// Props interface
 interface EventFormProps {
   prefilledEvent: any | null;
   editMode?: boolean;
@@ -100,7 +94,6 @@ const EventForm = ({ prefilledEvent, editMode = false, requiresBannerUpload = fa
     prefilledEvent?.categories || []
   );
 
-  // Initialize form with prefilled values if available
   const form = useForm<EventFormValues>({
     resolver: zodResolver(eventFormSchema),
     defaultValues: prefilledEvent 
@@ -123,15 +116,12 @@ const EventForm = ({ prefilledEvent, editMode = false, requiresBannerUpload = fa
         },
   });
 
-  // Form submission handler
   const onSubmit = async (data: EventFormValues) => {
     setIsSubmitting(true);
     
     try {
-      // In a real app, this would send data to your backend
       console.log("Submitting event data:", data);
       
-      // Simulate a delay for the save operation
       await new Promise(resolve => setTimeout(resolve, 1500));
       
       toast({
@@ -141,7 +131,6 @@ const EventForm = ({ prefilledEvent, editMode = false, requiresBannerUpload = fa
           : "Your event has been created successfully.",
       });
       
-      // Redirect to events page
       navigate("/events");
     } catch (error) {
       console.error("Error submitting event:", error);
@@ -155,7 +144,6 @@ const EventForm = ({ prefilledEvent, editMode = false, requiresBannerUpload = fa
     }
   };
 
-  // Handle category selection
   const handleCategoryToggle = (category: string) => {
     setSelectedCategories(prev => {
       if (prev.includes(category)) {
@@ -165,7 +153,6 @@ const EventForm = ({ prefilledEvent, editMode = false, requiresBannerUpload = fa
       }
     });
     
-    // Update form value
     const currentCategories = form.getValues("categories");
     if (currentCategories.includes(category)) {
       form.setValue(
@@ -177,11 +164,9 @@ const EventForm = ({ prefilledEvent, editMode = false, requiresBannerUpload = fa
     }
   };
 
-  // Mock image upload handler - in a real app, this would upload to your storage
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      // Simulate image upload by creating an object URL
       const imageUrl = URL.createObjectURL(file);
       form.setValue("image", imageUrl);
     }
@@ -193,7 +178,6 @@ const EventForm = ({ prefilledEvent, editMode = false, requiresBannerUpload = fa
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="md:col-span-2 space-y-6">
-              {/* Basic Information */}
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
@@ -290,7 +274,6 @@ const EventForm = ({ prefilledEvent, editMode = false, requiresBannerUpload = fa
                 </CardContent>
               </Card>
               
-              {/* Location */}
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
@@ -362,7 +345,6 @@ const EventForm = ({ prefilledEvent, editMode = false, requiresBannerUpload = fa
                 </CardContent>
               </Card>
               
-              {/* Date and Time */}
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
@@ -456,7 +438,6 @@ const EventForm = ({ prefilledEvent, editMode = false, requiresBannerUpload = fa
                 </CardContent>
               </Card>
               
-              {/* Tickets and Capacity */}
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
@@ -544,7 +525,6 @@ const EventForm = ({ prefilledEvent, editMode = false, requiresBannerUpload = fa
             </div>
             
             <div className="md:col-span-1 space-y-6">
-              {/* Event Image */}
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
@@ -596,7 +576,6 @@ const EventForm = ({ prefilledEvent, editMode = false, requiresBannerUpload = fa
                                   type="button"
                                   variant="outline"
                                   className="cursor-pointer"
-                                  as="span"
                                 >
                                   Upload Image
                                 </Button>
@@ -623,7 +602,6 @@ const EventForm = ({ prefilledEvent, editMode = false, requiresBannerUpload = fa
                 </CardContent>
               </Card>
               
-              {/* Submit Button */}
               <Card>
                 <CardContent className="pt-6">
                   <Button
