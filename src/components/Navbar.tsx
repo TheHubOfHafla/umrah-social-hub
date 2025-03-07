@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -60,12 +61,13 @@ const Navbar = ({ isAuthenticated = true }: { isAuthenticated?: boolean }) => {
         : "py-2 md:py-3 bg-transparent"
     )}>
       <div className="container flex items-center justify-between">
-        <div className="flex items-center">
+        {/* Left side navigation items */}
+        <div className="flex items-center flex-shrink-0">
           <NavigationMenu className="hidden md:flex">
             <NavigationMenuList>
               {navigation.map(item => <NavigationMenuItem key={item.href}>
                   <NavigationMenuLink asChild className={cn(
-                    "px-4 py-2 text-base font-medium tracking-wide transition-all duration-200 rounded-md",
+                    "px-3 md:px-4 py-2 text-sm md:text-base font-medium tracking-wide transition-all duration-200 rounded-md",
                     "hover:text-primary hover:bg-primary/10 hover:scale-105",
                     item.active 
                       ? "text-primary font-semibold border-b-2 border-primary" 
@@ -80,43 +82,46 @@ const Navbar = ({ isAuthenticated = true }: { isAuthenticated?: boolean }) => {
           </NavigationMenu>
         </div>
 
-        <div className="absolute left-1/2 transform -translate-x-1/2">
+        {/* Logo in center */}
+        <div className="absolute left-1/2 transform -translate-x-1/2 z-10">
           <button onClick={() => handleNavigation("/")} className="flex items-center gap-1 md:gap-2 group">
-            <Zap className="h-5 w-5 md:h-7 md:w-7 text-primary group-hover:animate-pulse-soft" />
-            <span className="font-heading text-xl md:text-2xl tracking-tight text-primary font-bold">EventHub</span>
+            <Zap className="h-5 w-5 md:h-6 md:w-6 text-primary group-hover:animate-pulse-soft" />
+            <span className="font-heading text-lg md:text-xl lg:text-2xl tracking-tight text-primary font-bold">EventHub</span>
           </button>
         </div>
 
-        <div className="flex items-center">
-          <div className="hidden md:flex items-center space-x-2">
+        {/* Right side buttons */}
+        <div className="flex items-center ml-auto flex-shrink-0">
+          <div className="hidden md:flex items-center space-x-1 lg:space-x-2">
             <button onClick={() => handleNavigation("/events/create")}>
-              <Button className="flex items-center gap-2 bg-primary hover:bg-primary/90 transition-all duration-200 hover:scale-105">
-                <Plus className="h-4 w-4" />
-                Create Event
+              <Button size="sm" className="flex items-center gap-1 bg-primary hover:bg-primary/90 transition-all duration-200 hover:scale-105 text-xs md:text-sm">
+                <Plus className="h-3 w-3 md:h-4 md:w-4" />
+                <span className="hidden sm:inline">Create</span>
+                <span className="hidden md:inline"> Event</span>
               </Button>
             </button>
             
             {isAuthenticated ? (
               <>
                 <Button variant="ghost" size="icon" className="hover:bg-primary/10 hover:text-primary transition-all duration-200">
-                  <Bell className="h-5 w-5" />
+                  <Bell className="h-4 w-4" />
                 </Button>
                 
                 <button onClick={() => handleNavigation("/dashboard/profile")}>
-                  <Button variant="outline" className="flex items-center gap-2 hover:bg-primary/10 hover:text-primary transition-all duration-200">
-                    <UserRound className="h-4 w-4" />
-                    My Profile
+                  <Button variant="outline" size="sm" className="flex items-center gap-1 hover:bg-primary/10 hover:text-primary transition-all duration-200 hidden lg:flex">
+                    <UserRound className="h-3 w-3 md:h-4 md:w-4" />
+                    <span className="text-xs md:text-sm">Profile</span>
                   </Button>
                 </button>
                 
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" className="flex items-center gap-2 hover:bg-primary/10 hover:text-primary transition-all duration-200">
+                    <Button variant="ghost" size="sm" className="flex items-center gap-1 hover:bg-primary/10 hover:text-primary transition-all duration-200 px-1">
                       <UserAvatar user={currentUser} size="sm" />
-                      <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                      <ChevronDown className="h-3 w-3 md:h-4 md:w-4 text-muted-foreground" />
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuContent align="end" className="w-48 md:w-56">
                     <DropdownMenuItem className="hover:bg-primary/10 hover:text-primary" onClick={() => handleNavigation("/dashboard")}>
                       <User className="mr-2 h-4 w-4" />
                       Dashboard
@@ -131,27 +136,28 @@ const Navbar = ({ isAuthenticated = true }: { isAuthenticated?: boolean }) => {
             ) : (
               <>
                 <button onClick={() => handleNavigation("/login")}>
-                  <Button variant="outline" className="flex items-center gap-2 hover:bg-primary/10 hover:text-primary transition-all duration-200">
-                    <LogIn className="h-4 w-4" />
-                    Sign In
+                  <Button variant="outline" size="sm" className="flex items-center gap-1 hover:bg-primary/10 hover:text-primary transition-all duration-200 text-xs md:text-sm">
+                    <LogIn className="h-3 w-3 md:h-4 md:w-4" />
+                    <span className="hidden sm:inline">Sign In</span>
                   </Button>
                 </button>
                 <button onClick={() => handleNavigation("/signup")}>
-                  <Button className="flex items-center gap-2 bg-primary hover:bg-primary/90 transition-all duration-200 hover:scale-105">
-                    <UserPlus className="h-4 w-4" />
-                    Sign Up
+                  <Button size="sm" className="flex items-center gap-1 bg-primary hover:bg-primary/90 transition-all duration-200 hover:scale-105 text-xs md:text-sm">
+                    <UserPlus className="h-3 w-3 md:h-4 md:w-4" />
+                    <span className="hidden sm:inline">Sign Up</span>
                   </Button>
                 </button>
               </>
             )}
           </div>
 
-          <Button variant="ghost" size="icon" className="md:hidden hover:bg-primary/10 hover:text-primary" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+          <Button variant="ghost" size="icon" className="md:hidden hover:bg-primary/10 hover:text-primary ml-2" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
             {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </Button>
         </div>
       </div>
 
+      {/* Mobile menu */}
       <div className={cn(
         "fixed inset-x-0 top-[57px] z-50 h-[calc(100vh-57px)] bg-background/95 backdrop-blur-md transition-transform duration-300 ease-in-out md:hidden overflow-y-auto", 
         mobileMenuOpen ? "translate-x-0" : "translate-x-full"
