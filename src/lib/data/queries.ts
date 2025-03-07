@@ -44,7 +44,7 @@ export const getRecommendedEvents = (userId: string): Event[] => {
   if (!user || !user.interests) {
     // For users without interests, return featured events or popular events
     const featuredOrPopular = [...getFeaturedEvents(), ...getPopularEvents()];
-    return [...new Set(featuredOrPopular)].slice(0, 9); // Ensure 9 unique events
+    return [...new Set(featuredOrPopular)].slice(0, 12); // Ensure 12 unique events
   }
   
   // First try to get events matching user interests
@@ -55,7 +55,7 @@ export const getRecommendedEvents = (userId: string): Event[] => {
     );
     
   // If we don't have enough events from interests, add some featured or popular events
-  if (recommended.length < 9) {
+  if (recommended.length < 12) {
     const featuredOrPopular = [...getFeaturedEvents(), ...getPopularEvents()]
       .filter(event => !user.eventsAttending?.includes(event.id) && 
                        !recommended.some(r => r.id === event.id));
@@ -63,8 +63,8 @@ export const getRecommendedEvents = (userId: string): Event[] => {
     recommended = [...recommended, ...featuredOrPopular];
   }
   
-  // Return exactly 9 events, or pad with more events if needed
-  return recommended.slice(0, 9);
+  // Return exactly 12 events, or pad with more events if needed
+  return recommended.slice(0, 12);
 };
 
 export const getEventsByAttendeeType = (type: AttendeeType): Event[] => {

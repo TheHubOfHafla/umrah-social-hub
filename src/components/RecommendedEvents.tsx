@@ -10,8 +10,8 @@ interface RecommendedEventsProps {
 }
 
 const RecommendedEvents = ({ events }: RecommendedEventsProps) => {
-  // Make sure we only display up to 9 events (3x3 grid)
-  const displayEvents = events.slice(0, 9);
+  // Make sure we only display up to 12 events (4 rows of 3)
+  const displayEvents = events.slice(0, 12);
   
   return (
     <section className="container mx-auto px-4 py-8">

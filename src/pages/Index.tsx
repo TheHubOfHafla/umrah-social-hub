@@ -27,7 +27,7 @@ const Index = ({ isAuthenticated = false }: { isAuthenticated?: boolean }) => {
   const [popularEvents, setPopularEvents] = useState(getFeaturedEvents());
   const [recommendedEvents, setRecommendedEvents] = useState(
     isAuthenticated 
-      ? getRecommendedEvents(currentUser.id).slice(0, 9) // Get up to 9 events for the 3x3 grid
+      ? getRecommendedEvents(currentUser.id).slice(0, 12) // Get up to 12 events for the 4x3 grid
       : [] // No recommendations for guests
   );
   const [categoryEvents, setCategoryEvents] = useState(getEventsByCategory(categories[0].value));
