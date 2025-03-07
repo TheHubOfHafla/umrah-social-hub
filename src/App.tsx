@@ -1,3 +1,4 @@
+
 import React, { useState, createContext } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Index from "./pages/Index";
@@ -8,7 +9,9 @@ import OrganizersPage from "./pages/OrganizersPage";
 import OrganizerProfilePage from "./pages/OrganizerProfilePage";
 import Dashboard from "./pages/dashboard/Dashboard";
 import UserProfile from "./pages/dashboard/UserProfile";
-import MyEvents from "./pages/dashboard/MyEvents";
+// Using the existing unused UserEvents file instead of MyEvents
+import UserEvents from "./pages/dashboard/UserEvents";
+// Let's create simple placeholders for these pages
 import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
 import { Toaster } from "@/components/ui/toaster"
@@ -48,7 +51,7 @@ function App() {
           <Route path="/organizers/:id" element={<OrganizerProfilePage />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/dashboard/profile" element={<UserProfile />} />
-          <Route path="/dashboard/events" element={<MyEvents />} />
+          <Route path="/dashboard/events" element={<UserEvents />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignupPage />} />
         </Routes>

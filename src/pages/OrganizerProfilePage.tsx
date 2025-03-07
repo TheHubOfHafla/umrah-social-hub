@@ -3,13 +3,13 @@ import { useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import OrganizerProfileHeader from "@/components/profile/OrganizerProfileHeader";
-import { EventGrid } from "@/components/EventGrid";
+import EventGrid from "@/components/EventGrid";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
-import { PageWrapper } from "@/components/PageWrapper";
+import PageWrapper from "@/components/PageWrapper";
 import { Container } from "@/components/ui/container";
 import { organizers } from "@/lib/data/organizers";
-import { events } from "@/lib/data/events";
+import { events } from "@/lib/data";
 
 const OrganizerProfilePage = () => {
   const { id } = useParams<{ id: string }>();
