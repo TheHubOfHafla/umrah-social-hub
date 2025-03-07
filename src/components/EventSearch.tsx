@@ -14,13 +14,18 @@ const sampleEvents = getFeaturedEvents();
 interface EventSearchProps {
   onSearch: (query: string) => void;
   className?: string;
+  // Add new properties to support the Events.tsx usage
+  onLocationSelect?: (location: string) => void;
+  initialLocation?: string;
 }
 
 const EventSearch = ({
   onSearch,
   className,
+  onLocationSelect,
+  initialLocation = "",
 }: EventSearchProps) => {
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState(initialLocation || "");
   const [isOpen, setIsOpen] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -32,6 +37,11 @@ const EventSearch = ({
   ).slice(0, 5); // Limit to 5 results
 
   const handleSearch = (query: string) => {
+    // Call the appropriate handler based on which one was provided
+    if (onLocationSelect) {
+      onLocationSelect(query);
+    }
+    
     onSearch(query);
     setIsOpen(false);
   };
@@ -49,6 +59,13 @@ const EventSearch = ({
       }, 100);
     }
   }, [isOpen]);
+
+  // Effect to update searchTerm when initialLocation changes
+  useEffect(() => {
+    if (initialLocation) {
+      setSearchTerm(initialLocation);
+    }
+  }, [initialLocation]);
 
   return (
     <div className={cn("relative", className)}>
