@@ -198,7 +198,35 @@ const AiEventCreator = () => {
 
   // Edit event handler - navigate to manual creation with prefilled data
   const handleEditEvent = () => {
-    navigate("/events/create", { state: { event: generatedEvent } });
+    // Format the event data to match what the CreateEventPage expects
+    const formattedEvent = {
+      ...generatedEvent,
+      // Ensure dates are properly formatted as ISO strings if they're Date objects
+      date: {
+        start: generatedEvent.date.start instanceof Date 
+          ? generatedEvent.date.start.toISOString() 
+          : generatedEvent.date.start,
+        end: generatedEvent.date.end instanceof Date 
+          ? generatedEvent.date.end.toISOString() 
+          : generatedEvent.date.end,
+      },
+      // Add any other required fields for the form
+      categories: [generatedEvent.category], // Convert single category to array
+      shortDescription: generatedEvent.description.substring(0, 150) + (generatedEvent.description.length > 150 ? '...' : ''),
+      // Add a flag to indicate this event was created with AI
+      fromAiCreator: true,
+      // Add empty image field that will be required in the edit form
+      image: "",
+      requiresBannerUpload: true // Flag to indicate banner upload is required
+    };
+    
+    // Navigate to the create event page with the formatted event data
+    navigate("/events/create", { 
+      state: { 
+        event: formattedEvent,
+        editMode: true 
+      } 
+    });
   };
 
   // Show launch confirmation dialog
