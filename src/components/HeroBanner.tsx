@@ -1,10 +1,10 @@
 
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Filter, UserPlus } from "lucide-react";
 import Button from "@/components/Button";
-import LocationSearch from "@/components/LocationSearch";
+import EventSearch from "@/components/EventSearch";
 import { User } from "@/types";
 import { motion } from "framer-motion";
 
@@ -17,6 +17,7 @@ interface HeroBannerProps {
 const HeroBanner = ({ user, onLocationSelect, isAuthenticated = true }: HeroBannerProps) => {
   const [bannerLoaded, setBannerLoaded] = useState(false);
   const [contentVisible, setContentVisible] = useState(false);
+  const navigate = useNavigate();
   
   // Trigger content animation after a short delay
   useEffect(() => {
@@ -26,6 +27,11 @@ const HeroBanner = ({ user, onLocationSelect, isAuthenticated = true }: HeroBann
     
     return () => clearTimeout(timer);
   }, []);
+  
+  const handleSearch = (query: string) => {
+    // Navigate to events page with search query
+    navigate(`/events?search=${encodeURIComponent(query)}`);
+  };
   
   return (
     <section className="relative">
@@ -57,7 +63,7 @@ const HeroBanner = ({ user, onLocationSelect, isAuthenticated = true }: HeroBann
               "text-4xl sm:text-5xl font-bold tracking-tight font-heading leading-tight text-balance transition-all duration-700 delay-100",
               contentVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
             )}>
-              Instant Islamic Events Near You
+              Discover Islamic Events Near You
             </h1>
             
             <div className={cn(
@@ -69,9 +75,8 @@ const HeroBanner = ({ user, onLocationSelect, isAuthenticated = true }: HeroBann
                 whileHover={{ scale: 1.02 }}
                 transition={{ type: "spring", stiffness: 400, damping: 10 }}
               >
-                <LocationSearch 
-                  onLocationSelect={onLocationSelect} 
-                  initialLocation={user?.location ? `${user.location.city}, ${user.location.country}` : "London, United Kingdom"} 
+                <EventSearch 
+                  onSearch={handleSearch}
                   className="w-full" 
                 />
               </motion.div>

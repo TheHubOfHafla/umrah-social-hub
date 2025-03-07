@@ -1,49 +1,39 @@
 
 import { useState, useEffect, useRef } from "react";
 import { Input } from "@/components/ui/input";
-import { MapPin, Search, X } from "lucide-react";
+import { Search, X, Calendar, Tag } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
+import { getFeaturedEvents } from "@/lib/data";
 
-// Mock locations for demo
-const popularLocations = [
-  "London, UK",
-  "Manchester, UK",
-  "Birmingham, UK",
-  "Leeds, UK",
-  "Glasgow, UK",
-  "Edinburgh, UK",
-  "Liverpool, UK",
-];
+// Mock events for search results
+const sampleEvents = getFeaturedEvents();
 
-interface LocationSearchProps {
-  onLocationSelect: (location: string) => void;
+interface EventSearchProps {
+  onSearch: (query: string) => void;
   className?: string;
-  initialLocation?: string;
 }
 
-const LocationSearch = ({
-  onLocationSelect,
+const EventSearch = ({
+  onSearch,
   className,
-  initialLocation = "",
-}: LocationSearchProps) => {
-  const [location, setLocation] = useState(initialLocation);
-  const [isOpen, setIsOpen] = useState(false);
+}: EventSearchProps) => {
   const [searchTerm, setSearchTerm] = useState("");
+  const [isOpen, setIsOpen] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const filteredLocations = popularLocations.filter((loc) =>
-    loc.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredEvents = sampleEvents.filter((event) =>
+    event.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    event.location.city.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    event.categories.some(cat => cat.toLowerCase().includes(searchTerm.toLowerCase()))
+  ).slice(0, 5); // Limit to 5 results
 
-  const handleLocationSelect = (selectedLocation: string) => {
-    setLocation(selectedLocation);
-    onLocationSelect(selectedLocation);
+  const handleSearch = (query: string) => {
+    onSearch(query);
     setIsOpen(false);
-    setSearchTerm("");
   };
 
   const clearSearch = () => {
@@ -72,8 +62,8 @@ const LocationSearch = ({
             )} />
             <Input
               type="text"
-              value={location || "Search location..."}
-              readOnly
+              value={searchTerm || "Search events..."}
+              readOnly={!isOpen}
               onClick={() => setIsOpen(true)}
               className={cn(
                 "w-full pl-10 pr-4 cursor-pointer transition-all duration-300",
@@ -82,10 +72,7 @@ const LocationSearch = ({
                 "hover:shadow-[0_0_15px_rgba(139,92,246,0.3)]"
               )}
             />
-            <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-purple-500 transition-all duration-300 group-hover:text-purple-600" />
-            <div className="absolute right-3 top-1/2 -translate-y-1/2">
-              <Search className="h-4 w-4 text-purple-400 transition-all duration-300 group-hover:text-purple-600 group-hover:rotate-15 group-hover:scale-110" />
-            </div>
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-purple-500 transition-all duration-300 group-hover:text-purple-600" />
             
             <div className={cn(
               "absolute bottom-0 left-0 h-[2px] bg-gradient-to-r from-purple-600 to-purple-400",
@@ -99,10 +86,15 @@ const LocationSearch = ({
             <Search className="ml-2 h-4 w-4 shrink-0 text-purple-500" />
             <Input
               ref={inputRef}
-              placeholder="Search location..."
+              placeholder="Search events..."
               className="border-0 p-2 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 bg-transparent"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && searchTerm) {
+                  handleSearch(searchTerm);
+                }
+              }}
               onFocus={() => setIsFocused(true)}
               onBlur={() => setIsFocused(false)}
             />
@@ -123,15 +115,15 @@ const LocationSearch = ({
           </div>
           <div className="max-h-60 overflow-auto backdrop-blur-sm">
             <AnimatePresence>
-              {filteredLocations.length > 0 ? (
+              {filteredEvents.length > 0 ? (
                 <motion.div 
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   className="grid gap-1 p-2"
                 >
-                  {filteredLocations.map((loc, index) => (
+                  {filteredEvents.map((event, index) => (
                     <motion.div
-                      key={loc}
+                      key={event.id}
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: index * 0.05, duration: 0.2 }}
@@ -139,22 +131,72 @@ const LocationSearch = ({
                       <Button
                         variant="ghost"
                         className="w-full justify-start font-normal text-left hover:bg-purple-50 hover:text-purple-700 group"
-                        onClick={() => handleLocationSelect(loc)}
+                        onClick={() => handleSearch(event.title)}
                       >
-                        <MapPin className="mr-2 h-4 w-4 text-purple-400 group-hover:text-purple-500" />
-                        <span className="truncate">{loc}</span>
+                        <div className="flex items-center w-full">
+                          <div className="rounded-md bg-purple-100 p-1 mr-2">
+                            {event.categories[0] === 'education' && <Tag className="h-4 w-4 text-purple-600" />}
+                            {event.categories[0] === 'charity' && <Tag className="h-4 w-4 text-purple-600" />}
+                            {event.categories[0] === 'community' && <Calendar className="h-4 w-4 text-purple-600" />}
+                          </div>
+                          <div className="flex flex-col overflow-hidden">
+                            <span className="truncate font-medium">{event.title}</span>
+                            <span className="text-xs text-muted-foreground truncate">{event.location.city}, {event.location.country}</span>
+                          </div>
+                        </div>
                       </Button>
                     </motion.div>
                   ))}
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: filteredEvents.length * 0.05, duration: 0.2 }}
+                  >
+                    <Button
+                      variant="ghost"
+                      className="w-full justify-center text-purple-600 hover:bg-purple-50 hover:text-purple-700 text-sm mt-2 border-t border-purple-100/50 pt-2"
+                      onClick={() => handleSearch(searchTerm)}
+                    >
+                      Search for "{searchTerm}"
+                    </Button>
+                  </motion.div>
                 </motion.div>
-              ) : (
+              ) : searchTerm ? (
                 <motion.div 
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   className="p-4 text-center text-sm text-muted-foreground"
                 >
-                  <p className="text-purple-400">No locations found</p>
-                  <p className="text-xs mt-1 text-muted-foreground">Try a different search term</p>
+                  <p className="text-purple-400">No events found</p>
+                  <Button
+                    variant="ghost"
+                    className="w-full justify-center text-purple-600 hover:bg-purple-50 hover:text-purple-700 text-sm mt-2"
+                    onClick={() => handleSearch(searchTerm)}
+                  >
+                    Search for "{searchTerm}"
+                  </Button>
+                </motion.div>
+              ) : (
+                <motion.div 
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="p-4"
+                >
+                  <p className="text-sm text-center text-muted-foreground mb-2">Try searching for:</p>
+                  <div className="flex flex-wrap gap-2 justify-center">
+                    {['Quran', 'Charity', 'Community'].map((term, i) => (
+                      <motion.button
+                        key={term}
+                        className="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-xs hover:bg-purple-200 transition-colors"
+                        onClick={() => setSearchTerm(term)}
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ delay: i * 0.1 }}
+                      >
+                        {term}
+                      </motion.button>
+                    ))}
+                  </div>
                 </motion.div>
               )}
             </AnimatePresence>
@@ -165,4 +207,4 @@ const LocationSearch = ({
   );
 };
 
-export default LocationSearch;
+export default EventSearch;
