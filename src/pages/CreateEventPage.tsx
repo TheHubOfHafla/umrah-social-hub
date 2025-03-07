@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -9,7 +10,7 @@ import {
   CircleHelp, ChevronRight, Sparkles,
   Bot, UserCircle2, LightbulbIcon, Edit
 } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -39,6 +40,7 @@ import { cn } from "@/lib/utils";
 import { EventCategory, EventLocation } from "@/types";
 import { categories } from "@/lib/data";
 import { useToast } from "@/hooks/use-toast";
+import AiEventCreator from "@/components/event-creation/AiEventCreator";
 
 const eventFormSchema = z.object({
   title: z.string().min(3, { message: "Event title must be at least 3 characters" }),
@@ -70,10 +72,14 @@ const CreateEventPage = () => {
   const [creationMode, setCreationMode] = useState<"select" | "manual" | "ai">("select");
   const { toast } = useToast();
   const navigate = useNavigate();
+  const location = useLocation();
+  
+  // Check if we have event data from AI to pre-fill
+  const prefilledEvent = location.state?.event;
   
   const form = useForm<EventFormValues>({
     resolver: zodResolver(eventFormSchema),
-    defaultValues: {
+    defaultValues: prefilledEvent || {
       title: "",
       description: "",
       location: {
@@ -84,6 +90,13 @@ const CreateEventPage = () => {
       },
       isFree: false,
       category: "",
+    }
+  });
+  
+  // If we have prefilled event data, automatically go to manual mode
+  useState(() => {
+    if (prefilledEvent) {
+      setCreationMode("manual");
     }
   });
   
@@ -225,73 +238,19 @@ const CreateEventPage = () => {
         <div className="container max-w-6xl mx-auto px-4">
           <div className="mb-10 text-center">
             <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-blue-500 bg-clip-text text-transparent">AI-Assisted Event Creation</h1>
-            <p className="text-muted-foreground mt-2 max-w-xl mx-auto">Tell us about your event and our AI will help you create it.</p>
+            <p className="text-muted-foreground mt-2 max-w-xl mx-auto">Let our AI help you create a great event in minutes.</p>
           </div>
           
-          <Card className="max-w-2xl mx-auto border-none shadow-lg">
-            <CardHeader className="bg-purple-50 rounded-t-lg">
-              <CardTitle className="flex items-center">
-                <Bot className="mr-2 h-5 w-5 text-purple-500" />
-                Describe Your Event
-              </CardTitle>
-              <CardDescription>Provide a description and let AI handle the rest</CardDescription>
-            </CardHeader>
-            <CardContent className="pt-6 space-y-6">
-              <FormField
-                control={form.control}
-                name="description"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-base font-medium">Tell us about your event</FormLabel>
-                    <FormControl>
-                      <Textarea 
-                        placeholder="Example: I want to host a tech conference in San Francisco next month focusing on AI innovations with around 200 attendees." 
-                        className="min-h-32 text-base" 
-                        {...field} 
-                      />
-                    </FormControl>
-                    <FormDescription>
-                      Include details like type of event, location, date, and expected attendees
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <div className="pt-4 flex justify-between">
-                <Button 
-                  type="button" 
-                  variant="outline" 
-                  onClick={() => setCreationMode("select")}
-                >
-                  Back to Options
-                </Button>
-                <Button 
-                  type="button"
-                  className="bg-gradient-to-r from-purple-600 to-blue-500 hover:from-purple-700 hover:to-blue-600"
-                  size="lg"
-                >
-                  Generate Event Details <Sparkles className="ml-2 h-4 w-4" />
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-          
-          <div className="max-w-2xl mx-auto mt-6">
-            <div className="bg-blue-50 p-6 rounded-lg border border-blue-100">
-              <div className="flex items-start">
-                <Info className="text-blue-500 mr-4 mt-1 h-5 w-5 flex-shrink-0" />
-                <div>
-                  <h3 className="font-medium text-blue-700">AI Creation Tips</h3>
-                  <ul className="mt-2 space-y-1 text-sm text-blue-600">
-                    <li>• Be as specific as possible about your event</li>
-                    <li>• Include time, location, and target audience</li>
-                    <li>• Mention any special requirements or features</li>
-                    <li>• You can always edit the AI-generated details later</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
+          <div className="flex flex-col items-center">
+            <Button 
+              variant="outline" 
+              onClick={() => setCreationMode("select")}
+              className="mb-8 text-purple-600 border-purple-200 hover:bg-purple-50"
+            >
+              Back to Creation Options
+            </Button>
+            
+            <AiEventCreator />
           </div>
         </div>
       </div>

@@ -12,8 +12,9 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   iconPosition?: 'left' | 'right';
   fullWidth?: boolean;
   rounded?: boolean;
-  gradient?: 'warm' | 'cool' | 'earth' | 'sunset';
+  gradient?: 'warm' | 'cool' | 'earth' | 'sunset' | 'purple';
   withShadow?: boolean;
+  withHoverEffect?: boolean;
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
@@ -30,6 +31,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     rounded = false,
     gradient,
     withShadow = false,
+    withHoverEffect = false,
     ...props 
   }, ref) => {
     // Map our custom variants to shadcn variants
@@ -51,19 +53,22 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         className={cn(
           'font-medium transition-all tracking-tight',
           'active:scale-[0.98]',
-          variant === 'primary' && 'bg-[#8B5CF6] text-white hover:bg-[#7C5AE2]', // Changed to purple
+          variant === 'primary' && 'bg-[#8B5CF6] text-white hover:bg-[#7C5AE2]',
           variant === 'subtle' && 'bg-secondary text-secondary-foreground hover:bg-secondary/80',
           variant === 'gradient' && {
-            'bg-gradient-warm': gradient === 'warm' || !gradient,
-            'bg-gradient-cool': gradient === 'cool',
-            'bg-gradient-earth': gradient === 'earth',
-            'bg-gradient-sunset': gradient === 'sunset',
+            'bg-gradient-warm': gradient === 'warm' && !gradient?.includes('purple'),
+            'bg-gradient-cool': gradient === 'cool' && !gradient?.includes('purple'),
+            'bg-gradient-earth': gradient === 'earth' && !gradient?.includes('purple'),
+            'bg-gradient-sunset': gradient === 'sunset' && !gradient?.includes('purple'),
+            'bg-gradient-to-r from-purple-600 to-purple-400': gradient === 'purple' || !gradient,
             'text-white': true,
           },
           rounded && 'rounded-full',
           fullWidth && 'w-full',
           loading && 'cursor-not-allowed',
           withShadow && 'shadow-soft hover:shadow-medium',
+          withHoverEffect && 'transition-transform duration-200 hover:scale-105',
+          withHoverEffect && variant === 'gradient' && 'hover:from-purple-700 hover:to-purple-500',
           className
         )}
         {...props}

@@ -69,10 +69,10 @@ const ChatbotButton = () => {
                 size="icon"
                 className={cn(
                   "h-12 w-12 sm:h-14 sm:w-14 rounded-full shadow-lg transition-all duration-300",
-                  isOpen ? "bg-secondary hover:bg-secondary/90" : "bg-primary hover:bg-primary/90",
+                  isOpen ? "bg-purple-200 text-purple-800 hover:bg-purple-300" : "bg-purple-600 hover:bg-purple-700 text-white",
                   isAnimating && "animate-pulse",
                   !isOpen && !hasBounced && "animate-bounce",
-                  "hover:scale-110 focus:scale-110 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2"
+                  "hover:scale-110 focus:scale-110 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-offset-2"
                 )}
                 aria-label={isOpen ? "Close chat" : "Open chat"}
               >
@@ -83,7 +83,7 @@ const ChatbotButton = () => {
                 )}
               </Button>
             </TooltipTrigger>
-            <TooltipContent side="left" className="bg-black text-white border-black">
+            <TooltipContent side="left" className="bg-purple-900 text-white border-purple-900">
               <p>{isOpen ? "Close chat" : "Chat with us"}</p>
             </TooltipContent>
           </Tooltip>
