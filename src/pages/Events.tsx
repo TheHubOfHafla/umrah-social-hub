@@ -1,10 +1,9 @@
-
 import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import EventGrid from "@/components/EventGrid";
 import CategoryChips from "@/components/CategoryChips";
-import LocationSearch from "@/components/LocationSearch";
+import EventSearch from "@/components/EventSearch";
 import Button from "@/components/Button";
 import { Input } from "@/components/ui/input";
 import { 
@@ -179,7 +178,7 @@ const Events = () => {
               </div>
               
               <div className="flex gap-2">
-                <LocationSearch
+                <EventSearch
                   onLocationSelect={setSelectedLocation}
                   initialLocation={selectedLocation}
                   className="w-full md:w-48"
