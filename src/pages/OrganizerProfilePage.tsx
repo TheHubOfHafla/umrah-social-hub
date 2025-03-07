@@ -1,3 +1,4 @@
+
 import { useParams } from "react-router-dom";
 import { useState } from "react";
 import PageWrapper from "@/components/PageWrapper";
@@ -8,86 +9,94 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import EventGrid from "@/components/EventGrid";
 import { Separator } from "@/components/ui/separator";
-import { Check, Clock, MapPin, Share2, Users } from "lucide-react";
+import { Check, ExternalLink, MapPin, Share2 } from "lucide-react";
 import { organizers } from "@/lib/data";
-import { events as allEvents } from "@/lib/data/events";
+import { mockEvents } from "@/lib/data/events";
+import { Event } from "@/types";
 
 const OrganizerProfilePage = () => {
-  const { organizerId } = useParams<{ organizerId: string }>();
-  const organizer = organizers.find((org) => org.id === organizerId);
-  const [events, setEvents] = useState(allEvents);
+  const { id } = useParams<{ id: string }>();
+  const organizer = organizers.find((org) => org.id === id);
+  const [events, setEvents] = useState<Event[]>(mockEvents);
 
   if (!organizer) {
     return (
       <PageWrapper>
-        <div>Organizer not found</div>
+        <div className="container py-12">
+          <Card className="p-6">
+            <h2 className="text-2xl font-semibold">Organizer not found</h2>
+            <p className="text-muted-foreground">The organizer you're looking for doesn't exist or has been removed.</p>
+          </Card>
+        </div>
       </PageWrapper>
     );
   }
 
+  const initials = organizer.name
+      .split(' ')
+      .map(n => n[0])
+      .join('')
+      .toUpperCase()
+      .substring(0, 2);
+
   const pastEvents = events.filter(
-    (event) => event.organizerId === organizerId && new Date(event.date) < new Date()
+    (event) => event.organizer.id === id && new Date(event.date.start) < new Date()
   );
   const upcomingEvents = events.filter(
-    (event) => event.organizerId === organizerId && new Date(event.date) >= new Date()
+    (event) => event.organizer.id === id && new Date(event.date.start) >= new Date()
   );
 
   return (
     <PageWrapper>
       <div className="container py-12">
         <Card className="p-6 mb-8">
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center space-x-4">
-              <Avatar className="h-16 w-16">
-                <AvatarImage src={organizer.imageUrl} alt={organizer.name} />
-                <AvatarFallback>{organizer.name.charAt(0)}</AvatarFallback>
+          <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+              <Avatar className="h-16 w-16 border-2 border-primary/10">
+                <AvatarImage src={organizer.avatar} alt={organizer.name} />
+                <AvatarFallback className="bg-primary/10 text-primary text-xl">
+                  {initials}
+                </AvatarFallback>
               </Avatar>
               <div>
                 <h2 className="text-2xl font-semibold">{organizer.name}</h2>
-                <p className="text-muted-foreground">{organizer.description}</p>
-                <div className="flex space-x-2 mt-2">
-                  <Badge variant="secondary">{organizer.category}</Badge>
-                  {organizer.isVerified && (
-                    <Badge variant="outline">
-                      <Check className="h-4 w-4 mr-1" />
-                      Verified
-                    </Badge>
-                  )}
+                <p className="text-muted-foreground">{organizer.bio || "No bio available"}</p>
+                <div className="flex flex-wrap gap-2 mt-2">
+                  <Badge variant="secondary">{organizer.organizationType}</Badge>
                 </div>
               </div>
             </div>
-            <Button>
+            <Button className="self-start sm:self-auto">
               <Share2 className="h-4 w-4 mr-2" /> Share
             </Button>
           </div>
           <Separator />
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
             <div>
-              <h3 className="text-lg font-semibold mb-2">Contact Information</h3>
-              <p>
-                <strong>Email:</strong> {organizer.email}
-              </p>
-              <p>
-                <strong>Phone:</strong> {organizer.phone}
-              </p>
-              <p>
-                <strong>Website:</strong>{" "}
-                <a
-                  href={organizer.website}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-primary hover:underline"
-                >
-                  {organizer.website}
-                </a>
+              <h3 className="text-lg font-semibold mb-2">About</h3>
+              <p className="text-muted-foreground">
+                {organizer.bio || "No information available."}
               </p>
             </div>
             <div>
-              <h3 className="text-lg font-semibold mb-2">Location</h3>
-              <p>
+              <h3 className="text-lg font-semibold mb-2">Contact Information</h3>
+              {organizer.website && (
+                <p className="flex items-center gap-2 mb-2">
+                  <strong>Website:</strong>{" "}
+                  <a
+                    href={organizer.website}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-primary hover:underline flex items-center gap-1"
+                  >
+                    Visit website <ExternalLink className="h-3.5 w-3.5" />
+                  </a>
+                </p>
+              )}
+              <div className="flex items-center gap-1 text-muted-foreground">
                 <MapPin className="h-4 w-4 inline-block mr-1" />
-                {organizer.address}
-              </p>
+                The organizer has not provided a location.
+              </div>
             </div>
           </div>
         </Card>
