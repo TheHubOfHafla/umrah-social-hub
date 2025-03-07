@@ -10,7 +10,7 @@ interface RecommendedEventsProps {
 }
 
 const RecommendedEvents = ({ events }: RecommendedEventsProps) => {
-  // Make sure we only display up to 12 events (4 rows of 3)
+  // Make sure we only display up to 12 events (3 rows of 4)
   const displayEvents = events.slice(0, 12);
   
   return (
@@ -27,7 +27,7 @@ const RecommendedEvents = ({ events }: RecommendedEventsProps) => {
         </Link>
       </div>
       
-      <EventGrid events={displayEvents} columns={3} />
+      <EventGrid events={displayEvents} columns={4} />
       
       <div className="text-center mt-8 sm:hidden">
         <Link to="/events">
