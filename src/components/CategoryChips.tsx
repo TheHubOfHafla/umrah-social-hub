@@ -37,7 +37,7 @@ const CategoryChips = ({
   return (
     <div className={cn("w-full", className)}>
       <ScrollArea className="w-full whitespace-nowrap">
-        <div className="flex space-x-2 py-2">
+        <div className="hidden md:flex space-x-2 py-2">
           {categories.map((category) => {
             const isSelected = selectedCategories.includes(category.value);
             const isHovered = hoveredCategory === category.value;
