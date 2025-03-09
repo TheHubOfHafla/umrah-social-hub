@@ -27,13 +27,10 @@ export const generateBasicEvent = (category: string, details: string) => {
       city: "City",
       country: "Country",
     },
-    date: {
-      start: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 1 week from now
-      end: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000 + 2 * 60 * 60 * 1000), // 2 hours after start
-    },
-    category: category as EventCategory,
+    suggestedDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 1 week from now, format as YYYY-MM-DD
     capacity: 50,
     isFree: category === "charity-fundraiser" ? false : true,
-    price: category === "charity-fundraiser" ? 25 : 0,
+    suggestedPrice: category === "charity-fundraiser" ? 25 : 0,
+    categoryRecommendations: [category]
   };
 };

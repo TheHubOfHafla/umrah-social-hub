@@ -163,14 +163,16 @@ const AiEventCreator = () => {
 
       if (error) {
         console.error("Error generating event:", error);
-        setError("Failed to generate event. Please try again.");
+        setError("Failed to generate event. Using fallback generator.");
         toast({
-          title: "Generation Failed",
-          description: "There was an error generating your event. Please try again.",
-          variant: "destructive"
+          title: "Using Fallback Generator",
+          description: "We couldn't connect to the AI service, but we've created a basic event for you to edit.",
+          variant: "warning"
         });
-        setProgress(0);
-        setStage("add-details");
+        
+        // Use the fallback generator from our local data utility
+        const fallbackEvent = generateBasicEvent(selectedCategory, values.details);
+        handleGeneratedEventData(fallbackEvent);
         return;
       }
 
@@ -179,52 +181,22 @@ const AiEventCreator = () => {
       
       // Process the generated event data
       if (data?.event) {
-        const eventData = data.event;
+        handleGeneratedEventData(data.event);
         
-        // Convert the suggested date to a Date object
-        const suggestedDate = eventData.suggestedDate ? new Date(eventData.suggestedDate) : new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
-        
-        // Format the event data to match our app's event structure
-        const formattedEvent = {
-          title: eventData.title,
-          description: eventData.description,
-          location: {
-            name: eventData.location.name,
-            address: eventData.location.address,
-            city: eventData.location.city,
-            country: eventData.location.country,
-          },
-          date: {
-            start: suggestedDate,
-            end: new Date(suggestedDate.getTime() + 2 * 60 * 60 * 1000), // 2 hours after start
-          },
-          category: selectedCategory,
-          capacity: eventData.capacity || 50,
-          isFree: eventData.isFree !== undefined ? eventData.isFree : true,
-          price: eventData.suggestedPrice || 0,
-        };
-
-        setGeneratedEvent(formattedEvent);
-        
-        // Prefill the edit form
-        editForm.setValue("title", formattedEvent.title);
-        editForm.setValue("description", formattedEvent.description);
-        editForm.setValue("location", formattedEvent.location.name);
-        editForm.setValue("city", formattedEvent.location.city);
-        editForm.setValue("country", formattedEvent.location.country);
-        editForm.setValue("date", formattedEvent.date.start.toLocaleDateString());
-        editForm.setValue("capacity", String(formattedEvent.capacity));
-        editForm.setValue("price", formattedEvent.price);
-        
-        setTimeout(() => {
-          setStage("review");
+        if (data.source === 'fallback') {
+          toast({
+            title: "Using Simplified Generator",
+            description: "We used a simplified event generator. Please review and edit the details.",
+            variant: "warning"
+          });
+        } else {
           toast({
             title: "Event Generated!",
-            description: "Review your AI-generated event details before launching.",
+            description: "Your AI-generated event is ready for review.",
           });
-        }, 500);
+        }
       } else {
-        setError("Invalid response from AI. Please try again.");
+        setError("Invalid response format. Please try again.");
         toast({
           title: "Generation Failed",
           description: "Unexpected response format. Please try again.",
@@ -234,13 +206,16 @@ const AiEventCreator = () => {
       }
     } catch (err) {
       console.error("Error calling AI function:", err);
-      setError("Failed to connect to AI service. Please try again.");
+      setError("Failed to connect to AI service. Using fallback generator.");
       toast({
-        title: "Connection Error",
-        description: "Failed to connect to AI service. Please try again.",
-        variant: "destructive"
+        title: "Using Fallback Generator",
+        description: "We couldn't connect to the AI service, but we've created a basic event for you to edit.",
+        variant: "warning"
       });
-      setStage("add-details");
+      
+      // Use the fallback generator from our local data utility
+      const fallbackEvent = generateBasicEvent(selectedCategory, values.details);
+      handleGeneratedEventData(fallbackEvent);
     } finally {
       // Ensure interval is cleared
       if (progressIntervalRef.current) {
@@ -248,6 +223,50 @@ const AiEventCreator = () => {
         progressIntervalRef.current = null;
       }
     }
+  };
+
+  // Helper function to process generated event data
+  const handleGeneratedEventData = (eventData: any) => {
+    // Convert the suggested date to a Date object
+    const suggestedDate = eventData.suggestedDate 
+      ? new Date(eventData.suggestedDate) 
+      : new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+    
+    // Format the event data to match our app's event structure
+    const formattedEvent = {
+      title: eventData.title || `${selectedCategory.charAt(0).toUpperCase() + selectedCategory.slice(1)} Event`,
+      description: eventData.description || eventDetails,
+      location: {
+        name: eventData.location?.name || "To be determined",
+        address: eventData.location?.address || "Address pending",
+        city: eventData.location?.city || "City",
+        country: eventData.location?.country || "Country",
+      },
+      date: {
+        start: suggestedDate,
+        end: new Date(suggestedDate.getTime() + 2 * 60 * 60 * 1000), // 2 hours after start
+      },
+      category: selectedCategory,
+      capacity: eventData.capacity || 50,
+      isFree: eventData.isFree !== undefined ? eventData.isFree : true,
+      price: eventData.suggestedPrice || 0,
+    };
+
+    setGeneratedEvent(formattedEvent);
+    
+    // Prefill the edit form
+    editForm.setValue("title", formattedEvent.title);
+    editForm.setValue("description", formattedEvent.description);
+    editForm.setValue("location", formattedEvent.location.name);
+    editForm.setValue("city", formattedEvent.location.city);
+    editForm.setValue("country", formattedEvent.location.country);
+    editForm.setValue("date", formattedEvent.date.start.toLocaleDateString());
+    editForm.setValue("capacity", String(formattedEvent.capacity));
+    editForm.setValue("price", formattedEvent.price);
+    
+    setTimeout(() => {
+      setStage("review");
+    }, 500);
   };
 
   // Clean up interval on unmount
