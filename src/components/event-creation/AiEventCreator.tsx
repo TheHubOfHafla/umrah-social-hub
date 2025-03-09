@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
@@ -45,6 +44,9 @@ import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { generateBasicEvent } from "@/lib/data";
+import { useContext } from "react";
+import { AuthContext } from "@/App";
+import { EventCategory } from "@/types";
 
 const eventCategories = [
   { id: "islamic-talk", name: "Islamic Talk", icon: "🕌" },
@@ -54,6 +56,18 @@ const eventCategories = [
   { id: "workshop", name: "Workshop", icon: "🔧" },
   { id: "other", name: "Other", icon: "📝" },
 ];
+
+const mapToEventCategory = (categoryId: string): EventCategory => {
+  const categoryMap: { [key: string]: EventCategory } = {
+    "islamic-talk": "lecture",
+    "charity-fundraiser": "charity",
+    "umrah-trip": "umrah",
+    "business-networking": "social",
+    "workshop": "workshop",
+    "other": "other"
+  };
+  return categoryMap[categoryId] || "other";
+};
 
 const categoryFormSchema = z.object({
   category: z.string().min(1, { message: "Please select an event category" }),
@@ -82,9 +96,11 @@ const AiEventCreator = () => {
   const [showLaunchConfirmation, setShowLaunchConfirmation] = useState(false);
   const [bannerPreview, setBannerPreview] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
   const progressIntervalRef = useRef<number | null>(null);
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { currentUser } = useContext(AuthContext);
 
   const categoryForm = useForm<z.infer<typeof categoryFormSchema>>({
     resolver: zodResolver(categoryFormSchema),
@@ -259,7 +275,60 @@ const AiEventCreator = () => {
     };
   }, []);
 
-  const handleLaunchEvent = () => {
+  const saveEventToDatabase = async () => {
+    if (!generatedEvent || !currentUser) return false;
+    
+    setIsSaving(true);
+    
+    try {
+      const eventData = {
+        title: generatedEvent.title,
+        description: generatedEvent.description,
+        start_date: generatedEvent.date.start,
+        end_date: generatedEvent.date.end,
+        organizer_id: currentUser.id,
+        capacity: generatedEvent.capacity,
+        is_free: generatedEvent.isFree,
+        base_price: generatedEvent.price,
+        location_name: generatedEvent.location.name,
+        location_address: generatedEvent.location.address,
+        location_city: generatedEvent.location.city,
+        location_country: generatedEvent.location.country,
+        image: bannerPreview || '/placeholder.svg',
+        categories: [mapToEventCategory(selectedCategory)],
+      };
+      
+      const { data, error } = await supabase
+        .from('events')
+        .insert(eventData)
+        .select('id');
+      
+      if (error) {
+        console.error("Error saving event:", error);
+        toast({
+          title: "Error",
+          description: "Failed to save your event. Please try again.",
+          variant: "destructive"
+        });
+        setIsSaving(false);
+        return false;
+      }
+      
+      console.log("Event created with ID:", data[0].id);
+      return true;
+    } catch (err) {
+      console.error("Error in saveEventToDatabase:", err);
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred while saving your event.",
+        variant: "destructive"
+      });
+      setIsSaving(false);
+      return false;
+    }
+  };
+
+  const handleLaunchEvent = async () => {
     if (!bannerPreview) {
       toast({
         title: "Banner Required",
@@ -269,19 +338,22 @@ const AiEventCreator = () => {
       return;
     }
     
-    if (generatedEvent) {
-      generatedEvent.image = bannerPreview;
+    const success = await saveEventToDatabase();
+    
+    if (success) {
+      setStage("complete");
+      toast({
+        title: "Event Created Successfully!",
+        description: "Your event has been published and added to your dashboard.",
+      });
+      
+      setTimeout(() => {
+        navigate("/organizer/events");
+      }, 2000);
+    } else {
+      setShowLaunchConfirmation(false);
+      setIsSaving(false);
     }
-    
-    setStage("complete");
-    toast({
-      title: "Event Created Successfully!",
-      description: "Your event has been published.",
-    });
-    
-    setTimeout(() => {
-      navigate("/events");
-    }, 2000);
   };
 
   const handleEditEvent = () => {
@@ -979,9 +1051,17 @@ const AiEventCreator = () => {
             <Button 
               onClick={handleShowLaunchConfirmation}
               className="bg-gradient-to-r from-purple-600 to-purple-400 hover:from-purple-700 hover:to-purple-500 text-white transition-all duration-300 hover:scale-[1.02] font-medium w-full sm:w-auto"
-              disabled={!bannerPreview}
+              disabled={!bannerPreview || isSaving}
             >
-              Launch Event <Send className="ml-2 h-4 w-4" />
+              {isSaving ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Saving...
+                </>
+              ) : (
+                <>
+                  Launch Event <Send className="ml-2 h-4 w-4" />
+                </>
+              )}
             </Button>
           </CardFooter>
         </Card>
@@ -1001,7 +1081,7 @@ const AiEventCreator = () => {
             </div>
             <h3 className="text-lg font-medium mb-2">Congratulations!</h3>
             <p className="text-gray-600 max-w-md mx-auto">
-              Your event has been successfully created and published. You will be redirected to the events page shortly.
+              Your event has been successfully created and published. You will be redirected to your events dashboard shortly.
             </p>
           </CardContent>
         </Card>
@@ -1018,8 +1098,18 @@ const AiEventCreator = () => {
             </AlertDialogHeader>
             <AlertDialogFooter>
               <AlertDialogCancel onClick={() => setShowLaunchConfirmation(false)}>Cancel</AlertDialogCancel>
-              <AlertDialogAction onClick={handleLaunchEvent} className="bg-gradient-to-r from-purple-600 to-purple-400">
-                Launch Event
+              <AlertDialogAction 
+                onClick={handleLaunchEvent} 
+                className="bg-gradient-to-r from-purple-600 to-purple-400"
+                disabled={isSaving}
+              >
+                {isSaving ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Saving...
+                  </>
+                ) : (
+                  <>Launch Event</>
+                )}
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
