@@ -21,6 +21,7 @@ import { useToast } from "@/hooks/use-toast";
 import { EventCategory } from "@/types";
 import { categories } from "@/lib/data/categories";
 import { Badge } from "@/components/ui/badge";
+import { supabase } from "@/integrations/supabase/client";
 
 // Basic user information form schema
 const userInfoSchema = z.object({
@@ -158,28 +159,57 @@ const Signup = ({ onSignupSuccess }: { onSignupSuccess?: () => void }) => {
     try {
       console.log("Verifying code:", values.verificationCode);
       
-      // Simulate verification process
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      // In a real app, we would validate the code with a backend service
-      // For demo purposes, we'll assume the code is correct
-      
-      console.log("User signup data with interests:", userData);
-      
-      toast({
-        title: "Account created!",
-        description: "You have successfully signed up.",
-      });
-      
-      // Call the onSignupSuccess callback if provided
-      if (onSignupSuccess) {
-        onSignupSuccess();
+      if (!userData) {
+        throw new Error("User data not found");
       }
       
-      navigate("/");
-    } catch (error) {
+      // Register the user with Supabase
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email: userData.email,
+        password: userData.password,
+        options: {
+          data: {
+            name: userData.name,
+          },
+        }
+      });
+      
+      if (authError) {
+        throw authError;
+      }
+      
+      if (authData.user) {
+        // Update the user's profile with additional information
+        // Note: The trigger we created will create a basic profile, but we need to update it with additional info
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .update({
+            name: userData.name,
+            phone: userData.phone,
+            city: userData.city,
+            interests: userData.interests,
+          })
+          .eq('id', authData.user.id);
+        
+        if (profileError) {
+          console.error("Profile update error:", profileError);
+        }
+        
+        toast({
+          title: "Account created!",
+          description: "You have successfully signed up.",
+        });
+        
+        // Call the onSignupSuccess callback if provided
+        if (onSignupSuccess) {
+          onSignupSuccess();
+        }
+        
+        navigate("/");
+      }
+    } catch (error: any) {
       console.error("Signup error:", error);
-      setAuthError("Failed to verify code. Please try again.");
+      setAuthError(error.message || "Failed to verify code. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -214,8 +244,6 @@ const Signup = ({ onSignupSuccess }: { onSignupSuccess?: () => void }) => {
     }
     
     try {
-      console.log("Signing up with Google using phone:", phoneNumber);
-      
       // Store partial user data and move to interests step
       setUserData({
         name: userInfoForm.getValues("name") || "Google User",
