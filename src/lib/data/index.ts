@@ -6,4 +6,6 @@ export * from './events';
 export * from './users';
 export * from './queries';
 export * from './chat';
-export * from './data';
+
+// Export the data.ts from the parent folder to make it accessible
+export { generateBasicEvent, categories } from '../data';
