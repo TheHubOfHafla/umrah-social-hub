@@ -113,18 +113,33 @@ const EventDetailPage = () => {
       </div>
       
       <Container className="py-8">
-        <div className="bg-white rounded-xl shadow-sm p-4 mb-8">
+        <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6 mb-8">
           <Tabs defaultValue="details" value={activeTab} onValueChange={handleTabChange} className="w-full">
             <TabsList className="w-full mb-8 justify-start gap-2">
-              <TabsTrigger value="details" className="text-base md:text-lg font-semibold">
-                Details
+              <TabsTrigger 
+                value="details" 
+                className="text-base md:text-lg font-semibold"
+              >
+                Event Details
               </TabsTrigger>
               <TabsTrigger 
                 value="chat" 
                 disabled={!isAttending && !isOrganizer}
-                className="text-base md:text-lg font-semibold"
+                className="text-base md:text-lg font-semibold relative"
               >
-                Chat {!isAttending && !isOrganizer && <span className="text-xs ml-1 opacity-70">(Register to access)</span>}
+                <span className="relative">
+                  Event Chat
+                  {!isAttending && !isOrganizer ? (
+                    <span className="absolute -top-1 -right-1 flex h-3 w-3">
+                      <span className="text-xs ml-1 opacity-70">(Register to access)</span>
+                    </span>
+                  ) : (
+                    <span className="absolute -top-1 -right-2 flex h-3 w-3">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-30"></span>
+                      <span className="relative inline-flex rounded-full h-3 w-3 bg-primary"></span>
+                    </span>
+                  )}
+                </span>
               </TabsTrigger>
             </TabsList>
             
@@ -134,11 +149,17 @@ const EventDetailPage = () => {
             
             <TabsContent value="chat" className="py-4">
               {isAttending || isOrganizer ? (
-                <div className="rounded-xl overflow-hidden">
+                <div className="rounded-xl overflow-hidden border-2 border-primary/20 shadow-md">
+                  <div className="border-b border-primary/10 bg-primary/5 px-4 py-3">
+                    <h2 className="text-xl font-bold text-primary">Live Event Chat</h2>
+                    <p className="text-sm text-muted-foreground">
+                      Connect with attendees and organizers in real-time
+                    </p>
+                  </div>
                   <ChatInterface event={event} isOrganizer={isOrganizer} />
                 </div>
               ) : (
-                <div className="border rounded-lg p-8 text-center bg-muted/10">
+                <div className="border-2 border-dashed rounded-lg p-8 text-center bg-muted/10">
                   <h3 className="text-xl font-semibold mb-3">Join the conversation</h3>
                   <p className="text-muted-foreground mb-6 max-w-lg mx-auto">
                     Register for this event to access the chat and connect with other attendees.

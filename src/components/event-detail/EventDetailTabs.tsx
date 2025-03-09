@@ -13,7 +13,7 @@ interface EventDetailTabsProps {
 const EventDetailTabs = ({ event }: EventDetailTabsProps) => {
   return (
     <Tabs defaultValue="about" className="w-full">
-      <TabsList className="mb-6 w-full justify-start">
+      <TabsList className="mb-8 w-full justify-start">
         <TabsTrigger value="about">About</TabsTrigger>
         <TabsTrigger value="location">Location</TabsTrigger>
         <TabsTrigger value="organizer">Organizer</TabsTrigger>
@@ -21,7 +21,7 @@ const EventDetailTabs = ({ event }: EventDetailTabsProps) => {
       
       <TabsContent value="about" className="space-y-6 animate-in fade-in-50">
         <div className="prose prose-lg max-w-none">
-          <h2 className="text-2xl font-bold mb-4">About this event</h2>
+          <h2 className="text-2xl font-bold mb-6">About this event</h2>
           <p className="text-lg leading-relaxed whitespace-pre-line">
             {event.description}
           </p>
