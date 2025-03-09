@@ -2,7 +2,8 @@
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Search, Filter, ChevronUp, ChevronDown } from "lucide-react";
-import { categories, mockEvents } from "@/lib/data";
+import { categories } from "@/lib/data/categories";
+import { mockEvents } from "@/lib/data/events";
 import { Event, EventCategory, AttendeeType } from "@/types";
 import CategoryChips from "@/components/CategoryChips";
 import EventGrid from "@/components/EventGrid";

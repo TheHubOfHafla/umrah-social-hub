@@ -1,4 +1,3 @@
-
 import { useParams } from "react-router-dom";
 import { useState } from "react";
 import PageWrapper from "@/components/PageWrapper";
@@ -10,7 +9,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import EventGrid from "@/components/EventGrid";
 import { Separator } from "@/components/ui/separator";
 import { Check, ExternalLink, MapPin, Share2 } from "lucide-react";
-import { organizers } from "@/lib/data";
+import { organizers } from "@/lib/data/organizers";
 import { mockEvents } from "@/lib/data/events";
 import { Event } from "@/types";
 

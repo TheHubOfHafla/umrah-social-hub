@@ -1,9 +1,9 @@
-
 import { useEffect, useState } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 
 import { getEventById, getRelatedEvents } from "@/lib/data/queries";
+import { currentUser } from "@/lib/data/users";
 import { Event } from "@/types";
 import Button from "@/components/Button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -18,7 +18,6 @@ import EventDetailTabs from "@/components/event-detail/EventDetailTabs";
 import RelatedEvents from "@/components/event-detail/RelatedEvents";
 import ChatInterface from "@/components/chat/ChatInterface";
 import ChatNotifications from "@/components/chat/ChatNotifications";
-import { currentUser } from "@/lib/data";
 
 const EventDetailPage = () => {
   const { eventId } = useParams<{ eventId: string }>();

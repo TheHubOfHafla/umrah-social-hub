@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { MessageCircle, Users } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -6,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Event } from '@/types';
 import { useNavigate } from 'react-router-dom';
-import { currentUser } from '@/lib/data';
+import { currentUser } from "@/lib/data/users";
 
 interface EventChatProps {
   event: Event;
