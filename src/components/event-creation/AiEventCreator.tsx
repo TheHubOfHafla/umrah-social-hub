@@ -43,6 +43,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
+import { generateBasicEvent } from "@/lib/data";
 
 const eventCategories = [
   { id: "islamic-talk", name: "Islamic Talk", icon: "🕌" },
@@ -53,7 +54,6 @@ const eventCategories = [
   { id: "other", name: "Other", icon: "📝" },
 ];
 
-// Form schemas for different steps
 const categoryFormSchema = z.object({
   category: z.string().min(1, { message: "Please select an event category" }),
 });
@@ -64,7 +64,6 @@ const detailsFormSchema = z.object({
   }),
 });
 
-// Stages of the event creation process
 type CreationStage = 
   | "select-category" 
   | "add-details" 
@@ -86,7 +85,6 @@ const AiEventCreator = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
 
-  // Form for category selection
   const categoryForm = useForm<z.infer<typeof categoryFormSchema>>({
     resolver: zodResolver(categoryFormSchema),
     defaultValues: {
@@ -94,7 +92,6 @@ const AiEventCreator = () => {
     },
   });
 
-  // Form for event details
   const detailsForm = useForm<z.infer<typeof detailsFormSchema>>({
     resolver: zodResolver(detailsFormSchema),
     defaultValues: {
@@ -102,7 +99,6 @@ const AiEventCreator = () => {
     },
   });
 
-  // Form for editing event details
   const editForm = useForm({
     defaultValues: {
       title: "",
@@ -116,12 +112,10 @@ const AiEventCreator = () => {
     }
   });
 
-  // Handle category selection
   const onCategorySubmit = (values: z.infer<typeof categoryFormSchema>) => {
     setSelectedCategory(values.category);
     setStage("add-details");
     
-    // Pre-fill the details field with a helpful starter
     const selectedCategoryObj = eventCategories.find(cat => cat.id === values.category);
     if (selectedCategoryObj) {
       const starterText = `I'm planning a ${selectedCategoryObj.name}. `;
@@ -130,25 +124,22 @@ const AiEventCreator = () => {
     }
   };
 
-  // Handle details submission and generate event with OpenAI API
   const onDetailsSubmit = async (values: z.infer<typeof detailsFormSchema>) => {
     setEventDetails(values.details);
     setStage("generating");
     setProgress(0);
     setError(null);
     
-    // Start progress animation
     progressIntervalRef.current = window.setInterval(() => {
       setProgress(prev => {
         if (prev >= 95) {
-          return 95; // Cap at 95% until we get actual response
+          return 95;
         }
         return prev + 1;
       });
     }, 100);
 
     try {
-      // Call the Supabase Edge Function
       const { data, error } = await supabase.functions.invoke('ai-event-generator', {
         body: {
           eventCategory: selectedCategory,
@@ -156,7 +147,6 @@ const AiEventCreator = () => {
         }
       });
 
-      // Clear the progress interval
       if (progressIntervalRef.current) {
         clearInterval(progressIntervalRef.current);
       }
@@ -167,19 +157,16 @@ const AiEventCreator = () => {
         toast({
           title: "Using Fallback Generator",
           description: "We couldn't connect to the AI service, but we've created a basic event for you to edit.",
-          variant: "warning"
+          variant: "destructive"
         });
         
-        // Use the fallback generator from our local data utility
         const fallbackEvent = generateBasicEvent(selectedCategory, values.details);
         handleGeneratedEventData(fallbackEvent);
         return;
       }
 
-      // Set progress to 100%
       setProgress(100);
       
-      // Process the generated event data
       if (data?.event) {
         handleGeneratedEventData(data.event);
         
@@ -187,7 +174,7 @@ const AiEventCreator = () => {
           toast({
             title: "Using Simplified Generator",
             description: "We used a simplified event generator. Please review and edit the details.",
-            variant: "warning"
+            variant: "destructive"
           });
         } else {
           toast({
@@ -210,14 +197,12 @@ const AiEventCreator = () => {
       toast({
         title: "Using Fallback Generator",
         description: "We couldn't connect to the AI service, but we've created a basic event for you to edit.",
-        variant: "warning"
+        variant: "destructive"
       });
       
-      // Use the fallback generator from our local data utility
       const fallbackEvent = generateBasicEvent(selectedCategory, values.details);
       handleGeneratedEventData(fallbackEvent);
     } finally {
-      // Ensure interval is cleared
       if (progressIntervalRef.current) {
         clearInterval(progressIntervalRef.current);
         progressIntervalRef.current = null;
@@ -225,14 +210,11 @@ const AiEventCreator = () => {
     }
   };
 
-  // Helper function to process generated event data
   const handleGeneratedEventData = (eventData: any) => {
-    // Convert the suggested date to a Date object
     const suggestedDate = eventData.suggestedDate 
       ? new Date(eventData.suggestedDate) 
       : new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
     
-    // Format the event data to match our app's event structure
     const formattedEvent = {
       title: eventData.title || `${selectedCategory.charAt(0).toUpperCase() + selectedCategory.slice(1)} Event`,
       description: eventData.description || eventDetails,
@@ -244,7 +226,7 @@ const AiEventCreator = () => {
       },
       date: {
         start: suggestedDate,
-        end: new Date(suggestedDate.getTime() + 2 * 60 * 60 * 1000), // 2 hours after start
+        end: new Date(suggestedDate.getTime() + 2 * 60 * 60 * 1000),
       },
       category: selectedCategory,
       capacity: eventData.capacity || 50,
@@ -254,7 +236,6 @@ const AiEventCreator = () => {
 
     setGeneratedEvent(formattedEvent);
     
-    // Prefill the edit form
     editForm.setValue("title", formattedEvent.title);
     editForm.setValue("description", formattedEvent.description);
     editForm.setValue("location", formattedEvent.location.name);
@@ -269,7 +250,6 @@ const AiEventCreator = () => {
     }, 500);
   };
 
-  // Clean up interval on unmount
   useEffect(() => {
     return () => {
       if (progressIntervalRef.current) {
@@ -278,9 +258,7 @@ const AiEventCreator = () => {
     };
   }, []);
 
-  // Launch event handler
   const handleLaunchEvent = () => {
-    // Check if banner image exists
     if (!bannerPreview) {
       toast({
         title: "Banner Required",
@@ -290,7 +268,6 @@ const AiEventCreator = () => {
       return;
     }
     
-    // Update the generated event with the banner
     if (generatedEvent) {
       generatedEvent.image = bannerPreview;
     }
@@ -306,7 +283,6 @@ const AiEventCreator = () => {
     }, 2000);
   };
 
-  // Navigate to detailed edit page
   const handleEditEvent = () => {
     if (generatedEvent) {
       generatedEvent.image = bannerPreview || "";
@@ -314,7 +290,6 @@ const AiEventCreator = () => {
     }
   };
 
-  // Show launch confirmation dialog
   const handleShowLaunchConfirmation = () => {
     if (!bannerPreview) {
       toast({
@@ -327,7 +302,6 @@ const AiEventCreator = () => {
     setShowLaunchConfirmation(true);
   };
 
-  // Reset the process
   const handleReset = () => {
     setStage("select-category");
     setSelectedCategory("");
@@ -341,12 +315,10 @@ const AiEventCreator = () => {
     editForm.reset();
   };
 
-  // Toggle to edit mode in the review stage
   const handleToggleEditMode = () => {
     setStage(stage === "review" ? "edit-details" : "review");
   };
 
-  // Handle inline edits and update the generatedEvent
   const handleEditSubmit = (data: any) => {
     if (generatedEvent) {
       const updatedEvent = {
@@ -374,12 +346,9 @@ const AiEventCreator = () => {
     }
   };
 
-  // Handle banner image upload
   const handleBannerUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      // In a real app, you would upload this file to your server
-      // For now, we'll just create a local URL for preview
       const imageUrl = URL.createObjectURL(file);
       setBannerPreview(imageUrl);
       
@@ -390,7 +359,6 @@ const AiEventCreator = () => {
     }
   };
 
-  // Select a sample banner
   const selectSampleBanner = (imageUrl: string) => {
     setBannerPreview(imageUrl);
     
@@ -400,7 +368,6 @@ const AiEventCreator = () => {
     });
   };
 
-  // Get selected category info
   const getSelectedCategoryInfo = () => {
     return eventCategories.find(cat => cat.id === selectedCategory);
   };
@@ -415,7 +382,6 @@ const AiEventCreator = () => {
 
   return (
     <div className="w-full max-w-3xl mx-auto p-4 md:p-0">
-      {/* Progress Steps */}
       <div className="w-full mb-8">
         <div className="flex justify-between items-center">
           <div className={cn(
@@ -506,7 +472,6 @@ const AiEventCreator = () => {
         </div>
       </div>
 
-      {/* Category Selection */}
       {stage === "select-category" && (
         <Card className="border-purple-200 shadow-lg transition-all duration-300 hover:shadow-xl animate-fade-in">
           <CardHeader className="bg-purple-50 border-b border-purple-100">
@@ -566,7 +531,6 @@ const AiEventCreator = () => {
         </Card>
       )}
 
-      {/* Add Details */}
       {stage === "add-details" && (
         <Card className="border-purple-200 shadow-lg transition-all duration-300 hover:shadow-xl animate-fade-in">
           <CardHeader className="bg-purple-50 border-b border-purple-100">
@@ -638,7 +602,6 @@ const AiEventCreator = () => {
         </Card>
       )}
 
-      {/* Generating Event */}
       {stage === "generating" && (
         <Card className="border-purple-200 shadow-lg transition-all animate-fade-in">
           <CardHeader className="bg-purple-50 border-b border-purple-100">
@@ -674,7 +637,6 @@ const AiEventCreator = () => {
                 <p className="animate-pulse"><span className="font-medium">Please wait</span> while we analyze your inputs and generate your event details</p>
               </div>
               
-              {/* Loading animation dots */}
               <div className="flex justify-center mt-4 space-x-1">
                 <div className="h-2 w-2 rounded-full bg-purple-500 animate-bounce"></div>
                 <div className="h-2 w-2 rounded-full bg-purple-500 animate-bounce [animation-delay:200ms]"></div>
@@ -685,7 +647,6 @@ const AiEventCreator = () => {
         </Card>
       )}
 
-      {/* Edit Details Inline */}
       {stage === "edit-details" && generatedEvent && (
         <Card className="border-purple-200 shadow-lg transition-all duration-300 hover:shadow-xl animate-fade-in">
           <CardHeader className="bg-purple-50 border-b border-purple-100">
@@ -858,7 +819,6 @@ const AiEventCreator = () => {
         </Card>
       )}
 
-      {/* Review & Launch */}
       {stage === "review" && generatedEvent && (
         <Card className="border-purple-200 shadow-lg transition-all duration-300 hover:shadow-xl animate-fade-in">
           <CardHeader className="bg-purple-50 border-b border-purple-100">
@@ -1026,64 +986,5 @@ const AiEventCreator = () => {
         </Card>
       )}
 
-      {/* Launch Confirmation Dialog */}
-      <AlertDialog open={showLaunchConfirmation} onOpenChange={setShowLaunchConfirmation}>
-        <AlertDialogContent className="border border-purple-200">
-          <AlertDialogHeader>
-            <AlertDialogTitle className="text-purple-900">Are you ready to launch?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Your event looks great! You can launch it now or make additional edits. 
-              Do you want to proceed with launching the event?
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter className="mt-4">
-            <AlertDialogCancel className="border-purple-200 text-purple-700 hover:bg-purple-50 hover:text-purple-900">
-              Cancel
-            </AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleToggleEditMode}
-              className="bg-purple-600 text-white hover:bg-purple-700"
-            >
-              Edit More Details
-            </AlertDialogAction>
-            <AlertDialogAction
-              onClick={handleLaunchEvent}
-              className="bg-gradient-to-r from-purple-600 to-purple-400 hover:from-purple-700 hover:to-purple-500 text-white"
-            >
-              Launch Now
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <
 
-      {/* Complete */}
-      {stage === "complete" && (
-        <Card className="border-purple-200 shadow-lg animate-fade-in">
-          <CardHeader className="bg-purple-50 border-b border-purple-100 text-center">
-            <CardTitle className="text-xl text-purple-900">Event Successfully Created!</CardTitle>
-            <CardDescription>Your event is now live and ready for attendees</CardDescription>
-          </CardHeader>
-          <CardContent className="pt-8 pb-8 flex flex-col items-center">
-            <div className="h-24 w-24 rounded-full bg-green-100 flex items-center justify-center mb-6">
-              <CheckCircle className="h-12 w-12 text-green-600" />
-            </div>
-            <p className="text-center max-w-md">
-              Congratulations! Your {getSelectedCategoryInfo()?.name} has been created and published. 
-              You can now share it with your potential attendees.
-            </p>
-          </CardContent>
-          <CardFooter className="justify-center border-t border-purple-100 bg-purple-50">
-            <Button 
-              onClick={() => navigate("/events")}
-              className="bg-gradient-to-r from-purple-600 to-purple-400 hover:from-purple-700 hover:to-purple-500 text-white transition-all duration-300 hover:scale-[1.02] font-medium"
-            >
-              View All Events
-            </Button>
-          </CardFooter>
-        </Card>
-      )}
-    </div>
-  );
-};
-
-export default AiEventCreator;
