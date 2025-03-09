@@ -85,7 +85,6 @@ gcp_jwt_path = "supabase/gcloud.json"
 # Port used for functions webserver.
 port = 54329
 
-# For more information on these settings, check out the Supabase docs:
-# https://supabase.com/docs/guides/functions/local-development
+# Function-specific configurations
 [functions.ai-event-generator]
 verify_jwt = false
