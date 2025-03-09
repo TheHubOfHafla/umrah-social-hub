@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
@@ -7,7 +8,7 @@ import {
   Bot, Edit, CheckCircle, ArrowRight, 
   Loader2, Sparkles, AlertTriangle, 
   PenLine, Send, RefreshCw, FileImage,
-  Camera, Image, Upload
+  Camera, Upload
 } from "lucide-react";
 import {
   Card,
@@ -986,5 +987,46 @@ const AiEventCreator = () => {
         </Card>
       )}
 
-      <
+      {stage === "complete" && (
+        <Card className="border-purple-200 shadow-lg transition-all animate-fade-in">
+          <CardHeader className="bg-purple-50 border-b border-purple-100">
+            <CardTitle className="text-center text-xl text-purple-900">Event Created Successfully!</CardTitle>
+            <CardDescription className="text-center">
+              Your event has been published and is now live
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="pt-8 pb-8 text-center">
+            <div className="w-20 h-20 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-6">
+              <CheckCircle className="h-10 w-10 text-green-600" />
+            </div>
+            <h3 className="text-lg font-medium mb-2">Congratulations!</h3>
+            <p className="text-gray-600 max-w-md mx-auto">
+              Your event has been successfully created and published. You will be redirected to the events page shortly.
+            </p>
+          </CardContent>
+        </Card>
+      )}
 
+      {showLaunchConfirmation && (
+        <AlertDialog open={showLaunchConfirmation} onOpenChange={setShowLaunchConfirmation}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Launch this event?</AlertDialogTitle>
+              <AlertDialogDescription>
+                This will publish your event and make it visible to all users. Are you sure you want to continue?
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel onClick={() => setShowLaunchConfirmation(false)}>Cancel</AlertDialogCancel>
+              <AlertDialogAction onClick={handleLaunchEvent} className="bg-gradient-to-r from-purple-600 to-purple-400">
+                Launch Event
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      )}
+    </div>
+  );
+};
+
+export default AiEventCreator;
