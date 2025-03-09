@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -30,6 +29,7 @@ import UserProfile from "./pages/dashboard/UserProfile";
 import OrganizerProfile from "./pages/dashboard/OrganizerProfile";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
+import AuthCallback from "./pages/AuthCallback";
 import AboutUs from "./pages/AboutUs";
 import HelpCenter from "./pages/HelpCenter";
 import ContactUs from "./pages/ContactUs";
@@ -41,7 +41,6 @@ import { fetchCurrentUser } from "@/lib/data/users";
 
 const queryClient = new QueryClient();
 
-// Create a context for authentication
 export const AuthContext = createContext({
   isAuthenticated: false,
   currentUser: null as User | null,
@@ -57,17 +56,14 @@ const App = () => {
   const [isLoading, setIsLoading] = useState(true);
   
   useEffect(() => {
-    // Check for authentication status when the app loads
     const checkAuth = async () => {
       setIsLoading(true);
       
-      // Get the current session
       const { data: { session } } = await supabase.auth.getSession();
       
       if (session) {
         setIsAuthenticated(true);
         
-        // Fetch the user profile data
         try {
           const userData = await fetchCurrentUser();
           if (userData) {
@@ -82,10 +78,8 @@ const App = () => {
       setIsLoading(false);
     };
     
-    // Check auth status immediately
     checkAuth();
     
-    // Set up listener for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === 'SIGNED_IN' && session) {
         setIsAuthenticated(true);
@@ -101,7 +95,6 @@ const App = () => {
       }
     });
     
-    // Cleanup subscription on unmount
     return () => {
       subscription.unsubscribe();
     };
@@ -113,7 +106,6 @@ const App = () => {
     const updatedEvents = [...userEventsAttending, eventId];
     setUserEventsAttending(updatedEvents);
     
-    // Update the user's profile in Supabase
     await supabase
       .from('profiles')
       .update({ events_attending: updatedEvents })
@@ -127,7 +119,6 @@ const App = () => {
     setUserEventsAttending([]);
   };
 
-  // Create a context value with auth state and event registration
   const contextValue = {
     isAuthenticated,
     currentUser,
@@ -136,7 +127,6 @@ const App = () => {
     onSignOut: handleSignOut
   };
 
-  // Show loading state while checking authentication
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-screen">
@@ -195,6 +185,7 @@ const App = () => {
                   {isAuthenticated ? <Navigate to="/profile" /> : <Signup />}
                 </PageWrapper>
               } />
+              <Route path="/auth/callback" element={<AuthCallback />} />
               <Route path="/profile" element={
                 <PageWrapper>
                   {isAuthenticated ? <UserProfile /> : <Navigate to="/login" />}

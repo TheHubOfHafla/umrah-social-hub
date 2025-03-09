@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { z } from "zod";
@@ -38,30 +39,23 @@ const userInfoSchema = z.object({
   path: ["confirmPassword"],
 });
 
-// Verification code schema
-const verificationSchema = z.object({
-  verificationCode: z.string().min(4, { message: "Please enter the verification code" }),
-});
-
 // Interests schema
 const interestsSchema = z.object({
   categories: z.array(z.string()).min(1, { message: "Please select at least one interest" }),
 });
 
 type UserInfoValues = z.infer<typeof userInfoSchema>;
-type VerificationValues = z.infer<typeof verificationSchema>;
 type InterestsValues = z.infer<typeof interestsSchema>;
 
-// Add onSignupSuccess prop
-const Signup = ({ onSignupSuccess }: { onSignupSuccess?: () => void }) => {
+const Signup = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
-  const [signupStep, setSignupStep] = useState<'userInfo' | 'interests' | 'verification'>('userInfo');
-  const [userData, setUserData] = useState<UserInfoValues & { interests?: EventCategory[] } | null>(null);
+  const [signupStep, setSignupStep] = useState<'userInfo' | 'interests'>('userInfo');
+  const [userData, setUserData] = useState<UserInfoValues | null>(null);
   const [phoneValidationError, setPhoneValidationError] = useState<string | null>(null);
   const [selectedInterests, setSelectedInterests] = useState<EventCategory[]>([]);
 
@@ -75,14 +69,6 @@ const Signup = ({ onSignupSuccess }: { onSignupSuccess?: () => void }) => {
       confirmPassword: "",
       city: "",
       phone: "",
-    },
-  });
-
-  // Form for verification code
-  const verificationForm = useForm<VerificationValues>({
-    resolver: zodResolver(verificationSchema),
-    defaultValues: {
-      verificationCode: "",
     },
   });
 
@@ -120,45 +106,6 @@ const Signup = ({ onSignupSuccess }: { onSignupSuccess?: () => void }) => {
     try {
       console.log("Interests submitted:", values);
       
-      // Store user data with interests
-      if (userData) {
-        setUserData({
-          ...userData,
-          interests: selectedInterests as EventCategory[]
-        });
-      }
-      
-      console.log("Sending verification code to:", userData?.phone);
-      
-      // Simulate sending verification code
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      // Generate a random 6-digit code (in a real app, this would be done on the server)
-      const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
-      console.log("Verification code generated:", verificationCode);
-      
-      toast({
-        title: "Verification code sent!",
-        description: `We've sent a verification code to ${userData?.phone}. In a real app, the code would be ${verificationCode}`,
-      });
-      
-      // Move to verification step
-      setSignupStep('verification');
-    } catch (error) {
-      console.error("Interests error:", error);
-      setAuthError("Failed to process interests. Please try again.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleVerificationSubmit = async (values: VerificationValues) => {
-    setIsLoading(true);
-    setAuthError(null);
-    
-    try {
-      console.log("Verifying code:", values.verificationCode);
-      
       if (!userData) {
         throw new Error("User data not found");
       }
@@ -180,14 +127,14 @@ const Signup = ({ onSignupSuccess }: { onSignupSuccess?: () => void }) => {
       
       if (authData.user) {
         // Update the user's profile with additional information
-        // Note: The trigger we created will create a basic profile, but we need to update it with additional info
         const { error: profileError } = await supabase
           .from('profiles')
           .update({
             name: userData.name,
             phone: userData.phone,
             city: userData.city,
-            interests: userData.interests,
+            country: '',
+            interests: selectedInterests as string[],
           })
           .eq('id', authData.user.id);
         
@@ -200,16 +147,11 @@ const Signup = ({ onSignupSuccess }: { onSignupSuccess?: () => void }) => {
           description: "You have successfully signed up.",
         });
         
-        // Call the onSignupSuccess callback if provided
-        if (onSignupSuccess) {
-          onSignupSuccess();
-        }
-        
         navigate("/");
       }
     } catch (error: any) {
       console.error("Signup error:", error);
-      setAuthError(error.message || "Failed to verify code. Please try again.");
+      setAuthError(error.message || "Failed to create account. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -233,32 +175,21 @@ const Signup = ({ onSignupSuccess }: { onSignupSuccess?: () => void }) => {
     setAuthError(null);
     setPhoneValidationError(null);
     
-    // Get the phone number value from the form
-    const phoneNumber = userInfoForm.getValues("phone");
-    
-    // Validate the phone number before proceeding
-    if (!phoneNumber || phoneNumber.length < 10) {
-      setPhoneValidationError("Please enter a valid phone number before signing up with Google");
-      setIsLoading(false);
-      return;
-    }
-    
     try {
-      // Store partial user data and move to interests step
-      setUserData({
-        name: userInfoForm.getValues("name") || "Google User",
-        email: userInfoForm.getValues("email") || "",
-        password: "", // Not needed for Google auth
-        confirmPassword: "",
-        city: userInfoForm.getValues("city") || "",
-        phone: phoneNumber,
+      // Sign up with Google
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+        },
       });
       
-      setSignupStep('interests');
-    } catch (error) {
+      if (error) {
+        throw error;
+      }
+    } catch (error: any) {
       console.error("Google sign-up error:", error);
-      setAuthError("Failed to sign up with Google. Please try again.");
-    } finally {
+      setAuthError(error.message || "Failed to sign up with Google. Please try again.");
       setIsLoading(false);
     }
   };
@@ -477,7 +408,7 @@ const Signup = ({ onSignupSuccess }: { onSignupSuccess?: () => void }) => {
               </Button>
             </form>
           </Form>
-        ) : signupStep === 'interests' ? (
+        ) : (
           <Form {...interestsForm}>
             <form onSubmit={interestsForm.handleSubmit(handleInterestsSubmit)} className="space-y-6">
               <div>
@@ -532,64 +463,8 @@ const Signup = ({ onSignupSuccess }: { onSignupSuccess?: () => void }) => {
                     </>
                   ) : (
                     <>
-                      <ArrowRight className="mr-2 h-4 w-4" />
-                      Continue
-                    </>
-                  )}
-                </Button>
-              </div>
-            </form>
-          </Form>
-        ) : (
-          <Form {...verificationForm}>
-            <form onSubmit={verificationForm.handleSubmit(handleVerificationSubmit)} className="space-y-6">
-              <div className="bg-muted/50 p-4 rounded-md text-sm">
-                <p>We've sent a verification code to <strong>{userData?.phone}</strong>.</p>
-                <p className="mt-2">In a real app, this would actually send an SMS code to your phone.</p>
-              </div>
-              
-              <FormField
-                control={verificationForm.control}
-                name="verificationCode"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Verification Code</FormLabel>
-                    <FormControl>
-                      <Input 
-                        placeholder="Enter code" 
-                        {...field} 
-                        disabled={isLoading}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <div className="flex gap-3">
-                <Button 
-                  type="button" 
-                  variant="outline"
-                  className="flex-1"
-                  onClick={() => setSignupStep('userInfo')}
-                  disabled={isLoading}
-                >
-                  Back
-                </Button>
-                <Button 
-                  type="submit" 
-                  className="flex-1" 
-                  disabled={isLoading}
-                >
-                  {isLoading ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Verifying...
-                    </>
-                  ) : (
-                    <>
                       <UserPlus className="mr-2 h-4 w-4" />
-                      Complete Signup
+                      Create Account
                     </>
                   )}
                 </Button>

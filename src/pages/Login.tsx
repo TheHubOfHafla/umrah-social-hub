@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
@@ -18,6 +18,8 @@ import { Input } from "@/components/ui/input";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
+import { AuthContext } from "@/App";
+import { supabase } from "@/integrations/supabase/client";
 
 const formSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email address" }),
@@ -26,8 +28,7 @@ const formSchema = z.object({
 
 type FormValues = z.infer<typeof formSchema>;
 
-// Add onLoginSuccess prop
-const Login = ({ onLoginSuccess }: { onLoginSuccess?: () => void }) => {
+const Login = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
@@ -49,22 +50,25 @@ const Login = ({ onLoginSuccess }: { onLoginSuccess?: () => void }) => {
     try {
       console.log("Logging in with:", values);
       
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      // Authenticate with Supabase
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: values.email,
+        password: values.password,
+      });
+      
+      if (error) {
+        throw error;
+      }
       
       toast({
         title: "Welcome back!",
         description: "You have successfully signed in.",
       });
       
-      // Call the onLoginSuccess callback if provided
-      if (onLoginSuccess) {
-        onLoginSuccess();
-      }
-      
       navigate("/");
-    } catch (error) {
+    } catch (error: any) {
       console.error("Login error:", error);
-      setAuthError("Invalid email or password. Please try again.");
+      setAuthError(error.message || "Invalid email or password. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -75,25 +79,20 @@ const Login = ({ onLoginSuccess }: { onLoginSuccess?: () => void }) => {
     setAuthError(null);
     
     try {
-      console.log("Signing in with Google");
-      
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      toast({
-        title: "Welcome!",
-        description: "You have successfully signed in with Google.",
+      // Redirect to Google OAuth flow
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+        },
       });
       
-      // Call the onLoginSuccess callback if provided
-      if (onLoginSuccess) {
-        onLoginSuccess();
+      if (error) {
+        throw error;
       }
-      
-      navigate("/");
-    } catch (error) {
+    } catch (error: any) {
       console.error("Google sign-in error:", error);
-      setAuthError("Failed to sign in with Google. Please try again.");
-    } finally {
+      setAuthError(error.message || "Failed to sign in with Google. Please try again.");
       setIsLoading(false);
     }
   };
