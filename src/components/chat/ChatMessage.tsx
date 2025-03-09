@@ -112,7 +112,7 @@ const ChatMessage = ({
             </div>
             
             {/* Moved timestamp to its own line to prevent overlap */}
-            <span className="text-xs text-muted-foreground whitespace-nowrap mr-10">
+            <span className="text-xs text-muted-foreground whitespace-nowrap mr-14">
               {formattedTime} · {formattedDate}
             </span>
           </div>
@@ -140,7 +140,7 @@ const ChatMessage = ({
       </div>
       
       {showActions && (
-        <div className="absolute top-3 right-2 flex items-center gap-1">
+        <div className="absolute bottom-3 right-3 flex items-center gap-1">
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
