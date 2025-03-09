@@ -35,12 +35,16 @@ import HelpCenter from "./pages/HelpCenter";
 import ContactUs from "./pages/ContactUs";
 import LegalPage from "./pages/LegalPage";
 import { useState, useEffect, createContext } from "react";
+import { supabase } from "./integrations/supabase/client";
+import { User } from "@/types";
+import { fetchCurrentUser } from "@/lib/data/users"; 
 
 const queryClient = new QueryClient();
 
 // Create a context for authentication
 export const AuthContext = createContext({
   isAuthenticated: false,
+  currentUser: null as User | null,
   userEventsAttending: [] as string[],
   onRegisterForEvent: (eventId: string) => {},
   onSignOut: () => {}
@@ -48,46 +52,98 @@ export const AuthContext = createContext({
 
 const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [userEventsAttending, setUserEventsAttending] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   
   useEffect(() => {
-    const token = localStorage.getItem('auth_token');
-    if (token) {
-      setIsAuthenticated(true);
+    // Check for authentication status when the app loads
+    const checkAuth = async () => {
+      setIsLoading(true);
       
-      // Load user's events (this is a mock, in a real app would be from API)
-      const savedEvents = localStorage.getItem('user_events');
-      if (savedEvents) {
-        setUserEventsAttending(JSON.parse(savedEvents));
+      // Get the current session
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (session) {
+        setIsAuthenticated(true);
+        
+        // Fetch the user profile data
+        try {
+          const userData = await fetchCurrentUser();
+          if (userData) {
+            setCurrentUser(userData);
+            setUserEventsAttending(userData.eventsAttending || []);
+          }
+        } catch (error) {
+          console.error("Error fetching user data:", error);
+        }
       }
-    }
+      
+      setIsLoading(false);
+    };
+    
+    // Check auth status immediately
+    checkAuth();
+    
+    // Set up listener for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (event === 'SIGNED_IN' && session) {
+        setIsAuthenticated(true);
+        const userData = await fetchCurrentUser();
+        if (userData) {
+          setCurrentUser(userData);
+          setUserEventsAttending(userData.eventsAttending || []);
+        }
+      } else if (event === 'SIGNED_OUT') {
+        setIsAuthenticated(false);
+        setCurrentUser(null);
+        setUserEventsAttending([]);
+      }
+    });
+    
+    // Cleanup subscription on unmount
+    return () => {
+      subscription.unsubscribe();
+    };
   }, []);
 
-  const handleLogin = () => {
-    localStorage.setItem('auth_token', 'user-is-logged-in');
-    setIsAuthenticated(true);
-  };
-  
-  const handleRegisterForEvent = (eventId: string) => {
+  const handleRegisterForEvent = async (eventId: string) => {
+    if (!currentUser) return;
+    
     const updatedEvents = [...userEventsAttending, eventId];
     setUserEventsAttending(updatedEvents);
-    localStorage.setItem('user_events', JSON.stringify(updatedEvents));
+    
+    // Update the user's profile in Supabase
+    await supabase
+      .from('profiles')
+      .update({ events_attending: updatedEvents })
+      .eq('id', currentUser.id);
   };
   
-  const handleSignOut = () => {
-    localStorage.removeItem('auth_token');
-    localStorage.removeItem('user_events');
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
     setIsAuthenticated(false);
+    setCurrentUser(null);
     setUserEventsAttending([]);
   };
 
   // Create a context value with auth state and event registration
   const contextValue = {
     isAuthenticated,
+    currentUser,
     userEventsAttending,
     onRegisterForEvent: handleRegisterForEvent,
     onSignOut: handleSignOut
   };
+
+  // Show loading state while checking authentication
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full"></div>
+      </div>
+    );
+  }
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -131,12 +187,12 @@ const App = () => {
               } />
               <Route path="/login" element={
                 <PageWrapper>
-                  {isAuthenticated ? <Navigate to="/profile" /> : <Login onLoginSuccess={handleLogin} />}
+                  {isAuthenticated ? <Navigate to="/profile" /> : <Login />}
                 </PageWrapper>
               } />
               <Route path="/signup" element={
                 <PageWrapper>
-                  {isAuthenticated ? <Navigate to="/profile" /> : <Signup onSignupSuccess={handleLogin} />}
+                  {isAuthenticated ? <Navigate to="/profile" /> : <Signup />}
                 </PageWrapper>
               } />
               <Route path="/profile" element={
