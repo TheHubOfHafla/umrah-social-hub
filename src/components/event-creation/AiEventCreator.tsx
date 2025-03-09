@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
@@ -43,6 +42,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
+import { supabase } from "@/integrations/supabase/client";
 
 const eventCategories = [
   { id: "islamic-talk", name: "Islamic Talk", icon: "🕌" },
@@ -81,6 +81,7 @@ const AiEventCreator = () => {
   const [progress, setProgress] = useState(0);
   const [showLaunchConfirmation, setShowLaunchConfirmation] = useState(false);
   const [bannerPreview, setBannerPreview] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const progressIntervalRef = useRef<number | null>(null);
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -108,6 +109,7 @@ const AiEventCreator = () => {
       description: "",
       location: "",
       city: "",
+      country: "",
       date: "",
       capacity: "",
       price: 0,
@@ -128,76 +130,124 @@ const AiEventCreator = () => {
     }
   };
 
-  // Handle details submission
-  const onDetailsSubmit = (values: z.infer<typeof detailsFormSchema>) => {
+  // Handle details submission and generate event with OpenAI API
+  const onDetailsSubmit = async (values: z.infer<typeof detailsFormSchema>) => {
     setEventDetails(values.details);
     setStage("generating");
-    simulateEventGeneration();
-  };
-
-  // Simulate AI generating the event
-  const simulateEventGeneration = () => {
-    // Reset progress
     setProgress(0);
+    setError(null);
     
-    // Animate progress over 10 seconds
+    // Start progress animation
     progressIntervalRef.current = window.setInterval(() => {
       setProgress(prev => {
-        if (prev >= 100) {
-          clearInterval(progressIntervalRef.current!);
-          return 100;
+        if (prev >= 95) {
+          return 95; // Cap at 95% until we get actual response
         }
         return prev + 1;
       });
     }, 100);
 
-    // Generate fake event data after 10 seconds
-    setTimeout(() => {
-      clearInterval(progressIntervalRef.current!);
-      setProgress(100);
+    try {
+      // Call the Supabase Edge Function
+      const { data, error } = await supabase.functions.invoke('ai-event-generator', {
+        body: {
+          eventCategory: selectedCategory,
+          eventDetails: values.details
+        }
+      });
 
-      // Get selected category name
-      const categoryName = eventCategories.find(c => c.id === selectedCategory)?.name || "Event";
-      
-      // Generate placeholder event - fixing the type error on line 189 by converting to string
-      const event = {
-        title: `${categoryName} - ${new Date().toLocaleDateString()}`,
-        description: eventDetails,
-        location: {
-          name: "To be determined",
-          address: "Address pending",
-          city: "City",
-          country: "Country",
-        },
-        date: {
-          start: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 1 week from now
-          end: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000 + 2 * 60 * 60 * 1000), // 2 hours after start
-        },
-        category: selectedCategory,
-        capacity: 50,
-        isFree: selectedCategory === "charity-fundraiser" ? false : true,
-        price: selectedCategory === "charity-fundraiser" ? 25 : 0,
-      };
+      // Clear the progress interval
+      if (progressIntervalRef.current) {
+        clearInterval(progressIntervalRef.current);
+      }
 
-      setGeneratedEvent(event);
-      
-      // Prefill the edit form - Convert capacity to string for the form
-      editForm.setValue("title", event.title);
-      editForm.setValue("description", event.description);
-      editForm.setValue("location", event.location.name);
-      editForm.setValue("city", event.location.city);
-      editForm.setValue("date", event.date.start.toLocaleDateString());
-      editForm.setValue("capacity", String(event.capacity)); // Fix: Convert to string
-      editForm.setValue("price", event.price);
-      
-      setTimeout(() => {
-        setStage("review");
+      if (error) {
+        console.error("Error generating event:", error);
+        setError("Failed to generate event. Please try again.");
         toast({
-          title: "Event Generated!",
-          description: "Review your event details before launching.",
+          title: "Generation Failed",
+          description: "There was an error generating your event. Please try again.",
+          variant: "destructive"
         });
-      }, 500);
-    }, 10000);
+        setProgress(0);
+        setStage("add-details");
+        return;
+      }
+
+      // Set progress to 100%
+      setProgress(100);
+      
+      // Process the generated event data
+      if (data?.event) {
+        const eventData = data.event;
+        
+        // Convert the suggested date to a Date object
+        const suggestedDate = eventData.suggestedDate ? new Date(eventData.suggestedDate) : new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+        
+        // Format the event data to match our app's event structure
+        const formattedEvent = {
+          title: eventData.title,
+          description: eventData.description,
+          location: {
+            name: eventData.location.name,
+            address: eventData.location.address,
+            city: eventData.location.city,
+            country: eventData.location.country,
+          },
+          date: {
+            start: suggestedDate,
+            end: new Date(suggestedDate.getTime() + 2 * 60 * 60 * 1000), // 2 hours after start
+          },
+          category: selectedCategory,
+          capacity: eventData.capacity || 50,
+          isFree: eventData.isFree !== undefined ? eventData.isFree : true,
+          price: eventData.suggestedPrice || 0,
+        };
+
+        setGeneratedEvent(formattedEvent);
+        
+        // Prefill the edit form
+        editForm.setValue("title", formattedEvent.title);
+        editForm.setValue("description", formattedEvent.description);
+        editForm.setValue("location", formattedEvent.location.name);
+        editForm.setValue("city", formattedEvent.location.city);
+        editForm.setValue("country", formattedEvent.location.country);
+        editForm.setValue("date", formattedEvent.date.start.toLocaleDateString());
+        editForm.setValue("capacity", String(formattedEvent.capacity));
+        editForm.setValue("price", formattedEvent.price);
+        
+        setTimeout(() => {
+          setStage("review");
+          toast({
+            title: "Event Generated!",
+            description: "Review your AI-generated event details before launching.",
+          });
+        }, 500);
+      } else {
+        setError("Invalid response from AI. Please try again.");
+        toast({
+          title: "Generation Failed",
+          description: "Unexpected response format. Please try again.",
+          variant: "destructive"
+        });
+        setStage("add-details");
+      }
+    } catch (err) {
+      console.error("Error calling AI function:", err);
+      setError("Failed to connect to AI service. Please try again.");
+      toast({
+        title: "Connection Error",
+        description: "Failed to connect to AI service. Please try again.",
+        variant: "destructive"
+      });
+      setStage("add-details");
+    } finally {
+      // Ensure interval is cleared
+      if (progressIntervalRef.current) {
+        clearInterval(progressIntervalRef.current);
+        progressIntervalRef.current = null;
+      }
+    }
   };
 
   // Clean up interval on unmount
@@ -266,6 +316,7 @@ const AiEventCreator = () => {
     setGeneratedEvent(null);
     setProgress(0);
     setBannerPreview(null);
+    setError(null);
     categoryForm.reset();
     detailsForm.reset();
     editForm.reset();
@@ -287,9 +338,10 @@ const AiEventCreator = () => {
           ...generatedEvent.location,
           name: data.location,
           city: data.city,
+          country: data.country,
         },
-        capacity: parseInt(data.capacity),
-        price: parseFloat(data.price),
+        capacity: parseInt(data.capacity) || 50,
+        price: parseFloat(data.price) || 0,
         image: bannerPreview,
       };
       
@@ -335,6 +387,7 @@ const AiEventCreator = () => {
   };
 
   const getProgressText = () => {
+    if (error) return "Error occurred. Please try again.";
     if (progress < 30) return "Analyzing your requirements...";
     if (progress < 60) return "Crafting your event details...";
     if (progress < 90) return "Adding finishing touches...";
