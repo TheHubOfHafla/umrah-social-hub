@@ -3,9 +3,11 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 const AuthCallback = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   useEffect(() => {
     // Handle the OAuth callback
@@ -14,21 +16,34 @@ const AuthCallback = () => {
       
       if (error) {
         console.error("Error in auth callback:", error);
+        toast({
+          title: "Authentication failed",
+          description: error.message || "Please try again.",
+          variant: "destructive"
+        });
         navigate("/login");
         return;
       }
       
       if (data?.session) {
         // User is authenticated, redirect to dashboard/home
+        toast({
+          title: "Welcome to EventHub!",
+          description: "You've successfully signed in.",
+        });
         navigate("/");
       } else {
         // No session found, redirect to login
+        toast({
+          description: "Authentication incomplete. Please try again.",
+          variant: "destructive"
+        });
         navigate("/login");
       }
     };
     
     handleAuthCallback();
-  }, [navigate]);
+  }, [navigate, toast]);
   
   return (
     <div className="flex items-center justify-center h-screen">

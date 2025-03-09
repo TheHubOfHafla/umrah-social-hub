@@ -1,5 +1,4 @@
-
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
@@ -23,6 +22,7 @@ import { EventCategory } from "@/types";
 import { categories } from "@/lib/data/categories";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
+import { AuthContext } from "@/App";
 
 // Basic user information form schema
 const userInfoSchema = z.object({
@@ -142,12 +142,28 @@ const Signup = () => {
           console.error("Profile update error:", profileError);
         }
         
-        toast({
-          title: "Account created!",
-          description: "You have successfully signed up.",
+        // After successful signup, immediately sign in the user
+        const { error: signInError } = await supabase.auth.signInWithPassword({
+          email: userData.email,
+          password: userData.password,
         });
         
-        navigate("/");
+        if (signInError) {
+          console.error("Auto sign-in error:", signInError);
+          // Show success message but don't redirect automatically if auto-login fails
+          toast({
+            title: "Account created!",
+            description: "You have successfully signed up. Please sign in to continue.",
+          });
+          navigate("/login");
+        } else {
+          // Successfully signed up and logged in
+          toast({
+            title: "Welcome to EventHub!",
+            description: "Your account has been created and you're now signed in.",
+          });
+          navigate("/");
+        }
       }
     } catch (error: any) {
       console.error("Signup error:", error);
