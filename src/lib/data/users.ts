@@ -1,5 +1,5 @@
 
-import { User } from '@/types';
+import { User, EventCategory } from '@/types';
 import { supabase } from '@/integrations/supabase/client';
 
 export const currentUser: User = {
@@ -34,7 +34,7 @@ export const fetchCurrentUser = async (): Promise<User | null> => {
     id: profile.id,
     name: profile.name || '',
     avatar: profile.avatar || '/placeholder.svg',
-    interests: profile.interests || [],
+    interests: (profile.interests || []) as EventCategory[], // Explicitly cast to EventCategory[]
     location: {
       city: profile.city || '',
       country: profile.country || '',
@@ -57,7 +57,7 @@ export const updateUserProfile = async (
     .update({
       name: updates.name,
       avatar: updates.avatar,
-      interests: updates.interests,
+      interests: updates.interests as string[], // Cast to string[] when sending to Supabase
       city: updates.location?.city,
       country: updates.location?.country,
       following: updates.following,
