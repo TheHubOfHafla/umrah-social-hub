@@ -10,7 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import UserAvatar from "@/components/UserAvatar";
-import { currentUser } from "@/lib/data";
+import { currentUser } from "@/lib/data/users";
 import { Link } from "react-router-dom";
 import { Save, Building, MapPin, Globe, Share2 } from "lucide-react";
 

@@ -2,7 +2,8 @@
 import { useEffect, useState } from "react";
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { currentUser, getOrganizerEvents, getOrganizerPastEvents } from "@/lib/data";
+import { currentUser } from "@/lib/data/users";
+import { getOrganizerEvents, getOrganizerPastEvents } from "@/lib/data/queries";
 import { EventCategory } from "@/types";
 
 // Import our new components

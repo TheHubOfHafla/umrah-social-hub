@@ -1,16 +1,14 @@
+
 export const categories = [
-  { label: "Conference", value: "conference" },
-  { label: "Seminar", value: "seminar" },
+  { label: "Charity", value: "charity" },
+  { label: "Community", value: "community" },
+  { label: "Education", value: "education" },
+  { label: "Mosque", value: "mosque" },
+  { label: "Travel", value: "travel" },
+  { label: "Umrah", value: "umrah" },
+  { label: "Lecture", value: "lecture" },
   { label: "Workshop", value: "workshop" },
-  { label: "Networking Event", value: "networking" },
-  { label: "Trade Show", value: "trade-show" },
-  { label: "Webinar", value: "webinar" },
-  { label: "Concert", value: "concert" },
-  { label: "Festival", value: "festival" },
-  { label: "Party", value: "party" },
-  { label: "Exhibition", value: "exhibition" },
-  { label: "Charity Event", value: "charity" },
-  { label: "Sports Event", value: "sports" },
+  { label: "Social", value: "social" },
   { label: "Other", value: "other" },
 ];
 

@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import FeaturedEvent from "@/components/FeaturedEvent";
@@ -11,15 +10,14 @@ import Footer from "@/components/Footer";
 import EventCard from "@/components/EventCard";
 import Button from "@/components/Button";
 import { EventCategory } from "@/types";
+import { categories } from "@/lib/data/categories";
+import { currentUser } from "@/lib/data/users";
 import { 
   getFeaturedEvents,
   getRecommendedEvents, 
-  getEventsByCategory, 
-  categories, 
-  currentUser 
-} from "@/lib/data";
+  getEventsByCategory,
+} from "@/lib/data/queries";
 
-// Add prop to simulate guest view
 const Index = ({ isAuthenticated = false }: { isAuthenticated?: boolean }) => {
   const [selectedCategories, setSelectedCategories] = useState<EventCategory[]>([]);
   const [selectedLocation, setSelectedLocation] = useState("");
@@ -33,9 +31,7 @@ const Index = ({ isAuthenticated = false }: { isAuthenticated?: boolean }) => {
   const [categoryEvents, setCategoryEvents] = useState(getEventsByCategory(categories[0].value));
   const [animateContent, setAnimateContent] = useState(false);
 
-  // Animation delay
   useEffect(() => {
-    // Trigger animations after component mount
     setTimeout(() => setAnimateContent(true), 300);
   }, []);
 
@@ -59,7 +55,6 @@ const Index = ({ isAuthenticated = false }: { isAuthenticated?: boolean }) => {
           isAuthenticated={isAuthenticated} 
         />
         
-        {/* TopicsAndPicks container with full width for carousel */}
         <div className={`w-full transition-all duration-700 delay-100 ${animateContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
           <TopicsAndPicks />
         </div>

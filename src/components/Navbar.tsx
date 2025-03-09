@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -7,7 +6,7 @@ import { NavigationMenu, NavigationMenuItem, NavigationMenuLink, NavigationMenuL
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Bell, Calendar, ChevronDown, LogIn, Menu, User, UserPlus, X, Plus, UserRound, Zap } from "lucide-react";
 import UserAvatar from "./UserAvatar";
-import { currentUser } from "@/lib/data";
+import { currentUser } from "@/lib/data/users";
 
 interface NavItem {
   label: string;

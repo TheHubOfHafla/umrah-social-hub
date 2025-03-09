@@ -7,7 +7,8 @@ import DashboardStats from "@/components/dashboard/DashboardStats";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Calendar, BarChart2, Users, Ticket, PlusCircle, Target, TrendingUp, Lightbulb } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { currentUser, getOrganizerEvents } from "@/lib/data";
+import { currentUser } from "@/lib/data/users";
+import { getOrganizerEvents } from "@/lib/data/queries";
 import { EventCategory } from "@/types";
 import { Container } from "@/components/ui/container";
 

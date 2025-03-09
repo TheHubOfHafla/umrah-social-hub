@@ -1,4 +1,3 @@
-
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
@@ -7,7 +6,8 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Calendar, BarChart2, Users, Bookmark } from "lucide-react";
 import EventCard from "@/components/EventCard";
 import Button from "@/components/Button";
-import { currentUser, getRecommendedEvents, getUserEvents } from "@/lib/data";
+import { currentUser } from "@/lib/data/users";
+import { getRecommendedEvents, getUserEvents } from "@/lib/data/queries";
 
 const Dashboard = () => {
   useEffect(() => {

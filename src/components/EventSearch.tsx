@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
-import { getFeaturedEvents } from "@/lib/data";
+import { getFeaturedEvents } from "@/lib/data/queries";
 
 // Mock events for search results
 const sampleEvents = getFeaturedEvents();

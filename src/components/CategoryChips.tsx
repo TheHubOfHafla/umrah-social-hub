@@ -3,7 +3,7 @@ import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { EventCategory } from "@/types";
-import { categories } from "@/lib/data";
+import { categories } from "@/lib/data/categories";
 
 interface CategoryChipsProps {
   selectedCategories: EventCategory[];

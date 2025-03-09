@@ -1,7 +1,8 @@
+
 import { useState, useEffect, useCallback, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { EventCategory } from "@/types";
-import { categories } from "@/lib/data";
+import { categories } from "@/lib/data/categories";
 import { cn } from "@/lib/utils";
 import { 
   Heart, 
