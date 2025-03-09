@@ -12,8 +12,8 @@ interface EventDetailTabsProps {
 
 const EventDetailTabs = ({ event }: EventDetailTabsProps) => {
   return (
-    <Tabs defaultValue="about">
-      <TabsList className="mb-6">
+    <Tabs defaultValue="about" className="w-full">
+      <TabsList className="mb-6 w-full justify-start">
         <TabsTrigger value="about">About</TabsTrigger>
         <TabsTrigger value="location">Location</TabsTrigger>
         <TabsTrigger value="organizer">Organizer</TabsTrigger>
@@ -32,7 +32,7 @@ const EventDetailTabs = ({ event }: EventDetailTabsProps) => {
             <h3 className="text-xl font-semibold mb-4">Tags</h3>
             <div className="flex flex-wrap gap-2">
               {event.categories.map(category => (
-                <Badge key={category} variant="outline">
+                <Badge key={category} variant="outline" className="text-sm py-1 px-3">
                   {category}
                 </Badge>
               ))}
@@ -60,7 +60,7 @@ interface TabWrapperProps {
 const TabWrapper = ({ title, children }: TabWrapperProps) => (
   <div className="space-y-6">
     <h2 className="text-2xl font-bold mb-4">{title}</h2>
-    <Card>
+    <Card className="overflow-hidden shadow-sm border-muted/40">
       <CardContent className="p-6">
         {children}
       </CardContent>

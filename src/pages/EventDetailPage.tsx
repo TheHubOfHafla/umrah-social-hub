@@ -8,6 +8,7 @@ import { Event } from "@/types";
 import Button from "@/components/Button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Container } from "@/components/ui/container";
 
 // Event detail components
 import EventHeader from "@/components/event-detail/EventHeader";
@@ -67,7 +68,7 @@ const EventDetailPage = () => {
 
   if (error) {
     return (
-      <div className="container mx-auto px-4 py-16 text-center">
+      <Container size="md" className="py-16 text-center">
         <h1 className="text-2xl font-bold mb-4">Event not found</h1>
         <p className="text-muted-foreground mb-8">
           The event you're looking for doesn't exist or has been removed.
@@ -75,7 +76,7 @@ const EventDetailPage = () => {
         <Button onClick={() => navigate("/events")}>
           Browse all events
         </Button>
-      </div>
+      </Container>
     );
   }
 
@@ -97,7 +98,7 @@ const EventDetailPage = () => {
           <div className="absolute inset-0 bg-gradient-to-b from-background/80 to-background z-1" />
         </div>
 
-        <div className="container mx-auto px-4 py-4">
+        <Container className="py-4">
           <div className="flex flex-col lg:flex-row gap-8 relative z-10">
             <div className="flex flex-col w-full lg:w-2/3">
               <EventHeader event={event} />
@@ -108,50 +109,61 @@ const EventDetailPage = () => {
               <EventTicketCard event={event} />
             </div>
           </div>
+        </Container>
+      </div>
+      
+      <Container className="py-8">
+        <div className="bg-white rounded-xl shadow-sm p-4 mb-8">
+          <Tabs defaultValue="details" value={activeTab} onValueChange={handleTabChange} className="w-full">
+            <TabsList className="w-full mb-8 justify-start gap-2">
+              <TabsTrigger value="details" className="text-base md:text-lg font-semibold">
+                Details
+              </TabsTrigger>
+              <TabsTrigger 
+                value="chat" 
+                disabled={!isAttending && !isOrganizer}
+                className="text-base md:text-lg font-semibold"
+              >
+                Chat {!isAttending && !isOrganizer && <span className="text-xs ml-1 opacity-70">(Register to access)</span>}
+              </TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="details" className="py-4">
+              <EventDetailTabs event={event} />
+            </TabsContent>
+            
+            <TabsContent value="chat" className="py-4">
+              {isAttending || isOrganizer ? (
+                <div className="rounded-xl overflow-hidden">
+                  <ChatInterface event={event} isOrganizer={isOrganizer} />
+                </div>
+              ) : (
+                <div className="border rounded-lg p-8 text-center bg-muted/10">
+                  <h3 className="text-xl font-semibold mb-3">Join the conversation</h3>
+                  <p className="text-muted-foreground mb-6 max-w-lg mx-auto">
+                    Register for this event to access the chat and connect with other attendees.
+                    Stay updated with announcements and ask questions directly to the organizers.
+                  </p>
+                  <Button onClick={() => navigate(`/events/${event.id}/register`)} size="lg">
+                    Register Now
+                  </Button>
+                </div>
+              )}
+            </TabsContent>
+          </Tabs>
         </div>
-      </div>
+      </Container>
       
-      <div className="container mx-auto px-4 py-8">
-        <Tabs defaultValue="details" value={activeTab} onValueChange={handleTabChange}>
-          <TabsList className="mb-6">
-            <TabsTrigger value="details">Details</TabsTrigger>
-            <TabsTrigger value="chat" disabled={!isAttending && !isOrganizer}>
-              Chat {!isAttending && !isOrganizer && "(Register to access)"}
-            </TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="details">
-            <EventDetailTabs event={event} />
-          </TabsContent>
-          
-          <TabsContent value="chat">
-            {isAttending || isOrganizer ? (
-              <ChatInterface event={event} isOrganizer={isOrganizer} />
-            ) : (
-              <div className="border rounded-lg p-8 text-center">
-                <h3 className="text-lg font-medium mb-2">Join the conversation</h3>
-                <p className="text-muted-foreground mb-4">
-                  Register for this event to access the chat and connect with other attendees.
-                </p>
-                <Button onClick={() => navigate(`/events/${event.id}/register`)}>
-                  Register Now
-                </Button>
-              </div>
-            )}
-          </TabsContent>
-        </Tabs>
-      </div>
-      
-      <div className="container mx-auto px-4 pb-12">
+      <Container className="pb-12">
         <RelatedEvents events={relatedEvents} />
-      </div>
+      </Container>
     </>
   );
 };
 
 const EventDetailSkeleton = () => {
   return (
-    <div className="container mx-auto px-4 py-8">
+    <Container className="py-8">
       <div className="flex flex-col lg:flex-row gap-8">
         <div className="w-full lg:w-2/3">
           <Skeleton className="h-8 w-32 mb-4" />
@@ -170,7 +182,7 @@ const EventDetailSkeleton = () => {
           </div>
         </div>
       </div>
-    </div>
+    </Container>
   );
 };
 
