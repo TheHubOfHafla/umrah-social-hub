@@ -66,11 +66,11 @@ const Navbar = ({ isAuthenticated = true }: { isAuthenticated?: boolean }) => {
             <NavigationMenuList>
               {navigation.map(item => <NavigationMenuItem key={item.href}>
                   <NavigationMenuLink asChild className={cn(
-                    "px-3 md:px-4 py-2 text-sm md:text-base font-medium tracking-wide transition-all duration-200 rounded-md",
+                    "px-3 md:px-4 py-2 text-base md:text-lg lg:text-xl font-bold tracking-wide transition-all duration-200 rounded-md",
                     "hover:text-primary hover:bg-primary/10 hover:scale-105",
                     item.active 
-                      ? "text-primary font-semibold border-b-2 border-primary" 
-                      : "text-foreground/80 bg-transparent"
+                      ? "text-primary font-extrabold border-b-2 border-primary" 
+                      : "text-foreground/90 bg-transparent"
                   )}>
                     <button onClick={() => handleNavigation(item.href)}>
                       {item.label}
@@ -165,10 +165,10 @@ const Navbar = ({ isAuthenticated = true }: { isAuthenticated?: boolean }) => {
                 key={item.href} 
                 onClick={() => handleNavigation(item.href)}
                 className={cn(
-                  "px-4 py-2.5 text-base rounded-md transition-all duration-200 font-medium w-full text-left", 
+                  "px-4 py-2.5 text-lg rounded-md transition-all duration-200 font-bold w-full text-left", 
                   item.active 
-                    ? "bg-primary/10 text-primary font-semibold" 
-                    : "text-foreground/80 hover:bg-primary/10 hover:text-primary"
+                    ? "bg-primary/10 text-primary font-extrabold" 
+                    : "text-foreground/90 hover:bg-primary/10 hover:text-primary"
                 )}
               >
                 {item.label}
