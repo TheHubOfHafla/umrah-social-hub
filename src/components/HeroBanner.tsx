@@ -56,7 +56,7 @@ const HeroBanner = ({ user, onLocationSelect, isAuthenticated = true }: HeroBann
       <div className="absolute inset-0 flex items-center justify-center top-[30%] sm:top-[35%] z-20">
         <div className="container mx-auto px-4">
           <div className={cn(
-            "text-center max-w-3xl mx-auto space-y-6 backdrop-blur-sm p-8 rounded-2xl transition-all duration-700 ease-out",
+            "text-center max-w-3xl mx-auto space-y-6 p-8 rounded-2xl transition-all duration-700 ease-out",
             contentVisible ? "opacity-100 translate-y-0 bg-background/10" : "opacity-0 translate-y-8 bg-background/0"
           )}>
             <h1 className={cn(
