@@ -242,7 +242,7 @@ const TopicsAndPicks = () => {
         zIndex: 0
       }}>
       <div className="max-w-5xl mx-auto relative">
-        <h2 className="text-xl md:text-2xl font-bold mb-4 md:mb-8 text-center bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent animate-pulse-soft">Categories & Our Picks</h2>
+        {/* Removed the Categories & Our Picks heading */}
         
         <div 
           className="relative group" 
