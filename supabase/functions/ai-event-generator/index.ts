@@ -4,6 +4,7 @@ import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { generateBasicEvent } from "../../../src/lib/data.ts";
 
 const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
+const deepseekApiKey = Deno.env.get('DEEPSEEK_API_KEY');
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -28,9 +29,9 @@ serve(async (req) => {
       );
     }
 
-    if (!openAIApiKey) {
-      console.warn("OPENAI_API_KEY not set, falling back to basic event generator");
-      // Fall back to the basic event generator if OpenAI key is not available
+    // If neither API key is available, fall back to basic generator
+    if (!openAIApiKey && !deepseekApiKey) {
+      console.warn("Neither OPENAI_API_KEY nor DEEPSEEK_API_KEY set, falling back to basic event generator");
       const basicEvent = generateBasicEvent(eventCategory, eventDetails);
       return new Response(
         JSON.stringify({ event: basicEvent, source: 'fallback' }),
@@ -40,98 +41,199 @@ serve(async (req) => {
 
     console.log(`Generating event for category: ${eventCategory}, with details: ${eventDetails}`);
 
-    try {
-      const response = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${openAIApiKey}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          model: 'gpt-4o-mini',
-          messages: [
-            { 
-              role: 'system', 
-              content: `You are an event planning assistant. Create an event based on the category and description provided by the user. 
-                        Your response should be a JSON object with these fields:
-                        {
-                          "title": "Event title",
-                          "description": "Detailed event description",
-                          "location": {
-                            "name": "Venue name",
-                            "address": "Venue address",
-                            "city": "City name",
-                            "country": "Country name"
-                          },
-                          "suggestedDate": "YYYY-MM-DD",
-                          "capacity": 50,
-                          "isFree": true/false,
-                          "suggestedPrice": 0,
-                          "categoryRecommendations": ["tag1", "tag2"]
-                        }` 
-            },
-            { 
-              role: 'user', 
-              content: `Create an event in the category "${eventCategory}" with these details: "${eventDetails}".
-                        Format as valid JSON only with no extra text.` 
-            }
-          ],
-          response_format: { type: "json_object" }
-        }),
-      });
-      
-      console.log("OpenAI API response status:", response.status);
-      
-      if (!response.ok) {
-        const errorData = await response.text();
-        console.error('OpenAI API error:', errorData);
-        
-        // Fall back to the basic event generator
-        const basicEvent = generateBasicEvent(eventCategory, eventDetails);
-        return new Response(
-          JSON.stringify({ event: basicEvent, source: 'fallback', error: `OpenAI API error: ${response.status}` }),
-          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
-      }
-
-      const data = await response.json();
-      console.log("OpenAI response received");
-      
+    // Try Deepseek first if API key is available
+    if (deepseekApiKey) {
       try {
-        // Parse the JSON string from the API response
-        const generatedEvent = JSON.parse(data.choices[0].message.content);
+        console.log("Attempting to use Deepseek API");
+        const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${deepseekApiKey}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            model: 'deepseek-chat',
+            messages: [
+              { 
+                role: 'system', 
+                content: `You are an event planning assistant. Create an event based on the category and description provided by the user. 
+                          Your response should be a JSON object with these fields:
+                          {
+                            "title": "Event title",
+                            "description": "Detailed event description",
+                            "location": {
+                              "name": "Venue name",
+                              "address": "Venue address",
+                              "city": "City name",
+                              "country": "Country name"
+                            },
+                            "suggestedDate": "YYYY-MM-DD",
+                            "capacity": 50,
+                            "isFree": true/false,
+                            "suggestedPrice": 0,
+                            "categoryRecommendations": ["tag1", "tag2"]
+                          }` 
+              },
+              { 
+                role: 'user', 
+                content: `Create an event in the category "${eventCategory}" with these details: "${eventDetails}".
+                          Format as valid JSON only with no extra text.` 
+              }
+            ],
+            response_format: { type: "json_object" }
+          }),
+        });
         
-        // Return the parsed event data
-        return new Response(
-          JSON.stringify({ event: generatedEvent, source: 'openai' }),
-          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
-      } catch (parseError) {
-        console.error('Error parsing OpenAI response:', parseError);
-        console.log('Raw content:', data.choices[0].message.content);
+        console.log("Deepseek API response status:", response.status);
+        
+        if (!response.ok) {
+          const errorData = await response.text();
+          console.error('Deepseek API error:', errorData);
+          throw new Error(`Deepseek API error: ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log("Deepseek response received");
+        
+        try {
+          // Parse the JSON string from the API response
+          const generatedEvent = JSON.parse(data.choices[0].message.content);
+          
+          // Return the parsed event data
+          return new Response(
+            JSON.stringify({ event: generatedEvent, source: 'deepseek' }),
+            { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        } catch (parseError) {
+          console.error('Error parsing Deepseek response:', parseError);
+          console.log('Raw content:', data.choices[0].message.content);
+          throw new Error('Invalid response format from Deepseek AI');
+        }
+      } catch (deepseekError) {
+        console.error('Error with Deepseek API, falling back to OpenAI:', deepseekError);
+        // If Deepseek fails and OpenAI is available, try OpenAI next
+        if (!openAIApiKey) {
+          // If OpenAI is not available, fall back to basic generator
+          const basicEvent = generateBasicEvent(eventCategory, eventDetails);
+          return new Response(
+            JSON.stringify({ 
+              event: basicEvent, 
+              source: 'fallback', 
+              error: deepseekError.message 
+            }),
+            { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+      }
+    }
+
+    // Try OpenAI if Deepseek wasn't used or failed
+    if (openAIApiKey) {
+      try {
+        console.log("Attempting to use OpenAI API");
+        const response = await fetch('https://api.openai.com/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${openAIApiKey}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            model: 'gpt-4o-mini',
+            messages: [
+              { 
+                role: 'system', 
+                content: `You are an event planning assistant. Create an event based on the category and description provided by the user. 
+                          Your response should be a JSON object with these fields:
+                          {
+                            "title": "Event title",
+                            "description": "Detailed event description",
+                            "location": {
+                              "name": "Venue name",
+                              "address": "Venue address",
+                              "city": "City name",
+                              "country": "Country name"
+                            },
+                            "suggestedDate": "YYYY-MM-DD",
+                            "capacity": 50,
+                            "isFree": true/false,
+                            "suggestedPrice": 0,
+                            "categoryRecommendations": ["tag1", "tag2"]
+                          }` 
+              },
+              { 
+                role: 'user', 
+                content: `Create an event in the category "${eventCategory}" with these details: "${eventDetails}".
+                          Format as valid JSON only with no extra text.` 
+              }
+            ],
+            response_format: { type: "json_object" }
+          }),
+        });
+        
+        console.log("OpenAI API response status:", response.status);
+        
+        if (!response.ok) {
+          const errorData = await response.text();
+          console.error('OpenAI API error:', errorData);
+          
+          // Fall back to the basic event generator
+          const basicEvent = generateBasicEvent(eventCategory, eventDetails);
+          return new Response(
+            JSON.stringify({ 
+              event: basicEvent, 
+              source: 'fallback', 
+              error: `OpenAI API error: ${response.status}` 
+            }),
+            { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+
+        const data = await response.json();
+        console.log("OpenAI response received");
+        
+        try {
+          // Parse the JSON string from the API response
+          const generatedEvent = JSON.parse(data.choices[0].message.content);
+          
+          // Return the parsed event data
+          return new Response(
+            JSON.stringify({ event: generatedEvent, source: 'openai' }),
+            { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        } catch (parseError) {
+          console.error('Error parsing OpenAI response:', parseError);
+          console.log('Raw content:', data.choices[0].message.content);
+          
+          // Fall back to the basic event generator
+          const basicEvent = generateBasicEvent(eventCategory, eventDetails);
+          return new Response(
+            JSON.stringify({ 
+              event: basicEvent, 
+              source: 'fallback', 
+              error: 'Invalid response format from AI',
+              raw: data.choices[0].message.content 
+            }),
+            { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+      } catch (openAIError) {
+        console.error('Error calling OpenAI API:', openAIError);
         
         // Fall back to the basic event generator
         const basicEvent = generateBasicEvent(eventCategory, eventDetails);
         return new Response(
-          JSON.stringify({ 
-            event: basicEvent, 
-            source: 'fallback', 
-            error: 'Invalid response format from AI',
-            raw: data.choices[0].message.content 
-          }),
+          JSON.stringify({ event: basicEvent, source: 'fallback', error: openAIError.message }),
           { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
-    } catch (openAIError) {
-      console.error('Error calling OpenAI API:', openAIError);
-      
-      // Fall back to the basic event generator
-      const basicEvent = generateBasicEvent(eventCategory, eventDetails);
-      return new Response(
-        JSON.stringify({ event: basicEvent, source: 'fallback', error: openAIError.message }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
     }
+
+    // If we get here, we tried all available APIs and they failed
+    const basicEvent = generateBasicEvent(eventCategory, eventDetails);
+    return new Response(
+      JSON.stringify({ event: basicEvent, source: 'fallback', error: 'All API attempts failed' }),
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    );
   } catch (error) {
     console.error('Error in ai-event-generator function:', error);
     return new Response(
