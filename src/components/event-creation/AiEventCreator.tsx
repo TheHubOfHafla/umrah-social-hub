@@ -1,18 +1,7 @@
-
 import { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
-import { 
-  Bot, Edit, CheckCircle, Wand2, PenLine, 
-  ArrowRight, ArrowLeft, RefreshCw, Send
-} from "lucide-react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Bot, Edit, CheckCircle, Wand2, PenLine, ArrowRight, ArrowLeft, RefreshCw, Send } from "lucide-react";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
 import { AuthContext } from "@/App";
@@ -29,26 +18,25 @@ import EventReview from "./components/EventReview";
 import EventSuccessCard from "./components/EventSuccessCard";
 import LaunchConfirmationDialog from "./components/LaunchConfirmationDialog";
 
-interface AiEventCreatorProps {
-  initialCategory: string;
-  initialDetails: string;
-  onEventGenerated: (event: any) => void;
+export interface AiEventCreatorProps {
+  initialCategory?: string;
+  initialDetails?: string;
+  onEventGenerated?: (event: any) => void;
   showBackButton?: boolean;
   onBack?: () => void;
 }
 
-const AiEventCreator = ({
-  initialCategory,
-  initialDetails,
+const AiEventCreator: React.FC<AiEventCreatorProps> = ({
+  initialCategory = "",
+  initialDetails = "",
   onEventGenerated,
   showBackButton = false,
   onBack
-}: AiEventCreatorProps) => {
+}) => {
   const [generatedEvent, setGeneratedEvent] = useState<any>(null);
   const navigate = useNavigate();
   const { currentUser } = useContext(AuthContext);
   
-  // Custom hooks
   const {
     stage, setStage,
     selectedCategory, setSelectedCategory,

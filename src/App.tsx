@@ -150,14 +150,14 @@ const App = () => {
                   <EventsPage />
                 </PageWrapper>
               } />
-              <Route path="/events/:eventId" element={
-                <PageWrapper>
-                  <EventDetailPage />
-                </PageWrapper>
-              } />
               <Route path="/events/create" element={
                 <PageWrapper>
                   <CreateEventPage />
+                </PageWrapper>
+              } />
+              <Route path="/events/:eventId" element={
+                <PageWrapper>
+                  <EventDetailPage />
                 </PageWrapper>
               } />
               <Route path="/events/:eventId/register" element={
