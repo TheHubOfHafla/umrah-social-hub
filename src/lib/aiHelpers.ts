@@ -1,6 +1,5 @@
 
 import { categories } from "@/lib/data/categories";
-import { supabase } from "@/integrations/supabase/client";
 
 export const extractAppContext = () => {
   const appRoutes = [
@@ -34,25 +33,11 @@ export const extractAppContext = () => {
 
 export const callDeepseekChat = async (message: string, history: any[] = []) => {
   try {
-    const appContext = extractAppContext();
-    
-    const response = await supabase.functions.invoke('deepseek-chat', {
-      body: {
-        message,
-        context: JSON.stringify(appContext),
-        history
-      }
-    });
-
-    if (response.error) {
-      console.error('Error calling deepseek-chat function:', response.error);
-      return {
-        message: "I'm sorry, I'm having trouble connecting to my knowledge base. Please try again later.",
-        source: 'error'
-      };
-    }
-
-    return response.data;
+    // Return a static response since we're removing AI assistance
+    return {
+      message: "I'm a basic event assistant. To create an event, please use the manual creation option.",
+      source: 'static'
+    };
   } catch (error) {
     console.error('Error in callDeepseekChat:', error);
     return {
