@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
@@ -75,10 +76,14 @@ const categoryFormSchema = z.object({
 
 const detailsFormSchema = z.object({
   details: z.string()
-    .min(20, { 
-      message: "Please provide at least 20 characters about your event" 
+    .min(1, { 
+      message: "Please provide some details about your event" 
     })
 });
+
+const getWordCount = (text: string): number => {
+  return text.trim().split(/\s+/).filter(Boolean).length;
+};
 
 type CreationStage = 
   | "select-category" 
@@ -806,3 +811,342 @@ const AiEventCreator = () => {
                       {...editForm.register("date")}
                     />
                   </div>
+                  
+                  <div>
+                    <Label htmlFor="country" className="text-base font-medium">Country</Label>
+                    <Input
+                      id="country"
+                      className="mt-1"
+                      {...editForm.register("country")}
+                    />
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="capacity" className="text-base font-medium">Capacity</Label>
+                    <Input
+                      id="capacity"
+                      type="number"
+                      className="mt-1"
+                      {...editForm.register("capacity")}
+                    />
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="price" className="text-base font-medium">Price ($)</Label>
+                    <Input
+                      id="price"
+                      type="number"
+                      step="0.01"
+                      className="mt-1"
+                      {...editForm.register("price")}
+                    />
+                  </div>
+                </div>
+              </div>
+              
+              <div className="space-y-4">
+                <Label className="text-base font-medium">Event Banner</Label>
+                
+                {bannerPreview ? (
+                  <div className="rounded-lg overflow-hidden border border-purple-200 relative group">
+                    <img 
+                      src={bannerPreview} 
+                      alt="Event banner preview" 
+                      className="w-full h-[200px] object-cover"
+                    />
+                    <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity duration-200">
+                      <Button 
+                        type="button"
+                        variant="default"
+                        className="bg-purple-600 hover:bg-purple-700"
+                        onClick={() => document.getElementById('event-banner')?.click()}
+                      >
+                        <Edit className="mr-2 h-4 w-4" /> Change Banner
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <div 
+                    className="border-2 border-dashed border-purple-100 rounded-lg p-8 text-center hover:bg-purple-50 transition-colors cursor-pointer"
+                    onClick={() => document.getElementById('event-banner')?.click()}
+                  >
+                    <div className="mx-auto h-16 w-16 rounded-full bg-purple-100 flex items-center justify-center mb-4">
+                      <FileImage className="h-6 w-6 text-purple-500" />
+                    </div>
+                    <h4 className="text-base font-medium text-gray-700">Upload event banner</h4>
+                    <p className="text-sm text-gray-500 mt-1">
+                      Drag and drop or click to browse
+                    </p>
+                  </div>
+                )}
+                <input 
+                  type="file" 
+                  className="hidden" 
+                  id="event-banner"
+                  accept="image/*"
+                  onChange={handleBannerUpload}
+                />
+                
+                {!bannerPreview && (
+                  <div className="mt-4">
+                    <p className="text-sm font-medium mb-2">Or choose a sample banner:</p>
+                    <div className="grid grid-cols-3 gap-2">
+                      {/* Sample banners */}
+                      <img 
+                        src="https://images.unsplash.com/photo-1607825652811-304c91bd67ab" 
+                        alt="Sample banner 1" 
+                        className="h-20 w-full object-cover rounded-md cursor-pointer border-2 hover:border-purple-500 transition-all"
+                        onClick={() => selectSampleBanner("https://images.unsplash.com/photo-1607825652811-304c91bd67ab")}
+                      />
+                      <img 
+                        src="https://images.unsplash.com/photo-1511795409834-ef04bbd61622" 
+                        alt="Sample banner 2" 
+                        className="h-20 w-full object-cover rounded-md cursor-pointer border-2 hover:border-purple-500 transition-all"
+                        onClick={() => selectSampleBanner("https://images.unsplash.com/photo-1511795409834-ef04bbd61622")}
+                      />
+                      <img 
+                        src="https://images.unsplash.com/photo-1558008258-3256797b43f3" 
+                        alt="Sample banner 3" 
+                        className="h-20 w-full object-cover rounded-md cursor-pointer border-2 hover:border-purple-500 transition-all"
+                        onClick={() => selectSampleBanner("https://images.unsplash.com/photo-1558008258-3256797b43f3")}
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+              
+              <div className="flex justify-between pt-4">
+                <Button 
+                  type="button"
+                  variant="outline"
+                  onClick={handleToggleEditMode}
+                  className="border-purple-200 text-purple-700 hover:bg-purple-50"
+                >
+                  Cancel
+                </Button>
+                <Button 
+                  type="submit"
+                  className="bg-gradient-to-r from-purple-600 to-purple-400 hover:from-purple-700 hover:to-purple-500 text-white transition-all duration-300 hover:scale-[1.02] font-medium"
+                >
+                  Save Changes
+                </Button>
+              </div>
+            </form>
+          </CardContent>
+        </Card>
+      )}
+
+      {stage === "review" && generatedEvent && (
+        <Card className="border-purple-200 shadow-lg transition-all duration-300 hover:shadow-xl animate-fade-in">
+          <CardHeader className="bg-purple-50 border-b border-purple-100">
+            <div className="flex items-center space-x-2">
+              <div className="h-8 w-8 rounded-full bg-purple-200 flex items-center justify-center">
+                <CheckCircle className="h-5 w-5 text-purple-700" />
+              </div>
+              <div>
+                <CardTitle className="text-xl text-purple-900">Your Event Is Ready!</CardTitle>
+                <CardDescription>Review and publish or make additional changes</CardDescription>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent className="pt-6">
+            <div className="space-y-6">
+              <div className="rounded-lg overflow-hidden border border-purple-200">
+                {bannerPreview ? (
+                  <img src={bannerPreview} alt="Event banner" className="w-full h-[200px] object-cover" />
+                ) : (
+                  <div className="w-full h-[200px] bg-purple-50 flex flex-col items-center justify-center">
+                    <FileImage className="h-10 w-10 text-purple-300 mb-2" />
+                    <p className="text-purple-400 text-sm font-medium">Upload a banner for your event</p>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      className="mt-3 text-purple-700 border-purple-200 hover:bg-purple-50"
+                      onClick={() => document.getElementById('event-banner-review')?.click()}
+                    >
+                      <Upload className="mr-2 h-4 w-4" /> Upload Banner
+                    </Button>
+                    <input 
+                      type="file" 
+                      className="hidden" 
+                      id="event-banner-review"
+                      accept="image/*"
+                      onChange={handleBannerUpload}
+                    />
+                  </div>
+                )}
+              </div>
+              
+              <div className="space-y-4">
+                <div>
+                  <h3 className="text-lg font-bold text-gray-800">{generatedEvent.title}</h3>
+                  <p className="text-gray-600 mt-2 text-sm whitespace-pre-line">{generatedEvent.description}</p>
+                </div>
+                
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+                  <div className="bg-gray-50 p-3 rounded-md">
+                    <div className="flex items-start">
+                      <MapPin className="h-5 w-5 text-purple-500 mr-2 mt-0.5 flex-shrink-0" />
+                      <div>
+                        <p className="font-medium text-gray-700">Location</p>
+                        <p className="text-gray-600">{generatedEvent.location.name}</p>
+                        <p className="text-gray-600">{generatedEvent.location.city}, {generatedEvent.location.country}</p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="bg-gray-50 p-3 rounded-md">
+                    <div className="flex items-start">
+                      <CalendarIcon className="h-5 w-5 text-purple-500 mr-2 mt-0.5 flex-shrink-0" />
+                      <div>
+                        <p className="font-medium text-gray-700">Date & Time</p>
+                        <p className="text-gray-600">
+                          {generatedEvent.date.start.toLocaleDateString(undefined, {
+                            weekday: 'long',
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric'
+                          })}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="bg-gray-50 p-3 rounded-md">
+                    <div className="flex items-start">
+                      <Users className="h-5 w-5 text-purple-500 mr-2 mt-0.5 flex-shrink-0" />
+                      <div>
+                        <p className="font-medium text-gray-700">Capacity</p>
+                        <p className="text-gray-600">{generatedEvent.capacity} attendees</p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="bg-gray-50 p-3 rounded-md">
+                    <div className="flex items-start">
+                      <DollarSign className="h-5 w-5 text-purple-500 mr-2 mt-0.5 flex-shrink-0" />
+                      <div>
+                        <p className="font-medium text-gray-700">Price</p>
+                        <p className="text-gray-600">
+                          {generatedEvent.isFree ? 'Free' : `$${generatedEvent.price.toFixed(2)}`}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="flex justify-between pt-6">
+                <div className="space-x-3">
+                  <Button 
+                    type="button"
+                    variant="outline"
+                    onClick={handleReset}
+                    className="border-gray-200 text-gray-700 hover:bg-gray-50"
+                  >
+                    <RefreshCw className="mr-2 h-4 w-4" /> Start Over
+                  </Button>
+                  <Button 
+                    type="button"
+                    variant="outline"
+                    onClick={handleToggleEditMode}
+                    className="border-purple-200 text-purple-700 hover:bg-purple-50"
+                  >
+                    <Edit className="mr-2 h-4 w-4" /> Edit Details
+                  </Button>
+                </div>
+                
+                <div className="space-x-3">
+                  <Button
+                    type="button"
+                    onClick={handleEditEvent}
+                    variant="outline"
+                    className="border-blue-200 text-blue-700 hover:bg-blue-50"
+                  >
+                    Advanced Edit
+                  </Button>
+                  <Button 
+                    type="button"
+                    onClick={handleShowLaunchConfirmation}
+                    className="bg-gradient-to-r from-purple-600 to-purple-400 hover:from-purple-700 hover:to-purple-500 text-white transition-all duration-300 hover:scale-[1.02] font-medium"
+                    disabled={isSaving}
+                  >
+                    {isSaving ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Publishing...
+                      </>
+                    ) : (
+                      <>
+                        Launch Event <Send className="ml-2 h-4 w-4" />
+                      </>
+                    )}
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {stage === "complete" && (
+        <Card className="border-purple-200 shadow-lg transition-all animate-fade-in">
+          <CardHeader className="bg-green-50 border-b border-green-100">
+            <CardTitle className="text-center text-xl text-green-800 flex items-center justify-center">
+              <CheckCircle className="h-6 w-6 text-green-600 mr-2" />
+              Event Published Successfully!
+            </CardTitle>
+            <CardDescription className="text-center text-green-700">
+              Your event is now live and ready for attendees
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="pt-8 pb-6 text-center">
+            <div className="w-20 h-20 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-6">
+              <CheckCircle className="h-12 w-12 text-green-600" />
+            </div>
+            
+            <h3 className="text-xl font-bold mb-2">{generatedEvent?.title}</h3>
+            <p className="text-gray-600 mb-6">Has been created and published to your events list</p>
+            
+            <div className="flex flex-col sm:flex-row justify-center gap-4 pt-4">
+              <Button 
+                onClick={() => navigate("/events/create")}
+                variant="outline"
+                className="border-purple-200 text-purple-700 hover:bg-purple-50"
+              >
+                <Sparkles className="mr-2 h-5 w-5" /> Create Another Event
+              </Button>
+              <Button 
+                onClick={() => navigate("/organizer/events")}
+                className="bg-gradient-to-r from-purple-600 to-purple-400 hover:from-purple-700 hover:to-purple-500 text-white transition-all duration-300 hover:scale-[1.02] font-medium"
+              >
+                Go to My Events
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+      
+      <AlertDialog open={showLaunchConfirmation} onOpenChange={setShowLaunchConfirmation}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Launch your event?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will publish your event making it visible to potential attendees. You can still edit details later.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleLaunchEvent}>
+              Launch Event
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </div>
+  );
+};
+
+export default AiEventCreator;
