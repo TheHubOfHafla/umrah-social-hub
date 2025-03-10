@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { CalendarIcon, Clock, MapPin } from "lucide-react";
@@ -16,6 +15,8 @@ interface FeaturedEventProps {
 const FeaturedEvent = ({ event }: FeaturedEventProps) => {
   const [isVisible, setIsVisible] = useState(false);
 
+  const imageSrc = "/lovable-uploads/2b781a41-72aa-4b72-9785-fe84e014bdd7.png";
+
   useEffect(() => {
     const timer = setTimeout(() => setIsVisible(true), 100);
     return () => clearTimeout(timer);
@@ -31,7 +32,7 @@ const FeaturedEvent = ({ event }: FeaturedEventProps) => {
         <div className="relative aspect-[16/9] md:aspect-[21/9]">
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent z-10" />
           <img
-            src={event.image}
+            src={imageSrc}
             alt={event.title}
             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
           />
@@ -64,7 +65,10 @@ const FeaturedEvent = ({ event }: FeaturedEventProps) => {
             </div>
           </div>
         </div>
-        <CardContent className="p-3 md:p-6 bg-gradient-to-r from-primary/5 to-accent/5 transition-all duration-300 group-hover:from-primary/10 group-hover:to-accent/10">
+        <CardContent className={cn(
+          "p-4 transition-all duration-300 group-hover:bg-primary/5",
+          isFeatured && "px-0 pt-3"
+        )}>
           <div className="flex justify-between items-center">
             <div className="flex items-center space-x-2">
               <img

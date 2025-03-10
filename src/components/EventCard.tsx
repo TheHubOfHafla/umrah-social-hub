@@ -26,6 +26,9 @@ const EventCard = ({ event, className, variant = "default" }: EventCardProps) =>
   const displayDate = format(new Date(event.date.start), "EEE, MMM d • h:mm a");
   const displayLocation = `${event.location.city}, ${event.location.country}`;
 
+  // Use the uploaded image instead of the dynamic event.image
+  const imageSrc = "/lovable-uploads/2b781a41-72aa-4b72-9785-fe84e014bdd7.png";
+
   // Calculate time since last purchase if available
   const getTimeAgo = () => {
     if (event.ticketActivity?.lastPurchaseTime) {
@@ -49,7 +52,7 @@ const EventCard = ({ event, className, variant = "default" }: EventCardProps) =>
         <div className="relative">
           <AspectRatio ratio={isFeatured ? 16/9 : 4/3}>
             <img
-              src={event.image}
+              src={imageSrc}
               alt={event.title}
               className="object-cover w-full h-full z-10 transition-transform duration-500 group-hover:scale-105"
               onLoad={() => setImageLoaded(true)}
@@ -164,3 +167,4 @@ const EventCard = ({ event, className, variant = "default" }: EventCardProps) =>
 };
 
 export default EventCard;
+

@@ -12,6 +12,9 @@ interface UpcomingEventsListProps {
 }
 
 const UpcomingEventsList = ({ events }: UpcomingEventsListProps) => {
+  // Use the uploaded image
+  const imageSrc = "/lovable-uploads/2b781a41-72aa-4b72-9785-fe84e014bdd7.png";
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -57,7 +60,7 @@ const UpcomingEventsList = ({ events }: UpcomingEventsListProps) => {
                   <div className="flex flex-col sm:flex-row">
                     <div className="w-full sm:w-24 h-24 sm:h-auto overflow-hidden bg-muted">
                       <img 
-                        src={event.image} 
+                        src={imageSrc} 
                         alt={event.title} 
                         className="w-full h-full object-cover"
                       />
@@ -109,3 +112,4 @@ const UpcomingEventsList = ({ events }: UpcomingEventsListProps) => {
 };
 
 export default UpcomingEventsList;
+
