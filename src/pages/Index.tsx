@@ -62,8 +62,8 @@ const Index = ({ isAuthenticated = false }: { isAuthenticated?: boolean }) => {
           />
         </div>
         
-        {/* Moved the TopicsAndPicks component to its original position (not -mt-32) */}
-        <div className={`w-full mt-4 transition-all duration-700 delay-100 ${animateContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+        {/* Adjusted position of TopicsAndPicks component to be a bit higher */}
+        <div className={`w-full -mt-12 transition-all duration-700 delay-100 ${animateContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
           <TopicsAndPicks />
         </div>
         
