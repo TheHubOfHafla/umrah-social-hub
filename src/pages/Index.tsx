@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import FeaturedEvent from "@/components/FeaturedEvent";
@@ -9,6 +10,7 @@ import TopicsAndPicks from "@/components/TopicsAndPicks";
 import Footer from "@/components/Footer";
 import EventCard from "@/components/EventCard";
 import Button from "@/components/Button";
+import EventGrid from "@/components/EventGrid";
 import { EventCategory } from "@/types";
 import { categories } from "@/lib/data/categories";
 import { currentUser } from "@/lib/data/users";
@@ -16,13 +18,16 @@ import {
   getFeaturedEvents,
   getRecommendedEvents, 
   getEventsByCategory,
+  getPopularEvents,
 } from "@/lib/data/queries";
 
 const Index = ({ isAuthenticated = false }: { isAuthenticated?: boolean }) => {
   const [selectedCategories, setSelectedCategories] = useState<EventCategory[]>([]);
   const [selectedLocation, setSelectedLocation] = useState("");
   const [featuredEvents, setFeaturedEvents] = useState(getFeaturedEvents());
-  const [popularEvents, setPopularEvents] = useState(getFeaturedEvents());
+  const [popularEvents, setPopularEvents] = useState(getPopularEvents());
+  const [trendingEvents, setTrendingEvents] = useState(getPopularEvents().slice(3, 9));
+  const [upcomingEvents, setUpcomingEvents] = useState(getFeaturedEvents().slice(1, 7));
   const [recommendedEvents, setRecommendedEvents] = useState(
     isAuthenticated 
       ? getRecommendedEvents(currentUser.id).slice(0, 12) // Get up to 12 events for the 3x4 grid
@@ -85,6 +90,23 @@ const Index = ({ isAuthenticated = false }: { isAuthenticated?: boolean }) => {
           </section>
         )}
         
+        {/* Trending Events Section */}
+        <section className={`container mx-auto px-4 py-12 transition-all duration-700 delay-400 ${animateContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h2 className="text-2xl font-bold tracking-tight">Trending Now</h2>
+              <p className="text-muted-foreground">Events gaining popularity this week</p>
+            </div>
+            <Link to="/events" className="hidden sm:block">
+              <Button variant="ghost" className="gap-1">
+                View all 
+                <span className="ml-1">→</span>
+              </Button>
+            </Link>
+          </div>
+          <EventGrid events={trendingEvents} columns={3} />
+        </section>
+        
         {selectedCategories.length === 1 && (
           <div className={`transition-all duration-700 delay-[600ms] ${animateContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
             <CategoryEvents 
@@ -93,6 +115,23 @@ const Index = ({ isAuthenticated = false }: { isAuthenticated?: boolean }) => {
             />
           </div>
         )}
+        
+        {/* Upcoming Events Section */}
+        <section className={`container mx-auto px-4 py-12 transition-all duration-700 delay-500 ${animateContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h2 className="text-2xl font-bold tracking-tight">Upcoming Events</h2>
+              <p className="text-muted-foreground">Plan ahead with these upcoming gatherings</p>
+            </div>
+            <Link to="/events" className="hidden sm:block">
+              <Button variant="ghost" className="gap-1">
+                Explore more 
+                <span className="ml-1">→</span>
+              </Button>
+            </Link>
+          </div>
+          <EventGrid events={upcomingEvents} columns={3} />
+        </section>
         
         {isAuthenticated ? (
           <div className={`transition-all duration-700 delay-[700ms] ${animateContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
