@@ -74,9 +74,16 @@ const categoryFormSchema = z.object({
 });
 
 const detailsFormSchema = z.object({
-  details: z.string().min(20, { 
-    message: "Please provide at least 20 characters about your event" 
-  }),
+  details: z.string()
+    .min(20, { 
+      message: "Please provide at least 20 characters about your event" 
+    })
+    .refine((val) => {
+      const wordCount = val.trim().split(/\s+/).length;
+      return wordCount >= 75;
+    }, {
+      message: "Please provide at least 75 words about your event for better AI generation"
+    }),
 });
 
 type CreationStage = 
@@ -646,9 +653,21 @@ const AiEventCreator = () => {
                           placeholder={`Describe your ${getSelectedCategoryInfo()?.name} in detail. Include information like the purpose, target audience, expected size, special features, etc.`}
                           className="min-h-[150px] resize-y text-base"
                           {...field}
+                          onChange={(e) => {
+                            field.onChange(e);
+                            setEventDetails(e.target.value);
+                          }}
                         />
                       </FormControl>
-                      <FormMessage />
+                      <div className="flex justify-between mt-2 text-sm">
+                        <FormMessage />
+                        <div className={cn(
+                          "text-right",
+                          getWordCount(field.value) < 75 ? "text-amber-600" : "text-green-600"
+                        )}>
+                          {getWordCount(field.value)} / 75 words
+                        </div>
+                      </div>
                     </FormItem>
                   )}
                 />
@@ -662,6 +681,7 @@ const AiEventCreator = () => {
                         <li>Mention any special requirements for attendees</li>
                         <li>Describe what makes your event unique</li>
                         <li>The more details you provide, the better the AI can help you</li>
+                        <li>Provide at least 75 words for optimal AI generation</li>
                       </ul>
                     </div>
                   </div>
@@ -678,6 +698,7 @@ const AiEventCreator = () => {
                   <Button
                     type="submit"
                     className="bg-gradient-to-r from-purple-600 to-purple-400 hover:from-purple-700 hover:to-purple-500 text-white transition-all duration-300 hover:scale-[1.02] font-medium"
+                    disabled={getWordCount(eventDetails) < 75}
                   >
                     Generate Event <Sparkles className="ml-2 h-4 w-4" />
                   </Button>
@@ -1130,6 +1151,11 @@ const AiEventCreator = () => {
       )}
     </div>
   );
+};
+
+// Add a helper function to count words
+const getWordCount = (text: string): number => {
+  return text.trim().split(/\s+/).filter(word => word.length > 0).length;
 };
 
 export default AiEventCreator;
