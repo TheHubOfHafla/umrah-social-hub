@@ -83,11 +83,11 @@ const TopicsAndPicks = () => {
     dragFree: true,
     watchDrag: false, 
     duration: 30,
-    startIndex: Math.floor(categories.length / 2)
+    startIndex: 3
   });
   const [prevBtnDisabled, setPrevBtnDisabled] = useState(true);
   const [nextBtnDisabled, setNextBtnDisabled] = useState(true);
-  const [activeIndex, setActiveIndex] = useState(Math.floor(categories.length / 2));
+  const [activeIndex, setActiveIndex] = useState(3);
   const [slidesInView, setSlidesInView] = useState<number[]>([]);
   const [autoplayActive, setAutoplayActive] = useState(true);
   const [isDragging, setIsDragging] = useState(false);
