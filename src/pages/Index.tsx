@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import FeaturedEvent from "@/components/FeaturedEvent";
@@ -61,7 +62,8 @@ const Index = ({ isAuthenticated = false }: { isAuthenticated?: boolean }) => {
           />
         </div>
         
-        <div className={`w-full -mt-32 transition-all duration-700 delay-100 ${animateContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+        {/* Moved the TopicsAndPicks component to its original position (not -mt-32) */}
+        <div className={`w-full mt-4 transition-all duration-700 delay-100 ${animateContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
           <TopicsAndPicks />
         </div>
         
