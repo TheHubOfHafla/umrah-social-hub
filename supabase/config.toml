@@ -81,11 +81,10 @@ gcp_project_id = ""
 gcp_project_number = ""
 gcp_jwt_path = "supabase/gcloud.json"
 
-# The functions section must be a map of function names to their configurations
 [functions]
 # Port used for functions webserver.
 port = 54329
 
-# Function-specific configurations
+# Function-specific configurations (as a separate section)
 [functions.ai-event-generator]
 verify_jwt = false
