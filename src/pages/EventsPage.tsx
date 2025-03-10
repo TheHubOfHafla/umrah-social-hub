@@ -7,11 +7,11 @@ import EventSearch from "@/components/EventSearch";
 import EventGrid from "@/components/EventGrid";
 import { Event, EventCategory } from "@/types";
 import { 
-  getAllEvents, 
   getEventsByCategory,
   getEventsByAttendeeType 
 } from "@/lib/data/queries";
 import { supabase } from "@/integrations/supabase/client";
+import { mockEvents } from "@/lib/data/events";
 
 const EventsPage = () => {
   const [searchParams] = useSearchParams();
@@ -49,9 +49,10 @@ const EventsPage = () => {
           if (categoryParam) {
             mockEvents = getEventsByCategory(categoryParam);
           } else if (typeParam) {
-            mockEvents = getEventsByAttendeeType(typeParam);
+            mockEvents = getEventsByAttendeeType(typeParam as any); // Type cast as any to fix type error
           } else {
-            mockEvents = getAllEvents();
+            // Use the imported mockEvents directly
+            mockEvents = mockEvents;
           }
           
           setEvents(mockEvents);
@@ -61,11 +62,11 @@ const EventsPage = () => {
             id: event.id,
             title: event.title,
             description: event.description,
-            short_description: event.short_description,
+            shortDescription: event.short_description || "", // Map short_description to shortDescription
             categories: event.categories,
             date: {
-              start: new Date(event.start_date),
-              end: event.end_date ? new Date(event.end_date) : undefined
+              start: event.start_date, // Keep as ISO string
+              end: event.end_date || undefined
             },
             location: {
               name: event.location_name || '',
@@ -77,7 +78,8 @@ const EventsPage = () => {
             organizer: {
               id: event.organizer_id,
               name: "Event Organizer", // Ideally join with organizer data
-              avatar: "/placeholder.svg"
+              avatar: "/placeholder.svg",
+              organizationType: "company" // Default value to satisfy type
             },
             attendeeType: event.attendee_type,
             featured: event.featured,
@@ -90,12 +92,12 @@ const EventsPage = () => {
           setEvents(formattedEvents);
         } else {
           // No events in Supabase, fallback to mock data
-          setEvents(getAllEvents());
+          setEvents(mockEvents);
         }
       } catch (error) {
         console.error("Error in fetchEvents:", error);
         // Fallback to mock data
-        setEvents(getAllEvents());
+        setEvents(mockEvents);
       } finally {
         setLoading(false);
       }
@@ -123,8 +125,7 @@ const EventsPage = () => {
         <div className="mb-8">
           <EventSearch 
             onSearch={setSearchQuery}
-            defaultCategory={categoryParam}
-            defaultType={typeParam}
+            initialLocation={categoryParam || ""} // Use initialLocation instead
           />
         </div>
         
