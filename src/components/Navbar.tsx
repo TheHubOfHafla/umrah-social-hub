@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -83,7 +84,7 @@ const Navbar = ({ isAuthenticated = true }: { isAuthenticated?: boolean }) => {
         <div className="absolute left-1/2 transform -translate-x-1/2 z-10">
           <button onClick={() => handleNavigation("/")} className="flex items-center gap-1 md:gap-2 group">
             <Zap className="h-5 w-5 md:h-6 md:w-6 text-primary group-hover:animate-pulse-soft" />
-            <span className="font-heading text-lg md:text-xl lg:text-2xl tracking-tight text-primary font-bold">EventHub</span>
+            <span className="font-heading text-lg md:text-xl lg:text-2xl tracking-tight text-primary font-bold">HaflaHub</span>
           </button>
         </div>
 
