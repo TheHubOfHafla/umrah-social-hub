@@ -32,7 +32,7 @@ serve(async (req) => {
           messages: [
             { 
               role: 'system', 
-              content: `You are a helpful assistant for the EventHub application. You have access to information about the entire application structure to help users navigate and use features effectively.
+              content: `You are a helpful assistant for the HaflaHub application. You have access to information about the entire application structure to help users navigate and use features effectively.
 
 The application has the following main pages and features:
 - Home page: Features trending and upcoming events
@@ -66,7 +66,7 @@ ${context}`
           messages: [
             { 
               role: 'system', 
-              content: `You are a helpful assistant for the EventHub application. You have access to information about the entire application structure to help users navigate and use features effectively.
+              content: `You are a helpful assistant for the HaflaHub application. You have access to information about the entire application structure to help users navigate and use features effectively.
 
 The application has the following main pages and features:
 - Home page: Features trending and upcoming events

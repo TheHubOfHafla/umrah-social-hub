@@ -1,4 +1,3 @@
-
 import { Container } from "@/components/ui/container";
 
 const AboutUs = () => {
@@ -6,7 +5,7 @@ const AboutUs = () => {
     <div className="pt-20 pb-16">
       <div className="bg-primary/10 py-12 mb-10">
         <Container>
-          <h1 className="text-4xl font-bold text-center mb-4">About EventHub</h1>
+          <h1 className="text-4xl font-bold text-center mb-4">About HaflaHub</h1>
           <p className="text-lg text-center max-w-3xl mx-auto text-muted-foreground">
             Connecting communities through meaningful events and experiences
           </p>
@@ -18,7 +17,7 @@ const AboutUs = () => {
           <section className="space-y-4">
             <h2 className="text-2xl font-semibold">Our Story</h2>
             <p className="text-muted-foreground">
-              EventHub was founded in 2023 with a simple but powerful vision: to create a platform where people could easily discover
+              HaflaHub was founded in 2023 with a simple but powerful vision: to create a platform where people could easily discover
               and participate in events that matter to them. What began as a small project has evolved into a vibrant community
               connecting event organizers with attendees across the globe.
             </p>
@@ -31,7 +30,7 @@ const AboutUs = () => {
           <section className="space-y-4">
             <h2 className="text-2xl font-semibold">Our Mission</h2>
             <p className="text-muted-foreground">
-              At EventHub, our mission is to make events more accessible, discoverable, and engaging for everyone. We're dedicated
+              At HaflaHub, our mission is to make events more accessible, discoverable, and engaging for everyone. We're dedicated
               to building tools that help organizers create successful events and enable attendees to find experiences that
               resonate with their interests and values.
             </p>
@@ -62,7 +61,7 @@ const AboutUs = () => {
           <section className="space-y-4">
             <h2 className="text-2xl font-semibold">Our Team</h2>
             <p className="text-muted-foreground">
-              EventHub is powered by a diverse team of passionate individuals who are dedicated to our mission.
+              HaflaHub is powered by a diverse team of passionate individuals who are dedicated to our mission.
               From engineers and designers to customer support specialists, each team member brings unique
               perspectives and skills to create the best possible platform for our users.
             </p>

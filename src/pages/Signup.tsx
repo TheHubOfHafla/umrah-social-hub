@@ -1,3 +1,4 @@
+
 import { useState, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { z } from "zod";
@@ -215,11 +216,11 @@ const Signup = () => {
       <div className="w-full max-w-md space-y-8 bg-card rounded-lg shadow-lg p-8 border border-border">
         <div className="text-center">
           <Link to="/" className="inline-block">
-            <h1 className="text-2xl font-bold text-primary">EventHub</h1>
+            <h1 className="text-2xl font-bold text-primary">HaflaHub</h1>
           </Link>
           <h2 className="mt-6 text-3xl font-bold tracking-tight">Sign up</h2>
           <p className="mt-2 text-sm text-muted-foreground">
-            Create your account to start using EventHub
+            Create your account to start using HaflaHub
           </p>
         </div>
 
