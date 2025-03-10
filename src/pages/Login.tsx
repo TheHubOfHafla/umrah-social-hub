@@ -102,7 +102,7 @@ const Login = () => {
       <div className="w-full max-w-md space-y-8 bg-card rounded-lg shadow-lg p-8 border border-border">
         <div className="text-center">
           <Link to="/" className="inline-block">
-            <h1 className="text-2xl font-bold text-primary">HaflaHub</h1>
+            <h1 className="text-2xl font-bold text-primary">EventHub</h1>
           </Link>
           <h2 className="mt-6 text-3xl font-bold tracking-tight">Sign in</h2>
           <p className="mt-2 text-sm text-muted-foreground">

@@ -17,7 +17,7 @@ const Footer = () => {
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
           <div className="col-span-2 md:col-span-1 mb-4 md:mb-0">
-            <h3 className="text-lg font-semibold mb-3">HaflaHub</h3>
+            <h3 className="text-lg font-semibold mb-3">EventHub</h3>
             <p className="text-muted-foreground text-pretty text-sm max-w-xs">
               Connecting the community through events and shared experiences.
             </p>
@@ -65,7 +65,7 @@ const Footer = () => {
           </div>
         </div>
         <div className="border-t mt-8 pt-6 text-center text-xs text-muted-foreground">
-          <p>© {new Date().getFullYear()} HaflaHub. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} EventHub. All rights reserved.</p>
         </div>
       </div>
     </footer>

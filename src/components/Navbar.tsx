@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -66,11 +65,11 @@ const Navbar = ({ isAuthenticated = true }: { isAuthenticated?: boolean }) => {
             <NavigationMenuList>
               {navigation.map(item => <NavigationMenuItem key={item.href}>
                   <NavigationMenuLink asChild className={cn(
-                    "px-3 md:px-4 py-2 text-base md:text-md lg:text-lg font-semibold tracking-wide transition-all duration-200 rounded-md",
+                    "px-3 md:px-4 py-2 text-sm md:text-base font-medium tracking-wide transition-all duration-200 rounded-md",
                     "hover:text-primary hover:bg-primary/10 hover:scale-105",
                     item.active 
-                      ? "text-primary border-b-2 border-primary" 
-                      : "text-foreground/90 bg-transparent"
+                      ? "text-primary font-semibold border-b-2 border-primary" 
+                      : "text-foreground/80 bg-transparent"
                   )}>
                     <button onClick={() => handleNavigation(item.href)}>
                       {item.label}
@@ -84,7 +83,7 @@ const Navbar = ({ isAuthenticated = true }: { isAuthenticated?: boolean }) => {
         <div className="absolute left-1/2 transform -translate-x-1/2 z-10">
           <button onClick={() => handleNavigation("/")} className="flex items-center gap-1 md:gap-2 group">
             <Zap className="h-5 w-5 md:h-6 md:w-6 text-primary group-hover:animate-pulse-soft" />
-            <span className="font-heading text-lg md:text-xl lg:text-2xl tracking-tight text-primary font-bold">HaflaHub</span>
+            <span className="font-heading text-lg md:text-xl lg:text-2xl tracking-tight text-primary font-bold">EventHub</span>
           </button>
         </div>
 
@@ -165,10 +164,10 @@ const Navbar = ({ isAuthenticated = true }: { isAuthenticated?: boolean }) => {
                 key={item.href} 
                 onClick={() => handleNavigation(item.href)}
                 className={cn(
-                  "px-4 py-2.5 text-lg rounded-md transition-all duration-200 font-semibold w-full text-left", 
+                  "px-4 py-2.5 text-base rounded-md transition-all duration-200 font-medium w-full text-left", 
                   item.active 
-                    ? "bg-primary/10 text-primary" 
-                    : "text-foreground/90 hover:bg-primary/10 hover:text-primary"
+                    ? "bg-primary/10 text-primary font-semibold" 
+                    : "text-foreground/80 hover:bg-primary/10 hover:text-primary"
                 )}
               >
                 {item.label}

@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useCallback, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { EventCategory } from "@/types";
@@ -82,12 +83,11 @@ const TopicsAndPicks = () => {
     align: 'center', 
     dragFree: true,
     watchDrag: false, 
-    duration: 30,
-    startIndex: 3
+    duration: 30 
   });
   const [prevBtnDisabled, setPrevBtnDisabled] = useState(true);
   const [nextBtnDisabled, setNextBtnDisabled] = useState(true);
-  const [activeIndex, setActiveIndex] = useState(3);
+  const [activeIndex, setActiveIndex] = useState(0);
   const [slidesInView, setSlidesInView] = useState<number[]>([]);
   const [autoplayActive, setAutoplayActive] = useState(true);
   const [isDragging, setIsDragging] = useState(false);
@@ -242,6 +242,8 @@ const TopicsAndPicks = () => {
         zIndex: 0
       }}>
       <div className="max-w-5xl mx-auto relative">
+        <h2 className="text-xl md:text-2xl font-bold mb-4 md:mb-8 text-center bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent animate-pulse-soft">Categories & Our Picks</h2>
+        
         <div 
           className="relative group" 
           onMouseEnter={handleMouseEnter}

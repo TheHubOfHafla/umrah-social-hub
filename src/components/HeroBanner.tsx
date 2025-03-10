@@ -36,16 +36,16 @@ const HeroBanner = ({ user, onLocationSelect, isAuthenticated = true }: HeroBann
   return (
     <section className="relative">
       {/* Banner Image */}
-      <div className="w-full h-[80vh] relative overflow-hidden">
+      <div className="w-full h-[100vh] relative overflow-hidden">
         <div className={cn(
-          "absolute inset-0 bg-gradient-to-b from-background/0 via-background/5 to-background/0 z-10",
+          "absolute inset-0 bg-gradient-to-b from-background/0 via-background/0 to-background z-10",
           !bannerLoaded && "animate-pulse bg-muted"
         )}></div>
         <img 
           src="/lovable-uploads/3fa0e5f2-adb1-4481-b5cd-7871743c9ab3.png" 
           alt="Islamic community gathering" 
           className={cn(
-            "w-full h-full object-cover object-top transition-all duration-1000",
+            "w-full h-full object-cover transition-all duration-1000",
             bannerLoaded ? "opacity-100 scale-100" : "opacity-0 scale-110"
           )}
           onLoad={() => setBannerLoaded(true)}
@@ -53,10 +53,10 @@ const HeroBanner = ({ user, onLocationSelect, isAuthenticated = true }: HeroBann
       </div>
       
       {/* Content overlay */}
-      <div className="absolute inset-0 flex items-center justify-center top-[30%] sm:top-[35%] z-20">
+      <div className="absolute inset-0 z-20 flex items-center justify-center">
         <div className="container mx-auto px-4">
           <div className={cn(
-            "text-center max-w-3xl mx-auto space-y-6 p-8 rounded-2xl transition-all duration-700 ease-out",
+            "text-center max-w-3xl mx-auto space-y-6 backdrop-blur-sm p-8 rounded-2xl transition-all duration-700 ease-out",
             contentVisible ? "opacity-100 translate-y-0 bg-background/10" : "opacity-0 translate-y-8 bg-background/0"
           )}>
             <h1 className={cn(

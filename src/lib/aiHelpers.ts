@@ -12,8 +12,8 @@ export const extractAppContext = () => {
     { path: "/dashboard/events", name: "My Events", description: "Manage events you're attending" },
     { path: "/dashboard/profile", name: "Profile", description: "Edit your profile information" },
     { path: "/organizer", name: "Organizer Dashboard", description: "Manage your created events" },
-    { path: "/about", name: "About Us", description: "Learn about HaflaHub" },
-    { path: "/help", name: "Help Center", description: "Get help with using HaflaHub" },
+    { path: "/about", name: "About Us", description: "Learn about EventHub" },
+    { path: "/help", name: "Help Center", description: "Get help with using EventHub" },
     { path: "/login", name: "Login", description: "Sign in to your account" },
     { path: "/signup", name: "Sign Up", description: "Create a new account" },
   ];
@@ -25,7 +25,7 @@ export const extractAppContext = () => {
   }));
 
   return {
-    appName: "HaflaHub",
+    appName: "EventHub",
     appDescription: "A platform for finding and organizing Islamic community events",
     routes: appRoutes,
     categories: eventCategories

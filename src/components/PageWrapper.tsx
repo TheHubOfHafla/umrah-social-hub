@@ -22,7 +22,7 @@ const PageWrapper = ({
 }: PageWrapperProps) => {
   return (
     <div className={cn(
-      "flex flex-col min-h-screen w-full",
+      "flex flex-col min-h-screen",
       {
         "bg-background": background === "default",
         "bg-gradient-warm": background === "gradient",
@@ -31,7 +31,7 @@ const PageWrapper = ({
       className
     )}>
       <main className={cn(
-        "flex-grow w-full",
+        "flex-grow",
         withPadding && "pt-20 pb-10",
         containerClassName
       )}>
