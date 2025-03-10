@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { EventCategory } from "@/types";
@@ -83,11 +82,12 @@ const TopicsAndPicks = () => {
     align: 'center', 
     dragFree: true,
     watchDrag: false, 
-    duration: 30 
+    duration: 30,
+    startIndex: Math.floor(categories.length / 2)
   });
   const [prevBtnDisabled, setPrevBtnDisabled] = useState(true);
   const [nextBtnDisabled, setNextBtnDisabled] = useState(true);
-  const [activeIndex, setActiveIndex] = useState(0);
+  const [activeIndex, setActiveIndex] = useState(Math.floor(categories.length / 2));
   const [slidesInView, setSlidesInView] = useState<number[]>([]);
   const [autoplayActive, setAutoplayActive] = useState(true);
   const [isDragging, setIsDragging] = useState(false);
@@ -242,8 +242,6 @@ const TopicsAndPicks = () => {
         zIndex: 0
       }}>
       <div className="max-w-5xl mx-auto relative">
-        {/* Removed the Categories & Our Picks heading */}
-        
         <div 
           className="relative group" 
           onMouseEnter={handleMouseEnter}
