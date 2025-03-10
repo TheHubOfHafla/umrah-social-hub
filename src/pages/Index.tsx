@@ -63,7 +63,7 @@ const Index = ({ isAuthenticated = false }: { isAuthenticated?: boolean }) => {
         </div>
         
         {/* Adjusted position of TopicsAndPicks component to be a bit higher */}
-        <div className={`w-full -mt-12 transition-all duration-700 delay-100 ${animateContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+        <div className={`w-full -mt-24 transition-all duration-700 delay-100 ${animateContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
           <TopicsAndPicks />
         </div>
         

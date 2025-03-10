@@ -38,7 +38,7 @@ const HeroBanner = ({ user, onLocationSelect, isAuthenticated = true }: HeroBann
       {/* Banner Image */}
       <div className="w-full h-[80vh] relative overflow-hidden">
         <div className={cn(
-          "absolute inset-0 bg-gradient-to-b from-background/0 via-background/5 to-background/90 z-10",
+          "absolute inset-0 bg-gradient-to-b from-background/0 via-background/5 to-background/0 z-10",
           !bannerLoaded && "animate-pulse bg-muted"
         )}></div>
         <img 
