@@ -1,331 +1,162 @@
-import { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { 
-  Bot, Edit, CheckCircle, ArrowRight, 
-  Loader2, Sparkles, AlertTriangle, 
-  PenLine, Send, RefreshCw, FileImage,
-  Camera, Upload
-} from "lucide-react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+  Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Textarea } from "@/components/ui/textarea";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
-import { useToast } from "@/hooks/use-toast";
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
-import { supabase } from "@/integrations/supabase/client";
+import { format } from "date-fns";
+import { CalendarIcon, Clock, MapPin, Users, DollarSign, Image as ImageIcon, Upload, Check, Info, CircleHelp, ChevronRight, Sparkles, Bot, UserCircle2, LightbulbIcon, Edit, FileImage } from "lucide-react";
+import { categories } from "@/lib/data";
+import { useToast } from "@/hooks/use-toast";
+import { EventCategory, EventLocation } from "@/types";
 import { generateBasicEvent } from "@/lib/data";
-import { useContext } from "react";
-import { AuthContext } from "@/App";
-import { EventCategory } from "@/types";
+import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 
-const eventCategories = [
-  { id: "islamic-talk", name: "Islamic Talk", icon: "🕌" },
-  { id: "charity-fundraiser", name: "Charity Fundraiser", icon: "🤲" },
-  { id: "umrah-trip", name: "Umrah Trip", icon: "✈️" },
-  { id: "business-networking", name: "Business Networking", icon: "💼" },
-  { id: "workshop", name: "Workshop", icon: "🔧" },
-  { id: "other", name: "Other", icon: "📝" },
-];
-
-const mapToEventCategory = (categoryId: string): EventCategory => {
-  const categoryMap: { [key: string]: EventCategory } = {
-    "islamic-talk": "lecture",
-    "charity-fundraiser": "charity",
-    "umrah-trip": "umrah",
-    "business-networking": "social",
-    "workshop": "workshop",
-    "other": "other"
-  };
-  return categoryMap[categoryId] || "other";
-};
-
-const categoryFormSchema = z.object({
-  category: z.string().min(1, { message: "Please select an event category" }),
+const aiEventSchema = z.object({
+  category: z.string().min(1, { message: "Category is required" }),
+  details: z.string().min(10, { message: "Details must be at least 10 characters" }),
 });
 
-const detailsFormSchema = z.object({
-  details: z.string().min(20, { 
-    message: "Please provide at least 20 characters about your event" 
+const generatedEventSchema = z.object({
+  title: z.string().min(3, { message: "Event title must be at least 3 characters" }),
+  description: z.string().min(10, { message: "Description must be at least 10 characters" }),
+  location: z.object({
+    name: z.string().min(3, { message: "Location name is required" }),
+    address: z.string().min(5, { message: "Address is required" }),
+    city: z.string().min(2, { message: "City is required" }),
+    country: z.string().min(2, { message: "Country is required" }),
   }),
+  date: z.object({
+    start: z.date({ required_error: "Start date is required" }),
+    end: z.date().optional(),
+  }),
+  category: z.string(),
+  isFree: z.boolean().default(false),
+  price: z.number().optional(),
+  capacity: z.number().optional(),
+  image: z.string().min(1, { message: "Event banner/flyer is required" }),
 });
 
-type CreationStage = 
-  | "select-category" 
-  | "add-details" 
-  | "generating" 
-  | "review" 
-  | "edit-details" 
-  | "complete";
+type AiEventFormValues = z.infer<typeof aiEventSchema>;
+type GeneratedEventFormValues = z.infer<typeof generatedEventSchema>;
 
 const AiEventCreator = () => {
-  const [stage, setStage] = useState<CreationStage>("select-category");
-  const [selectedCategory, setSelectedCategory] = useState("");
-  const [eventDetails, setEventDetails] = useState("");
-  const [generatedEvent, setGeneratedEvent] = useState<any>(null);
-  const [progress, setProgress] = useState(0);
-  const [showLaunchConfirmation, setShowLaunchConfirmation] = useState(false);
+  const [stage, setStage] = useState<"input" | "generate" | "edit" | "complete">("input");
+  const [generatedEvent, setGeneratedEvent] = useState<GeneratedEventFormValues | null>(null);
   const [bannerPreview, setBannerPreview] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [isSaving, setIsSaving] = useState(false);
-  const progressIntervalRef = useRef<number | null>(null);
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
+  const [isFree, setIsFree] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
-  const { currentUser } = useContext(AuthContext);
 
-  const categoryForm = useForm<z.infer<typeof categoryFormSchema>>({
-    resolver: zodResolver(categoryFormSchema),
+  const aiForm = useForm<AiEventFormValues>({
+    resolver: zodResolver(aiEventSchema),
     defaultValues: {
       category: "",
-    },
-  });
-
-  const detailsForm = useForm<z.infer<typeof detailsFormSchema>>({
-    resolver: zodResolver(detailsFormSchema),
-    defaultValues: {
       details: "",
     },
   });
 
-  const editForm = useForm({
+  const generatedForm = useForm<GeneratedEventFormValues>({
+    resolver: zodResolver(generatedEventSchema),
     defaultValues: {
       title: "",
       description: "",
-      location: "",
-      city: "",
-      country: "",
-      date: "",
-      capacity: "",
-      price: 0,
-    }
-  });
-
-  const onCategorySubmit = (values: z.infer<typeof categoryFormSchema>) => {
-    setSelectedCategory(values.category);
-    setStage("add-details");
-    
-    const selectedCategoryObj = eventCategories.find(cat => cat.id === values.category);
-    if (selectedCategoryObj) {
-      const starterText = `I'm planning a ${selectedCategoryObj.name}. `;
-      detailsForm.setValue("details", starterText);
-      setEventDetails(starterText);
-    }
-  };
-
-  const onDetailsSubmit = async (values: z.infer<typeof detailsFormSchema>) => {
-    setEventDetails(values.details);
-    setStage("generating");
-    setProgress(0);
-    setError(null);
-    
-    progressIntervalRef.current = window.setInterval(() => {
-      setProgress(prev => {
-        if (prev >= 95) {
-          return 95;
-        }
-        return prev + 1;
-      });
-    }, 100);
-
-    try {
-      const { data, error } = await supabase.functions.invoke('ai-event-generator', {
-        body: {
-          eventCategory: selectedCategory,
-          eventDetails: values.details
-        }
-      });
-
-      if (progressIntervalRef.current) {
-        clearInterval(progressIntervalRef.current);
-      }
-
-      if (error) {
-        console.error("Error generating event:", error);
-        setError("Failed to generate event. Using fallback generator.");
-        toast({
-          title: "Using Fallback Generator",
-          description: "We couldn't connect to the AI service, but we've created a basic event for you to edit.",
-          variant: "destructive"
-        });
-        
-        const fallbackEvent = generateBasicEvent(selectedCategory, values.details);
-        handleGeneratedEventData(fallbackEvent);
-        return;
-      }
-
-      setProgress(100);
-      
-      if (data?.event) {
-        handleGeneratedEventData(data.event);
-        
-        if (data.source === 'fallback') {
-          toast({
-            title: "Using Simplified Generator",
-            description: "We used a simplified event generator. Please review and edit the details.",
-            variant: "destructive"
-          });
-        } else {
-          toast({
-            title: "Event Generated!",
-            description: "Your AI-generated event is ready for review.",
-          });
-        }
-      } else {
-        setError("Invalid response format. Please try again.");
-        toast({
-          title: "Generation Failed",
-          description: "Unexpected response format. Please try again.",
-          variant: "destructive"
-        });
-        setStage("add-details");
-      }
-    } catch (err) {
-      console.error("Error calling AI function:", err);
-      setError("Failed to connect to AI service. Using fallback generator.");
-      toast({
-        title: "Using Fallback Generator",
-        description: "We couldn't connect to the AI service, but we've created a basic event for you to edit.",
-        variant: "destructive"
-      });
-      
-      const fallbackEvent = generateBasicEvent(selectedCategory, values.details);
-      handleGeneratedEventData(fallbackEvent);
-    } finally {
-      if (progressIntervalRef.current) {
-        clearInterval(progressIntervalRef.current);
-        progressIntervalRef.current = null;
-      }
-    }
-  };
-
-  const handleGeneratedEventData = (eventData: any) => {
-    const suggestedDate = eventData.suggestedDate 
-      ? new Date(eventData.suggestedDate) 
-      : new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
-    
-    const formattedEvent = {
-      title: eventData.title || `${selectedCategory.charAt(0).toUpperCase() + selectedCategory.slice(1)} Event`,
-      description: eventData.description || eventDetails,
       location: {
-        name: eventData.location?.name || "To be determined",
-        address: eventData.location?.address || "Address pending",
-        city: eventData.location?.city || "City",
-        country: eventData.location?.country || "Country",
+        name: "",
+        address: "",
+        city: "",
+        country: "",
       },
       date: {
-        start: suggestedDate,
-        end: new Date(suggestedDate.getTime() + 2 * 60 * 60 * 1000),
+        start: new Date(),
       },
-      category: selectedCategory,
-      capacity: eventData.capacity || 50,
-      isFree: eventData.isFree !== undefined ? eventData.isFree : true,
-      price: eventData.suggestedPrice || 0,
-    };
+      isFree: false,
+      category: "",
+      image: "",
+    },
+  });
 
-    setGeneratedEvent(formattedEvent);
+  const handleGenerateEvent = async (values: AiEventFormValues) => {
+    setStage("generate");
     
-    editForm.setValue("title", formattedEvent.title);
-    editForm.setValue("description", formattedEvent.description);
-    editForm.setValue("location", formattedEvent.location.name);
-    editForm.setValue("city", formattedEvent.location.city);
-    editForm.setValue("country", formattedEvent.location.country);
-    editForm.setValue("date", formattedEvent.date.start.toLocaleDateString());
-    editForm.setValue("capacity", String(formattedEvent.capacity));
-    editForm.setValue("price", formattedEvent.price);
+    // Simulate AI event generation
+    const newEvent = generateBasicEvent(values.category, values.details);
     
-    setTimeout(() => {
-      setStage("review");
-    }, 500);
+    // Set default values for the generated event form
+    generatedForm.reset({
+      title: newEvent.title,
+      description: newEvent.description,
+      location: {
+        name: newEvent.location.name,
+        address: newEvent.location.address,
+        city: newEvent.location.city,
+        country: newEvent.location.country,
+      },
+      date: {
+        start: new Date(newEvent.suggestedDate),
+      },
+      isFree: newEvent.isFree,
+      price: newEvent.suggestedPrice,
+      capacity: newEvent.capacity,
+      category: newEvent.categoryRecommendations[0],
+      image: "",
+    });
+    
+    setGeneratedEvent({
+      title: newEvent.title,
+      description: newEvent.description,
+      location: {
+        name: newEvent.location.name,
+        address: newEvent.location.address,
+        city: newEvent.location.city,
+        country: newEvent.location.country,
+      },
+      date: {
+        start: new Date(newEvent.suggestedDate),
+      },
+      isFree: newEvent.isFree,
+      price: newEvent.suggestedPrice,
+      capacity: newEvent.capacity,
+      category: newEvent.categoryRecommendations[0],
+      image: "",
+    });
+    
+    setStage("edit");
   };
 
-  useEffect(() => {
-    return () => {
-      if (progressIntervalRef.current) {
-        clearInterval(progressIntervalRef.current);
-      }
-    };
-  }, []);
-
-  const saveEventToDatabase = async () => {
-    if (!generatedEvent || !currentUser) return false;
-    
-    setIsSaving(true);
-    
-    try {
-      const eventData = {
-        title: generatedEvent.title,
-        description: generatedEvent.description,
-        start_date: generatedEvent.date.start,
-        end_date: generatedEvent.date.end,
-        organizer_id: currentUser.id,
-        capacity: generatedEvent.capacity,
-        is_free: generatedEvent.isFree,
-        base_price: generatedEvent.price,
-        location_name: generatedEvent.location.name,
-        location_address: generatedEvent.location.address,
-        location_city: generatedEvent.location.city,
-        location_country: generatedEvent.location.country,
-        image: bannerPreview || '/placeholder.svg',
-        categories: [mapToEventCategory(selectedCategory)],
-      };
-      
-      const { data, error } = await supabase
-        .from('events')
-        .insert(eventData)
-        .select('id');
-      
-      if (error) {
-        console.error("Error saving event:", error);
-        toast({
-          title: "Error",
-          description: "Failed to save your event. Please try again.",
-          variant: "destructive"
-        });
-        setIsSaving(false);
-        return false;
-      }
-      
-      console.log("Event created with ID:", data[0].id);
-      return true;
-    } catch (err) {
-      console.error("Error in saveEventToDatabase:", err);
-      toast({
-        title: "Error",
-        description: "An unexpected error occurred while saving your event.",
-        variant: "destructive"
-      });
-      setIsSaving(false);
-      return false;
+  const handleBannerUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const imageUrl = URL.createObjectURL(file);
+      setBannerPreview(imageUrl);
+      generatedForm.setValue("image", imageUrl);
     }
+  };
+
+  const selectSampleBanner = (imageUrl: string) => {
+    setBannerPreview(imageUrl);
+    generatedForm.setValue("image", imageUrl);
   };
 
   const handleLaunchEvent = async () => {
@@ -338,300 +169,291 @@ const AiEventCreator = () => {
       return;
     }
     
-    const success = await saveEventToDatabase();
+    setStage("complete");
     
-    if (success) {
-      setStage("complete");
+    try {
+      // Prepare event data
+      const eventData = {
+        ...generatedEvent,
+        image: bannerPreview,
+        // Convert category string to array of categories as needed by the API
+        categories: [generatedEvent.category],
+        // Add organizer information
+        organizer_id: currentUser.id,
+        // Format dates for API
+        start_date: generatedEvent.date.start.toISOString(),
+        end_date: generatedEvent.date.end ? generatedEvent.date.end.toISOString() : null,
+        // Map location data to API format
+        location_name: generatedEvent.location.name,
+        location_address: generatedEvent.location.address,
+        location_city: generatedEvent.location.city,
+        location_country: generatedEvent.location.country,
+        // Set other required fields
+        featured: false,
+        is_free: generatedEvent.isFree,
+        base_price: generatedEvent.price || 0
+      };
+      
+      // In a real app, save to database - for now, we'll add to our mock data
+      const { data, error } = await supabase
+        .from('events')
+        .insert({
+          title: eventData.title,
+          description: eventData.description,
+          short_description: eventData.description.substring(0, 150) + (eventData.description.length > 150 ? '...' : ''),
+          organizer_id: eventData.organizer_id,
+          start_date: eventData.start_date,
+          end_date: eventData.end_date,
+          location_name: eventData.location_name,
+          location_address: eventData.location_address,
+          location_city: eventData.location_city,
+          location_country: eventData.location_country,
+          categories: eventData.categories,
+          capacity: eventData.capacity,
+          is_free: eventData.is_free,
+          base_price: eventData.base_price,
+          image: eventData.image,
+          featured: eventData.featured
+        })
+        .select();
+      
+      if (error) {
+        console.error("Error saving event:", error);
+        toast({
+          title: "Error Saving Event",
+          description: "There was a problem saving your event. Please try again.",
+          variant: "destructive",
+        });
+        return;
+      }
+      
       toast({
         title: "Event Created Successfully!",
-        description: "Your event has been published and added to your dashboard.",
+        description: "Your event has been published and is now visible on the events page.",
       });
       
+      // Redirect to organizer dashboard after a short delay
       setTimeout(() => {
-        navigate("/organizer/events");
+        navigate("/dashboard/organizer/events");
       }, 2000);
-    } else {
-      setShowLaunchConfirmation(false);
-      setIsSaving(false);
+      
+    } catch (err) {
+      console.error("Error creating event:", err);
+      toast({
+        title: "Error Creating Event",
+        description: "There was a problem creating your event. Please try again.",
+        variant: "destructive",
+      });
     }
   };
 
   const handleEditEvent = () => {
-    if (generatedEvent) {
-      generatedEvent.image = bannerPreview || "";
-      navigate("/events/create", { state: { event: generatedEvent } });
-    }
+    setStage("edit");
   };
 
   const handleShowLaunchConfirmation = () => {
-    if (!bannerPreview) {
-      toast({
-        title: "Banner Required",
-        description: "Please upload a banner image before launching your event.",
-        variant: "destructive",
-      });
-      return;
-    }
-    setShowLaunchConfirmation(true);
+    setStage("complete");
   };
 
-  const handleReset = () => {
-    setStage("select-category");
-    setSelectedCategory("");
-    setEventDetails("");
-    setGeneratedEvent(null);
-    setProgress(0);
-    setBannerPreview(null);
-    setError(null);
-    categoryForm.reset();
-    detailsForm.reset();
-    editForm.reset();
-  };
-
-  const handleToggleEditMode = () => {
-    setStage(stage === "review" ? "edit-details" : "review");
-  };
-
-  const handleEditSubmit = (data: any) => {
-    if (generatedEvent) {
-      const updatedEvent = {
-        ...generatedEvent,
-        title: data.title,
-        description: data.description,
-        location: {
-          ...generatedEvent.location,
-          name: data.location,
-          city: data.city,
-          country: data.country,
-        },
-        capacity: parseInt(data.capacity) || 50,
-        price: parseFloat(data.price) || 0,
-        image: bannerPreview,
-      };
-      
-      setGeneratedEvent(updatedEvent);
-      setStage("review");
-      
-      toast({
-        title: "Changes Saved",
-        description: "Your event details have been updated.",
-      });
-    }
-  };
-
-  const handleBannerUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const imageUrl = URL.createObjectURL(file);
-      setBannerPreview(imageUrl);
-      
-      toast({
-        title: "Banner Uploaded",
-        description: "Your event banner has been uploaded successfully.",
-      });
-    }
-  };
-
-  const selectSampleBanner = (imageUrl: string) => {
-    setBannerPreview(imageUrl);
-    
-    toast({
-      title: "Banner Selected",
-      description: "Sample banner has been selected for your event.",
-    });
-  };
-
-  const getSelectedCategoryInfo = () => {
-    return eventCategories.find(cat => cat.id === selectedCategory);
-  };
-
-  const getProgressText = () => {
-    if (error) return "Error occurred. Please try again.";
-    if (progress < 30) return "Analyzing your requirements...";
-    if (progress < 60) return "Crafting your event details...";
-    if (progress < 90) return "Adding finishing touches...";
-    return "Almost ready!";
-  };
-
-  return (
-    <div className="w-full max-w-3xl mx-auto p-4 md:p-0">
-      <div className="w-full mb-8">
-        <div className="flex justify-between items-center">
-          <div className={cn(
-            "flex flex-col items-center",
-            (stage === "select-category" || stage === "add-details" || stage === "generating" || stage === "review" || stage === "edit-details" || stage === "complete") 
-              ? "text-purple-700" : "text-gray-400"
-          )}>
-            <div className={cn(
-              "h-10 w-10 rounded-full flex items-center justify-center mb-2 transition-all duration-300",
-              (stage === "select-category" || stage === "add-details" || stage === "generating" || stage === "review" || stage === "edit-details" || stage === "complete") 
-                ? "bg-purple-100 text-purple-700 border-2 border-purple-700"
-                : "bg-gray-100 text-gray-400 border-2 border-gray-200"
-            )}>
-              {stage === "select-category" ? "1" : <CheckCircle className="h-5 w-5" />}
-            </div>
-            <span className="text-xs sm:text-sm font-medium">Category</span>
-          </div>
-          
-          <div className="flex-1 h-0.5 mx-2 bg-gray-200">
-            <div className={cn(
-              "h-full bg-purple-500 transition-all duration-500",
-              stage === "select-category" ? "w-0" : "w-full"
-            )} />
-          </div>
-          
-          <div className={cn(
-            "flex flex-col items-center",
-            (stage === "add-details" || stage === "generating" || stage === "review" || stage === "edit-details" || stage === "complete") 
-              ? "text-purple-700" : "text-gray-400"
-          )}>
-            <div className={cn(
-              "h-10 w-10 rounded-full flex items-center justify-center mb-2 transition-all duration-300",
-              (stage === "add-details" || stage === "generating" || stage === "review" || stage === "edit-details" || stage === "complete") 
-                ? "bg-purple-100 text-purple-700 border-2 border-purple-700"
-                : "bg-gray-100 text-gray-400 border-2 border-gray-200"
-            )}>
-              {stage === "add-details" ? "2" : (stage === "select-category" ? "2" : <CheckCircle className="h-5 w-5" />)}
-            </div>
-            <span className="text-xs sm:text-sm font-medium">Details</span>
-          </div>
-          
-          <div className="flex-1 h-0.5 mx-2 bg-gray-200">
-            <div className={cn(
-              "h-full bg-purple-500 transition-all duration-500",
-              stage === "select-category" || stage === "add-details" ? "w-0" : "w-full"
-            )} />
-          </div>
-          
-          <div className={cn(
-            "flex flex-col items-center",
-            (stage === "generating" || stage === "review" || stage === "edit-details" || stage === "complete") 
-              ? "text-purple-700" : "text-gray-400"
-          )}>
-            <div className={cn(
-              "h-10 w-10 rounded-full flex items-center justify-center mb-2 transition-all duration-300",
-              (stage === "generating" || stage === "review" || stage === "edit-details" || stage === "complete") 
-                ? "bg-purple-100 text-purple-700 border-2 border-purple-700"
-                : "bg-gray-100 text-gray-400 border-2 border-gray-200"
-            )}>
-              {stage === "generating" ? <Loader2 className="h-5 w-5 animate-spin" /> : 
-               (stage === "review" || stage === "edit-details" || stage === "complete" ? <CheckCircle className="h-5 w-5" /> : "3")}
-            </div>
-            <span className="text-xs sm:text-sm font-medium">Generate</span>
-          </div>
-          
-          <div className="flex-1 h-0.5 mx-2 bg-gray-200">
-            <div className={cn(
-              "h-full bg-purple-500 transition-all duration-500",
-              stage === "select-category" || stage === "add-details" || stage === "generating" ? "w-0" : "w-full"
-            )} />
-          </div>
-          
-          <div className={cn(
-            "flex flex-col items-center",
-            (stage === "review" || stage === "edit-details" || stage === "complete") 
-              ? "text-purple-700" : "text-gray-400"
-          )}>
-            <div className={cn(
-              "h-10 w-10 rounded-full flex items-center justify-center mb-2 transition-all duration-300",
-              (stage === "review" || stage === "edit-details" || stage === "complete") 
-                ? "bg-purple-100 text-purple-700 border-2 border-purple-700"
-                : "bg-gray-100 text-gray-400 border-2 border-gray-200"
-            )}>
-              {stage === "complete" ? <CheckCircle className="h-5 w-5" /> : "4"}
-            </div>
-            <span className="text-xs sm:text-sm font-medium">Launch</span>
-          </div>
-        </div>
-      </div>
-
-      {stage === "select-category" && (
-        <Card className="border-purple-200 shadow-lg transition-all duration-300 hover:shadow-xl animate-fade-in">
-          <CardHeader className="bg-purple-50 border-b border-purple-100">
-            <div className="flex items-center space-x-2">
-              <div className="h-8 w-8 rounded-full bg-purple-200 flex items-center justify-center">
-                <Bot className="h-5 w-5 text-purple-700" />
-              </div>
-              <div>
-                <CardTitle className="text-xl text-purple-900">What type of event are you hosting?</CardTitle>
-                <CardDescription>Select a category that best describes your event</CardDescription>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent className="pt-6">
-            <Form {...categoryForm}>
-              <form onSubmit={categoryForm.handleSubmit(onCategorySubmit)} className="space-y-6">
-                <FormField
-                  control={categoryForm.control}
-                  name="category"
-                  render={({ field }) => (
-                    <FormItem className="space-y-4">
-                      <RadioGroup
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                        className="grid grid-cols-1 md:grid-cols-2 gap-4"
+  if (stage === "input") {
+    return (
+      <Card className="w-full max-w-2xl mx-auto border-none shadow-lg">
+        <CardHeader className="bg-purple-50 rounded-t-lg">
+          <CardTitle className="flex items-center">
+            <Bot className="mr-2 h-5 w-5 text-purple-500" />
+            AI Event Creation
+          </CardTitle>
+          <CardDescription>Let our AI help you create your event</CardDescription>
+        </CardHeader>
+        <CardContent className="pt-6 space-y-6">
+          <Form {...aiForm}>
+            <form onSubmit={aiForm.handleSubmit(handleGenerateEvent)} className="space-y-4">
+              <FormField
+                control={aiForm.control}
+                name="category"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-base font-medium">Event Category</FormLabel>
+                    <FormControl>
+                      <select
+                        className="flex h-12 w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                        {...field}
                       >
-                        {eventCategories.map((category) => (
-                          <div key={category.id}>
-                            <RadioGroupItem
-                              value={category.id}
-                              id={category.id}
-                              className="peer sr-only"
-                            />
-                            <Label
-                              htmlFor={category.id}
-                              className="flex items-center space-x-3 rounded-lg border-2 border-purple-100 p-4 cursor-pointer transition-all hover:bg-purple-50 peer-data-[state=checked]:border-purple-600 peer-data-[state=checked]:bg-purple-50"
-                            >
-                              <span className="text-2xl">{category.icon}</span>
-                              <div className="font-medium">{category.name}</div>
-                            </Label>
-                          </div>
+                        <option value="">Select a category</option>
+                        {categories.map((category) => (
+                          <option key={category.value} value={category.value}>
+                            {category.label}
+                          </option>
                         ))}
-                      </RadioGroup>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <Button
-                  type="submit"
-                  className="w-full bg-gradient-to-r from-purple-600 to-purple-400 hover:from-purple-700 hover:to-purple-500 text-white transition-all duration-300 hover:scale-[1.02] font-medium"
-                >
-                  Continue <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
-              </form>
-            </Form>
-          </CardContent>
-        </Card>
-      )}
+                      </select>
+                    </FormControl>
+                    <FormDescription>
+                      Choose the category that best fits your event
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={aiForm.control}
+                name="details"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-base font-medium">Event Details</FormLabel>
+                    <FormControl>
+                      <Textarea 
+                        placeholder="Enter a brief description of your event" 
+                        className="min-h-32 text-base" 
+                        {...field} 
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      Provide as much detail as possible for better results
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <Button 
+                type="submit"
+                className="bg-gradient-to-r from-purple-600 to-blue-500 hover:from-purple-700 hover:to-blue-600 w-full"
+                size="lg"
+              >
+                Generate Event
+              </Button>
+            </form>
+          </Form>
+        </CardContent>
+      </Card>
+    );
+  }
 
-      {stage === "add-details" && (
-        <Card className="border-purple-200 shadow-lg transition-all duration-300 hover:shadow-xl animate-fade-in">
-          <CardHeader className="bg-purple-50 border-b border-purple-100">
-            <div className="flex items-center space-x-2">
-              <div className="h-8 w-8 rounded-full bg-purple-200 flex items-center justify-center">
-                <PenLine className="h-5 w-5 text-purple-700" />
-              </div>
-              <div>
-                <CardTitle className="text-xl text-purple-900">Tell us about your {getSelectedCategoryInfo()?.name}</CardTitle>
-                <CardDescription>
-                  Add details about your event to help our AI generate a great event page
-                </CardDescription>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent className="pt-6">
-            <Form {...detailsForm}>
-              <form onSubmit={detailsForm.handleSubmit(onDetailsSubmit)} className="space-y-6">
+  if (stage === "generate") {
+    return (
+      <Card className="w-full max-w-2xl mx-auto border-none shadow-lg">
+        <CardHeader className="bg-blue-50 rounded-t-lg">
+          <CardTitle className="flex items-center">
+            <Sparkles className="mr-2 h-5 w-5 text-blue-500" />
+            Generating Event...
+          </CardTitle>
+          <CardDescription>Please wait while our AI creates your event</CardDescription>
+        </CardHeader>
+        <CardContent className="pt-6 space-y-6">
+          <div className="flex justify-center">
+            <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-primary"></div>
+          </div>
+          <p className="text-center text-muted-foreground">
+            Generating event details based on your input. This may take a few moments.
+          </p>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (stage === "edit") {
+    return (
+      <Card className="w-full max-w-3xl mx-auto border-none shadow-lg">
+        <CardHeader className="bg-purple-50 rounded-t-lg">
+          <CardTitle className="flex items-center">
+            <Edit className="mr-2 h-5 w-5 text-purple-500" />
+            Edit Generated Event
+          </CardTitle>
+          <CardDescription>Review and adjust the details of your event</CardDescription>
+        </CardHeader>
+        <CardContent className="pt-6 space-y-6">
+          <Form {...generatedForm}>
+            <form onSubmit={generatedForm.handleSubmit(() => handleShowLaunchConfirmation())} className="space-y-6">
+              <FormField
+                control={generatedForm.control}
+                name="title"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-base font-medium">Event Title</FormLabel>
+                    <FormControl>
+                      <Input 
+                        placeholder="Give your event a catchy name" 
+                        className="h-12 text-lg" 
+                        {...field} 
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      Make it clear and exciting
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={generatedForm.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-base font-medium">Event Description</FormLabel>
+                    <FormControl>
+                      <Textarea 
+                        placeholder="Tell people what your event is all about" 
+                        className="min-h-32 text-base" 
+                        {...field} 
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      Be descriptive to get people excited
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={generatedForm.control}
+                name="location.name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-base font-medium">Venue Name</FormLabel>
+                    <FormControl>
+                      <Input 
+                        placeholder="e.g. Central Conference Hall" 
+                        className="h-12 text-base" 
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={generatedForm.control}
+                name="location.address"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-base font-medium">Address</FormLabel>
+                    <FormControl>
+                      <Input 
+                        placeholder="Street address" 
+                        className="h-12 text-base" 
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <FormField
-                  control={detailsForm.control}
-                  name="details"
+                  control={generatedForm.control}
+                  name="location.city"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-base font-medium">Event Details</FormLabel>
+                      <FormLabel className="text-base font-medium">City</FormLabel>
                       <FormControl>
-                        <Textarea
-                          placeholder={`Describe your ${getSelectedCategoryInfo()?.name} in detail. Include information like the purpose, target audience, expected size, special features, etc.`}
-                          className="min-h-[150px] resize-y text-base"
+                        <Input 
+                          placeholder="City" 
+                          className="h-12 text-base" 
                           {...field}
                         />
                       </FormControl>
@@ -639,484 +461,327 @@ const AiEventCreator = () => {
                     </FormItem>
                   )}
                 />
-                <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
-                  <div className="flex items-start">
-                    <AlertTriangle className="text-amber-500 mr-3 mt-0.5 h-5 w-5 flex-shrink-0" />
-                    <div className="text-sm text-amber-800">
-                      <p className="font-medium">Helpful tips:</p>
-                      <ul className="mt-1 list-disc list-inside space-y-1">
-                        <li>Include the location and date if possible</li>
-                        <li>Mention any special requirements for attendees</li>
-                        <li>Describe what makes your event unique</li>
-                        <li>The more details you provide, the better the AI can help you</li>
-                      </ul>
-                    </div>
-                  </div>
-                </div>
-                <div className="flex justify-between">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => setStage("select-category")}
-                    className="border-purple-200 text-purple-700 hover:bg-purple-50"
-                  >
-                    Back
-                  </Button>
-                  <Button
-                    type="submit"
-                    className="bg-gradient-to-r from-purple-600 to-purple-400 hover:from-purple-700 hover:to-purple-500 text-white transition-all duration-300 hover:scale-[1.02] font-medium"
-                  >
-                    Generate Event <Sparkles className="ml-2 h-4 w-4" />
-                  </Button>
-                </div>
-              </form>
-            </Form>
-          </CardContent>
-        </Card>
-      )}
-
-      {stage === "generating" && (
-        <Card className="border-purple-200 shadow-lg transition-all animate-fade-in">
-          <CardHeader className="bg-purple-50 border-b border-purple-100">
-            <CardTitle className="text-center text-xl text-purple-900">Creating Your Event</CardTitle>
-            <CardDescription className="text-center">
-              Our AI is crafting the perfect {getSelectedCategoryInfo()?.name} based on your details
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="pt-8 pb-8">
-            <div className="flex flex-col items-center">
-              <div className="relative h-40 w-40 mb-6">
-                <div className="absolute inset-0 rounded-full bg-purple-100 animate-pulse"></div>
-                <div className="absolute inset-6 rounded-full bg-purple-200 animate-pulse [animation-delay:200ms]"></div>
-                <div className="absolute inset-12 rounded-full bg-purple-300 animate-pulse [animation-delay:400ms]"></div>
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <Bot className="h-12 w-12 text-purple-700 animate-bounce" />
-                </div>
+                
+                <FormField
+                  control={generatedForm.control}
+                  name="location.country"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-base font-medium">Country</FormLabel>
+                      <FormControl>
+                        <Input 
+                          placeholder="Country" 
+                          className="h-12 text-base" 
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
               </div>
               
-              <div className="w-full max-w-md mb-8">
-                <div className="relative pt-1">
-                  <div className="overflow-hidden h-4 text-xs flex rounded-full bg-purple-100">
-                    <div 
-                      style={{ width: `${progress}%` }} 
-                      className="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-gradient-to-r from-purple-600 to-purple-400 transition-all duration-300 ease-out"
-                    ></div>
-                  </div>
-                </div>
-                <p className="text-center text-sm text-purple-700 mt-2">{getProgressText()}</p>
-              </div>
+              <FormField
+                control={generatedForm.control}
+                name="date.start"
+                render={({ field }) => (
+                  <FormItem className="flex flex-col">
+                    <FormLabel className="text-base font-medium">Event Date</FormLabel>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button
+                            variant="outline"
+                            className={cn(
+                              "w-full h-12 pl-3 text-left font-normal flex justify-between items-center",
+                              !field.value && "text-muted-foreground"
+                            )}
+                          >
+                            {field.value ? (
+                              format(field.value, "PPP")
+                            ) : (
+                              <span>Select date</span>
+                            )}
+                            <CalendarIcon className="h-5 w-5 opacity-70" />
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={field.value}
+                          onSelect={(date) => {
+                            field.onChange(date);
+                            setSelectedDate(date);
+                          }}
+                          disabled={(date) => date < new Date()}
+                          initialFocus
+                          className="pointer-events-auto"
+                        />
+                      </PopoverContent>
+                    </Popover>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
               
-              <div className="text-center text-gray-600 text-sm max-w-sm">
-                <p className="animate-pulse"><span className="font-medium">Please wait</span> while we analyze your inputs and generate your event details</p>
-              </div>
-              
-              <div className="flex justify-center mt-4 space-x-1">
-                <div className="h-2 w-2 rounded-full bg-purple-500 animate-bounce"></div>
-                <div className="h-2 w-2 rounded-full bg-purple-500 animate-bounce [animation-delay:200ms]"></div>
-                <div className="h-2 w-2 rounded-full bg-purple-500 animate-bounce [animation-delay:400ms]"></div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {stage === "edit-details" && generatedEvent && (
-        <Card className="border-purple-200 shadow-lg transition-all duration-300 hover:shadow-xl animate-fade-in">
-          <CardHeader className="bg-purple-50 border-b border-purple-100">
-            <div className="flex items-center space-x-2">
-              <div className="h-8 w-8 rounded-full bg-purple-200 flex items-center justify-center">
-                <Edit className="h-5 w-5 text-purple-700" />
-              </div>
-              <div>
-                <CardTitle className="text-xl text-purple-900">Edit Your Event</CardTitle>
-                <CardDescription>Make changes to your {getSelectedCategoryInfo()?.name}</CardDescription>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent className="pt-6">
-            <form onSubmit={editForm.handleSubmit(handleEditSubmit)} className="space-y-6">
-              <div className="space-y-4">
-                <div>
-                  <Label htmlFor="title" className="text-base font-medium">Event Title</Label>
-                  <Input
-                    id="title"
-                    className="mt-1"
-                    {...editForm.register("title")}
-                  />
-                </div>
-                
-                <div>
-                  <Label htmlFor="description" className="text-base font-medium">Description</Label>
-                  <Textarea
-                    id="description"
-                    className="mt-1 min-h-[100px]"
-                    {...editForm.register("description")}
-                  />
-                </div>
-                
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="location" className="text-base font-medium">Location</Label>
-                    <Input
-                      id="location"
-                      className="mt-1"
-                      {...editForm.register("location")}
-                    />
-                  </div>
-                  
-                  <div>
-                    <Label htmlFor="city" className="text-base font-medium">City</Label>
-                    <Input
-                      id="city"
-                      className="mt-1"
-                      {...editForm.register("city")}
-                    />
-                  </div>
-                </div>
-                
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="date" className="text-base font-medium">Date</Label>
-                    <Input
-                      id="date"
-                      className="mt-1"
-                      {...editForm.register("date")}
-                    />
-                  </div>
-                  
-                  <div>
-                    <Label htmlFor="capacity" className="text-base font-medium">Capacity</Label>
-                    <Input
-                      id="capacity"
-                      type="number"
-                      className="mt-1"
-                      {...editForm.register("capacity")}
-                    />
-                  </div>
-                </div>
-                
-                <div>
-                  <Label htmlFor="price" className="text-base font-medium">Price ($)</Label>
-                  <Input
-                    id="price"
-                    type="number"
-                    step="0.01"
-                    className="mt-1"
-                    {...editForm.register("price")}
-                  />
-                </div>
-                
-                <div className="pt-4 mt-4 border-t border-gray-200">
-                  <Label className="text-base font-medium block mb-2">Banner Image</Label>
-                  
-                  {bannerPreview ? (
-                    <div className="mb-3 relative rounded-lg overflow-hidden border border-purple-200">
-                      <img 
-                        src={bannerPreview} 
-                        alt="Event banner preview" 
-                        className="w-full h-[200px] object-cover"
+              <FormField
+                control={generatedForm.control}
+                name="capacity"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-base font-medium">Event Capacity</FormLabel>
+                    <FormControl>
+                      <Input 
+                        type="number" 
+                        min="1" 
+                        placeholder="How many people can attend?" 
+                        className="h-12 text-base"
+                        {...field}
+                        onChange={(e) => field.onChange(parseInt(e.target.value) || undefined)}
                       />
-                      <div className="absolute inset-0 bg-black/60 opacity-0 hover:opacity-100 flex items-center justify-center transition-opacity duration-200">
-                        <Button 
-                          type="button"
-                          className="bg-purple-600 hover:bg-purple-700 text-white"
-                          onClick={() => document.getElementById('event-banner-edit')?.click()}
+                    </FormControl>
+                    <FormDescription>
+                      Leave blank for unlimited capacity
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <div className="space-y-4">
+                <FormField
+                  control={generatedForm.control}
+                  name="image"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-base font-medium">
+                        Event Banner/Flyer <span className="text-red-500">*</span>
+                      </FormLabel>
+                      <FormDescription>
+                        Upload an eye-catching banner to attract more attendees. Events with images receive 2x more interest.
+                      </FormDescription>
+                      
+                      {bannerPreview ? (
+                        <div className="mt-2 rounded-lg overflow-hidden border border-purple-200 relative group">
+                          <img 
+                            src={bannerPreview} 
+                            alt="Event banner preview" 
+                            className="w-full h-[200px] object-cover"
+                          />
+                          <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity duration-200">
+                            <Button 
+                              type="button"
+                              variant="default"
+                              className="bg-purple-600 hover:bg-purple-700"
+                              onClick={() => document.getElementById('event-banner')?.click()}
+                            >
+                              <Edit className="mr-2 h-4 w-4" /> Change Banner
+                            </Button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div 
+                          className="border-2 border-dashed border-purple-200 rounded-lg p-8 text-center hover:bg-purple-50 transition-colors cursor-pointer"
+                          onClick={() => document.getElementById('event-banner')?.click()}
                         >
-                          <Camera className="mr-2 h-4 w-4" /> Change Image
-                        </Button>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="border-2 border-dashed border-purple-200 rounded-lg p-6 text-center hover:bg-purple-50 transition-colors cursor-pointer mb-3"
-                      onClick={() => document.getElementById('event-banner-edit')?.click()}
-                    >
-                      <Upload className="h-8 w-8 mx-auto mb-2 text-purple-500" />
-                      <p className="text-sm text-gray-600">Click to upload your event banner</p>
-                      <p className="text-xs text-gray-500 mt-1">Recommended size: 1200 x 630 pixels</p>
-                    </div>
+                          <div className="mx-auto h-16 w-16 rounded-full bg-purple-100 flex items-center justify-center mb-4">
+                            <FileImage className="h-6 w-6 text-purple-500" />
+                          </div>
+                          <h4 className="text-base font-medium text-gray-700">Upload event banner/flyer</h4>
+                          <p className="text-sm text-gray-500 mt-1">
+                            Drag and drop or click to browse
+                          </p>
+                          <input 
+                            type="file" 
+                            className="hidden" 
+                            id="event-banner"
+                            accept="image/*"
+                            onChange={handleBannerUpload}
+                          />
+                          <Button
+                            type="button" 
+                            className="mt-4 bg-purple-600 hover:bg-purple-700 text-white"
+                          >
+                            Select File
+                          </Button>
+                        </div>
+                      )}
+                      
+                      <FormMessage />
+                      
+                      {!bannerPreview && (
+                        <div className="mt-4">
+                          <p className="text-sm font-medium mb-2">Or choose a sample banner:</p>
+                          <div className="grid grid-cols-3 gap-2">
+                            <img 
+                              src="https://images.unsplash.com/photo-1605810230434-7631ac76ec81" 
+                              alt="Sample banner 1" 
+                              className="h-20 w-full object-cover rounded-md cursor-pointer border-2 hover:border-purple-500 transition-all"
+                              onClick={() => selectSampleBanner("https://images.unsplash.com/photo-1605810230434-7631ac76ec81")}
+                            />
+                            <img 
+                              src="https://images.unsplash.com/photo-1487058792275-0ad4aaf24ca7" 
+                              alt="Sample banner 2" 
+                              className="h-20 w-full object-cover rounded-md cursor-pointer border-2 hover:border-purple-500 transition-all"
+                              onClick={() => selectSampleBanner("https://images.unsplash.com/photo-1487058792275-0ad4aaf24ca7")}
+                            />
+                            <img 
+                              src="https://images.unsplash.com/photo-1519389950473-47ba0277781c" 
+                              alt="Sample banner 3" 
+                              className="h-20 w-full object-cover rounded-md cursor-pointer border-2 hover:border-purple-500 transition-all"
+                              onClick={() => selectSampleBanner("https://images.unsplash.com/photo-1519389950473-47ba0277781c")}
+                            />
+                          </div>
+                        </div>
+                      )}
+                    </FormItem>
                   )}
-                  
-                  <input 
-                    type="file" 
-                    className="hidden" 
-                    id="event-banner-edit"
-                    accept="image/*"
-                    onChange={handleBannerUpload}
+                />
+              </div>
+
+              <div className="space-y-4">
+                <FormLabel className="text-base font-medium">Pricing</FormLabel>
+                <div className="flex items-center space-x-2 p-4 bg-gray-50 rounded-md">
+                  <input
+                    type="checkbox"
+                    id="is-free"
+                    className="h-5 w-5 rounded border-gray-300 text-primary focus:ring-primary"
+                    checked={isFree}
+                    onChange={(e) => {
+                      setIsFree(e.target.checked);
+                      generatedForm.setValue("isFree", e.target.checked);
+                      if (e.target.checked) {
+                        generatedForm.setValue("price", 0);
+                      }
+                    }}
                   />
-                  
-                  {!bannerPreview && (
-                    <div>
-                      <p className="text-sm font-medium mb-2">Or choose a sample banner:</p>
-                      <div className="grid grid-cols-3 gap-2">
-                        <img 
-                          src="https://images.unsplash.com/photo-1605810230434-7631ac76ec81" 
-                          alt="Sample banner 1" 
-                          className="h-20 w-full object-cover rounded-md cursor-pointer border-2 hover:border-purple-500 transition-all"
-                          onClick={() => selectSampleBanner("https://images.unsplash.com/photo-1605810230434-7631ac76ec81")}
-                        />
-                        <img 
-                          src="https://images.unsplash.com/photo-1487058792275-0ad4aaf24ca7" 
-                          alt="Sample banner 2" 
-                          className="h-20 w-full object-cover rounded-md cursor-pointer border-2 hover:border-purple-500 transition-all"
-                          onClick={() => selectSampleBanner("https://images.unsplash.com/photo-1487058792275-0ad4aaf24ca7")}
-                        />
-                        <img 
-                          src="https://images.unsplash.com/photo-1519389950473-47ba0277781c" 
-                          alt="Sample banner 3" 
-                          className="h-20 w-full object-cover rounded-md cursor-pointer border-2 hover:border-purple-500 transition-all"
-                          onClick={() => selectSampleBanner("https://images.unsplash.com/photo-1519389950473-47ba0277781c")}
-                        />
-                      </div>
-                    </div>
-                  )}
+                  <label htmlFor="is-free" className="text-base">This is a free event</label>
                 </div>
+                
+                {!isFree && (
+                  <FormField
+                    control={generatedForm.control}
+                    name="price"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-base font-medium">Ticket Price ($)</FormLabel>
+                        <FormControl>
+                          <Input 
+                            type="number" 
+                            min="0" 
+                            step="0.01" 
+                            placeholder="0.00" 
+                            className="h-12 text-base"
+                            {...field}
+                            onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
               </div>
               
-              <div className="flex justify-between pt-4">
-                <Button 
-                  type="button" 
-                  variant="outline" 
-                  onClick={() => setStage("review")}
-                >
-                  Cancel
+              <div className="flex justify-between">
+                <Button variant="outline" onClick={() => setStage("input")}>
+                  Back
                 </Button>
                 <Button 
                   type="submit"
-                  className="bg-gradient-to-r from-purple-600 to-purple-400 hover:from-purple-700 hover:to-purple-500 text-white"
+                  className="bg-gradient-to-r from-purple-600 to-blue-500 hover:from-purple-700 hover:to-blue-600"
                 >
-                  Save Changes
+                  Launch Event
                 </Button>
               </div>
             </form>
-          </CardContent>
-        </Card>
-      )}
+          </Form>
+        </CardContent>
+      </Card>
+    );
+  }
 
-      {stage === "review" && generatedEvent && (
-        <Card className="border-purple-200 shadow-lg transition-all duration-300 hover:shadow-xl animate-fade-in">
-          <CardHeader className="bg-purple-50 border-b border-purple-100">
-            <div className="flex items-center space-x-2">
-              <div className="h-8 w-8 rounded-full bg-purple-200 flex items-center justify-center">
-                <CheckCircle className="h-5 w-5 text-purple-700" />
-              </div>
-              <div>
-                <CardTitle className="text-xl text-purple-900">Your Event is Ready!</CardTitle>
-                <CardDescription>Review and launch your event, or make additional edits</CardDescription>
-              </div>
+  if (stage === "complete") {
+    return (
+      <Card className="w-full max-w-2xl mx-auto border-none shadow-lg">
+        <CardHeader className="bg-green-50 rounded-t-lg">
+          <CardTitle className="flex items-center">
+            <Check className="mr-2 h-5 w-5 text-green-500" />
+            Event Ready to Launch!
+          </CardTitle>
+          <CardDescription>Review and launch your event to the world</CardDescription>
+        </CardHeader>
+        <CardContent className="pt-6 space-y-6">
+          {bannerPreview && (
+            <div className="rounded-lg overflow-hidden border border-purple-200">
+              <img 
+                src={bannerPreview} 
+                alt="Event banner preview" 
+                className="w-full h-[200px] object-cover"
+              />
             </div>
-          </CardHeader>
-          <CardContent className="pt-6">
-            <div className="space-y-6">
-              <div className="rounded-lg border border-purple-100 p-4 bg-white">
-                <h3 className="font-bold text-xl mb-2">{generatedEvent.title}</h3>
-                <div className="space-y-4">
-                  <div>
-                    <h4 className="text-sm font-medium text-gray-500">Description</h4>
-                    <p className="mt-1">{generatedEvent.description}</p>
-                  </div>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <h4 className="text-sm font-medium text-gray-500">Location</h4>
-                      <p className="mt-1">{generatedEvent.location.name}, {generatedEvent.location.city}</p>
-                    </div>
-                    
-                    <div>
-                      <h4 className="text-sm font-medium text-gray-500">Date & Time</h4>
-                      <p className="mt-1">{generatedEvent.date.start.toLocaleDateString()}</p>
-                    </div>
-                    
-                    <div>
-                      <h4 className="text-sm font-medium text-gray-500">Category</h4>
-                      <p className="mt-1">{getSelectedCategoryInfo()?.name}</p>
-                    </div>
-                    
-                    <div>
-                      <h4 className="text-sm font-medium text-gray-500">Capacity</h4>
-                      <p className="mt-1">{generatedEvent.capacity} attendees</p>
-                    </div>
-                    
-                    <div>
-                      <h4 className="text-sm font-medium text-gray-500">Pricing</h4>
-                      <p className="mt-1">
-                        {generatedEvent.isFree ? "Free" : `$${generatedEvent.price}`}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="pt-4 border-t border-gray-200">
-                <h3 className="font-medium text-lg mb-3">Event Banner</h3>
-                
-                {bannerPreview ? (
-                  <div className="mb-3 relative rounded-lg overflow-hidden border border-purple-200">
-                    <img 
-                      src={bannerPreview} 
-                      alt="Event banner preview" 
-                      className="w-full h-[200px] object-cover"
-                    />
-                    <div className="absolute inset-0 bg-black/60 opacity-0 hover:opacity-100 flex items-center justify-center transition-opacity duration-200">
-                      <Button 
-                        type="button"
-                        className="bg-purple-600 hover:bg-purple-700 text-white"
-                        onClick={() => document.getElementById('event-banner-review')?.click()}
-                      >
-                        <Camera className="mr-2 h-4 w-4" /> Change Image
-                      </Button>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="border-2 border-dashed border-purple-200 rounded-lg p-6 text-center hover:bg-purple-50 transition-colors cursor-pointer mb-3"
-                    onClick={() => document.getElementById('event-banner-review')?.click()}
-                  >
-                    <Upload className="h-8 w-8 mx-auto mb-2 text-purple-500" />
-                    <p className="text-sm text-gray-600">Upload your event banner <span className="text-red-500 font-bold">*</span></p>
-                    <p className="text-xs text-gray-500 mt-1">Events with images get more attendees!</p>
-                    <Button 
-                      type="button"
-                      variant="outline" 
-                      className="mt-3 text-purple-600 border-purple-200 hover:bg-purple-50"
-                    >
-                      <FileImage className="mr-2 h-4 w-4" /> Upload Image
-                    </Button>
-                  </div>
-                )}
-                
-                <input 
-                  type="file" 
-                  className="hidden" 
-                  id="event-banner-review"
-                  accept="image/*"
-                  onChange={handleBannerUpload}
-                />
-                
-                {!bannerPreview && (
-                  <div>
-                    <p className="text-sm font-medium mb-2">Or choose a sample banner:</p>
-                    <div className="grid grid-cols-3 gap-2">
-                      <img 
-                        src="https://images.unsplash.com/photo-1605810230434-7631ac76ec81" 
-                        alt="Sample banner 1" 
-                        className="h-20 w-full object-cover rounded-md cursor-pointer border-2 hover:border-purple-500 transition-all"
-                        onClick={() => selectSampleBanner("https://images.unsplash.com/photo-1605810230434-7631ac76ec81")}
-                      />
-                      <img 
-                        src="https://images.unsplash.com/photo-1487058792275-0ad4aaf24ca7" 
-                        alt="Sample banner 2" 
-                        className="h-20 w-full object-cover rounded-md cursor-pointer border-2 hover:border-purple-500 transition-all"
-                        onClick={() => selectSampleBanner("https://images.unsplash.com/photo-1487058792275-0ad4aaf24ca7")}
-                      />
-                      <img 
-                        src="https://images.unsplash.com/photo-1519389950473-47ba0277781c" 
-                        alt="Sample banner 3" 
-                        className="h-20 w-full object-cover rounded-md cursor-pointer border-2 hover:border-purple-500 transition-all"
-                        onClick={() => selectSampleBanner("https://images.unsplash.com/photo-1519389950473-47ba0277781c")}
-                      />
-                    </div>
-                  </div>
-                )}
-              </div>
-              
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <div className="flex items-start">
-                  <Bot className="text-blue-500 mr-3 mt-0.5 h-5 w-5 flex-shrink-0" />
-                  <div className="text-sm text-blue-800">
-                    <p className="font-medium">AI Notes:</p>
-                    <p className="mt-1">
-                      I've generated basic event details based on your inputs. You can edit these details directly using the "Edit Details" button below.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </CardContent>
-          <CardFooter className="flex flex-col sm:flex-row justify-between gap-4 pt-2 border-t border-purple-100 bg-purple-50">
-            <div className="flex gap-2 w-full sm:w-auto">
-              <Button 
-                variant="outline" 
-                onClick={handleReset}
-                className="border-purple-200 text-purple-700 hover:bg-purple-50 flex-1 sm:flex-initial"
-              >
-                <RefreshCw className="mr-2 h-4 w-4" /> Reset
-              </Button>
-              <Button 
-                onClick={handleToggleEditMode}
-                variant="default"
-                className="bg-purple-600 hover:bg-purple-700 text-white flex-1 sm:flex-initial"
-              >
-                <Edit className="mr-2 h-4 w-4" /> Edit Details
-              </Button>
-            </div>
-            <Button 
-              onClick={handleShowLaunchConfirmation}
-              className="bg-gradient-to-r from-purple-600 to-purple-400 hover:from-purple-700 hover:to-purple-500 text-white transition-all duration-300 hover:scale-[1.02] font-medium w-full sm:w-auto"
-              disabled={!bannerPreview || isSaving}
-            >
-              {isSaving ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Saving...
-                </>
-              ) : (
-                <>
-                  Launch Event <Send className="ml-2 h-4 w-4" />
-                </>
-              )}
+          )}
+          
+          <div className="space-y-2">
+            <h3 className="text-lg font-semibold">Event Details</h3>
+            <p><strong>Title:</strong> {generatedEvent?.title}</p>
+            <p><strong>Description:</strong> {generatedEvent?.description}</p>
+            <p><strong>Location:</strong> {generatedEvent?.location.name}, {generatedEvent?.location.address}, {generatedEvent?.location.city}, {generatedEvent?.location.country}</p>
+            <p><strong>Date:</strong> {generatedEvent?.date.start.toLocaleDateString()}</p>
+            <p><strong>Capacity:</strong> {generatedEvent?.capacity || 'Unlimited'}</p>
+          </div>
+          
+          <div className="flex justify-between">
+            <Button variant="outline" onClick={() => setStage("edit")}>
+              Edit Event
             </Button>
-          </CardFooter>
-        </Card>
-      )}
+            <Button 
+              className="bg-gradient-to-r from-green-600 to-blue-500 hover:from-green-700 hover:to-blue-600"
+              onClick={handleLaunchEvent}
+            >
+              Launch Event
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
-      {stage === "complete" && (
-        <Card className="border-purple-200 shadow-lg transition-all animate-fade-in">
-          <CardHeader className="bg-purple-50 border-b border-purple-100">
-            <CardTitle className="text-center text-xl text-purple-900">Event Created Successfully!</CardTitle>
-            <CardDescription className="text-center">
-              Your event has been published and is now live
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="pt-8 pb-8 text-center">
-            <div className="w-20 h-20 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-6">
-              <CheckCircle className="h-10 w-10 text-green-600" />
-            </div>
-            <h3 className="text-lg font-medium mb-2">Congratulations!</h3>
-            <p className="text-gray-600 max-w-md mx-auto">
-              Your event has been successfully created and published. You will be redirected to your events dashboard shortly.
-            </p>
-          </CardContent>
-        </Card>
-      )}
-
-      {showLaunchConfirmation && (
-        <AlertDialog open={showLaunchConfirmation} onOpenChange={setShowLaunchConfirmation}>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Launch this event?</AlertDialogTitle>
-              <AlertDialogDescription>
-                This will publish your event and make it visible to all users. Are you sure you want to continue?
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel onClick={() => setShowLaunchConfirmation(false)}>Cancel</AlertDialogCancel>
-              <AlertDialogAction 
-                onClick={handleLaunchEvent} 
-                className="bg-gradient-to-r from-purple-600 to-purple-400"
-                disabled={isSaving}
-              >
-                {isSaving ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Saving...
-                  </>
-                ) : (
-                  <>Launch Event</>
-                )}
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
-      )}
-    </div>
-  );
+  return null;
 };
+
+// Add this near the top of the component to get the current user
+const [currentUser, setCurrentUser] = useState<any>(() => {
+  // In a real app, get from auth context or API
+  return {
+    id: "1", // Default ID for demo purposes
+    name: "Current User"
+  };
+});
+
+// Add this effect to get the user information from Supabase
+useEffect(() => {
+  const getUserProfile = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (user) {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
+        .single();
+      
+      if (profile) {
+        setCurrentUser({
+          id: user.id,
+          ...profile
+        });
+      }
+    }
+  };
+  
+  getUserProfile();
+}, []);
 
 export default AiEventCreator;
