@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
@@ -8,7 +7,8 @@ import {
   Bot, Edit, CheckCircle, ArrowRight, 
   Loader2, Sparkles, AlertTriangle, 
   PenLine, Send, RefreshCw, FileImage,
-  Camera, Upload
+  Camera, Upload, MapPin, Calendar as CalendarIcon, 
+  Users, DollarSign
 } from "lucide-react";
 import {
   Card,
