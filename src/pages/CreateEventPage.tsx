@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -78,7 +77,6 @@ const CreateEventPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
   
-  // Check if we have event data from AI to pre-fill
   const prefilledEvent = location.state?.event || generatedEvent;
   
   const form = useForm<EventFormValues>({
@@ -100,7 +98,6 @@ const CreateEventPage = () => {
   
   const onSubmit = (values: EventFormValues) => {
     console.log(values);
-    // Here you would typically send the data to your backend
     toast({
       title: "Event created!",
       description: "Your event has been created successfully.",
@@ -114,15 +111,12 @@ const CreateEventPage = () => {
   const handleBannerUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      // In a real app, you would upload this file to your server
-      // For now, we'll just create a local URL for preview
       const imageUrl = URL.createObjectURL(file);
       setBannerPreview(imageUrl);
       form.setValue("image", imageUrl);
     }
   };
 
-  // Function to select a sample banner
   const selectSampleBanner = (imageUrl: string) => {
     setBannerPreview(imageUrl);
     form.setValue("image", imageUrl);
@@ -135,7 +129,6 @@ const CreateEventPage = () => {
 
   const handleEditSection = (section: 'details' | 'tickets' | 'date' | 'location') => {
     setEditSection(section);
-    // In a real implementation, you would open a form to edit the section
     toast({
       title: `Edit ${section}`,
       description: `You are now editing the ${section} section.`,
@@ -207,7 +200,6 @@ const CreateEventPage = () => {
                           }`}
                         >
                           <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center mb-2">
-                            {/* Render appropriate icon based on category */}
                             {category.value === 'charity' && <Globe className="h-5 w-5 text-purple-600" />}
                             {category.value === 'community' && <Users className="h-5 w-5 text-purple-600" />}
                             {category.value === 'education' && <Book className="h-5 w-5 text-purple-600" />}
@@ -273,9 +265,10 @@ const CreateEventPage = () => {
               </CardHeader>
               <CardContent className="p-6">
                 <AiEventCreator 
-                  category={eventCategory}
-                  description={eventDetails}
+                  initialCategory={eventCategory}
+                  initialDetails={eventDetails}
                   onEventGenerated={handleGenerateEvent}
+                  showBackButton={true}
                   onBack={() => setStep("details")}
                 />
               </CardContent>
@@ -367,7 +360,6 @@ const CreateEventPage = () => {
                     className="w-full bg-purple-600 hover:bg-purple-700 text-white"
                     size="lg"
                     onClick={() => {
-                      // Submit the form with the generated event data
                       toast({
                         title: "Event published!",
                         description: "Your event has been published successfully.",
@@ -397,7 +389,6 @@ const CreateEventPage = () => {
   );
 };
 
-// Import the Book icon we're using
 import { Book } from "lucide-react";
 
 export default CreateEventPage;
