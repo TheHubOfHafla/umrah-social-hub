@@ -20,6 +20,7 @@ import {
   getEventsByCategory,
   getPopularEvents,
 } from "@/lib/data/queries";
+import PageWrapper from "@/components/PageWrapper";
 
 const Index = ({ isAuthenticated = false }: { isAuthenticated?: boolean }) => {
   const [selectedCategories, setSelectedCategories] = useState<EventCategory[]>([]);
@@ -52,33 +53,34 @@ const Index = ({ isAuthenticated = false }: { isAuthenticated?: boolean }) => {
   };
 
   return (
-    <div className="min-h-screen overflow-hidden">
-      <main className="pb-8 md:pb-16">
-        <div className="-mt-16">
-          <HeroBanner 
-            user={isAuthenticated ? currentUser : undefined} 
-            onLocationSelect={handleLocationSelect}
-            isAuthenticated={isAuthenticated} 
-          />
-        </div>
+    <PageWrapper withPadding={false} className="overflow-hidden">
+      <div className="relative w-full">
+        {/* Hero Banner at the top */}
+        <HeroBanner 
+          user={isAuthenticated ? currentUser : undefined} 
+          onLocationSelect={handleLocationSelect}
+          isAuthenticated={isAuthenticated} 
+        />
         
-        {/* Adjusted position of TopicsAndPicks component to be a bit higher */}
-        <div className={`w-full -mt-24 transition-all duration-700 delay-100 ${animateContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+        {/* Add proper spacing for Topics and Picks section */}
+        <div className={`w-full pt-8 mt-8 transition-all duration-700 delay-100 ${animateContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
           <TopicsAndPicks />
         </div>
         
+        {/* Featured Events with proper margin */}
         {featuredEvents.length > 0 && (
-          <section className={`container mx-auto px-3 md:px-4 mt-4 md:mt-8 mb-8 md:mb-16 transition-all duration-700 delay-200 ${animateContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+          <section className={`container mx-auto px-3 md:px-4 mt-12 md:mt-20 mb-8 md:mb-16 transition-all duration-700 delay-200 ${animateContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
             <FeaturedEvent event={featuredEvents[0]} />
           </section>
         )}
         
+        {/* Content for authenticated vs. non-authenticated users */}
         {isAuthenticated ? (
-          <div className={`transition-all duration-700 delay-300 ${animateContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+          <div className={`transition-all duration-700 delay-300 mt-16 ${animateContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
             <RecommendedEvents events={recommendedEvents} />
           </div>
         ) : (
-          <section className={`container mx-auto px-4 py-12 transition-all duration-700 delay-300 ${animateContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+          <section className={`container mx-auto px-4 py-12 mt-12 transition-all duration-700 delay-300 ${animateContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
             <div className="mb-8">
               <h2 className="text-2xl font-bold mb-2">Popular Events</h2>
               <p className="text-muted-foreground">Discover what's trending in the community</p>
@@ -93,8 +95,8 @@ const Index = ({ isAuthenticated = false }: { isAuthenticated?: boolean }) => {
           </section>
         )}
         
-        {/* Trending Events Section */}
-        <section className={`container mx-auto px-4 py-12 transition-all duration-700 delay-400 ${animateContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+        {/* Trending Events Section with margin */}
+        <section className={`container mx-auto px-4 py-12 mt-8 transition-all duration-700 delay-400 ${animateContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
           <div className="flex items-center justify-between mb-6">
             <div>
               <h2 className="text-2xl font-bold tracking-tight">Trending Now</h2>
@@ -110,8 +112,9 @@ const Index = ({ isAuthenticated = false }: { isAuthenticated?: boolean }) => {
           <EventGrid events={trendingEvents} columns={3} />
         </section>
         
+        {/* Category-specific events */}
         {selectedCategories.length === 1 && (
-          <div className={`transition-all duration-700 delay-[600ms] ${animateContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+          <div className={`mt-12 transition-all duration-700 delay-[600ms] ${animateContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
             <CategoryEvents 
               category={selectedCategories[0]} 
               events={categoryEvents} 
@@ -120,7 +123,7 @@ const Index = ({ isAuthenticated = false }: { isAuthenticated?: boolean }) => {
         )}
         
         {/* Upcoming Events Section */}
-        <section className={`container mx-auto px-4 py-12 transition-all duration-700 delay-500 ${animateContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+        <section className={`container mx-auto px-4 py-12 mt-8 transition-all duration-700 delay-500 ${animateContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
           <div className="flex items-center justify-between mb-6">
             <div>
               <h2 className="text-2xl font-bold tracking-tight">Upcoming Events</h2>
@@ -136,12 +139,13 @@ const Index = ({ isAuthenticated = false }: { isAuthenticated?: boolean }) => {
           <EventGrid events={upcomingEvents} columns={3} />
         </section>
         
+        {/* User-specific content or sign-up promo */}
         {isAuthenticated ? (
-          <div className={`transition-all duration-700 delay-[700ms] ${animateContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+          <div className={`mt-16 transition-all duration-700 delay-[700ms] ${animateContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
             <MyEventsPromo />
           </div>
         ) : (
-          <section className={`container mx-auto px-4 py-12 my-12 bg-gradient-to-r from-primary/10 to-accent/10 rounded-lg backdrop-blur-sm transition-all duration-700 delay-[700ms] transform ${animateContent ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-8 scale-95'}`}>
+          <section className={`container mx-auto px-4 py-12 my-16 bg-gradient-to-r from-primary/10 to-accent/10 rounded-lg backdrop-blur-sm transition-all duration-700 delay-[700ms] transform ${animateContent ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-8 scale-95'}`}>
             <div className="max-w-4xl mx-auto text-center space-y-6 py-8">
               <h2 className="text-3xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent animate-pulse-soft">Join Our Community</h2>
               <p className="text-xl text-muted-foreground">
@@ -158,12 +162,12 @@ const Index = ({ isAuthenticated = false }: { isAuthenticated?: boolean }) => {
             </div>
           </section>
         )}
-      </main>
+      </div>
       
-      <div className={`transition-opacity duration-1000 delay-[800ms] ${animateContent ? 'opacity-100' : 'opacity-0'}`}>
+      <div className={`mt-12 transition-opacity duration-1000 delay-[800ms] ${animateContent ? 'opacity-100' : 'opacity-0'}`}>
         <Footer />
       </div>
-    </div>
+    </PageWrapper>
   );
 };
 
