@@ -48,6 +48,14 @@ import { useContext } from "react";
 import { AuthContext } from "@/App";
 import { EventCategory } from "@/types";
 
+interface AiEventCreatorProps {
+  initialCategory: string;
+  initialDetails: string;
+  onEventGenerated: (event: any) => void;
+  showBackButton?: boolean;
+  onBack?: () => void;
+}
+
 const eventCategories = [
   { id: "islamic-talk", name: "Islamic Talk", icon: "🕌" },
   { id: "charity-fundraiser", name: "Charity Fundraiser", icon: "🤲" },
@@ -94,7 +102,13 @@ type CreationStage =
   | "edit-details" 
   | "complete";
 
-const AiEventCreator = () => {
+const AiEventCreator = ({
+  initialCategory,
+  initialDetails,
+  onEventGenerated,
+  showBackButton = false,
+  onBack
+}: AiEventCreatorProps) => {
   const [stage, setStage] = useState<CreationStage>("select-category");
   const [selectedCategory, setSelectedCategory] = useState("");
   const [eventDetails, setEventDetails] = useState("");
@@ -135,6 +149,17 @@ const AiEventCreator = () => {
       price: 0,
     }
   });
+
+  useEffect(() => {
+    if (initialCategory) {
+      categoryForm.setValue("category", initialCategory);
+      setSelectedCategory(initialCategory);
+    }
+    if (initialDetails) {
+      detailsForm.setValue("details", initialDetails);
+      setEventDetails(initialDetails);
+    }
+  }, [initialCategory, initialDetails]);
 
   const onCategorySubmit = (values: z.infer<typeof categoryFormSchema>) => {
     setSelectedCategory(values.category);
@@ -1153,7 +1178,6 @@ const AiEventCreator = () => {
   );
 };
 
-// Add a helper function to count words
 const getWordCount = (text: string): number => {
   return text.trim().split(/\s+/).filter(word => word.length > 0).length;
 };
