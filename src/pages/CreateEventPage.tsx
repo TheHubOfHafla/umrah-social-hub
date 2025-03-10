@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -189,7 +190,7 @@ const CreateEventPage = () => {
               <CardContent className="pt-6 space-y-6">
                 <div className="space-y-4">
                   <div>
-                    <FormLabel className="text-base font-medium">Event category</FormLabel>
+                    <div className="text-base font-medium">Event category</div>
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mt-2">
                       {categories.slice(0, 9).map((category) => (
                         <div 
@@ -213,16 +214,16 @@ const CreateEventPage = () => {
                   </div>
                   
                   <div className="pt-4">
-                    <FormLabel className="text-base font-medium">Tell us about your event</FormLabel>
+                    <div className="text-base font-medium">Tell us about your event</div>
                     <Textarea 
                       placeholder="Describe your event - what is it about? When and where will it take place? Who should attend?"
                       className="min-h-32 text-base mt-2" 
                       value={eventDetails}
                       onChange={(e) => setEventDetails(e.target.value)}
                     />
-                    <FormDescription className="mt-2">
+                    <div className="mt-2 text-sm text-muted-foreground">
                       The more details you provide, the better our AI can help you create your event.
-                    </FormDescription>
+                    </div>
                   </div>
                 </div>
                 
