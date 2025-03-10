@@ -41,6 +41,33 @@ serve(async (req) => {
 
     console.log(`Generating event for category: ${eventCategory}, with details: ${eventDetails}`);
 
+    const instructionsPrompt = `You are an event planning assistant. Extract and create a structured event based on the category and description provided by the user.
+    Pay special attention to:
+    1. Event title - create an appropriate title if none is mentioned
+    2. Detailed description - expand on the provided details
+    3. Location - extract any venue, address, city, and country information
+    4. Date - extract or suggest a reasonable date
+    5. Capacity - extract the number of attendees if mentioned, default to 50 otherwise
+    6. Price - determine if the event is free or has a price based on the details
+    7. Tags/categories - suggest relevant tags for the event
+    
+    Your response should be ONLY a JSON object with these exact fields:
+    {
+      "title": "Event title",
+      "description": "Detailed event description",
+      "location": {
+        "name": "Venue name",
+        "address": "Venue address",
+        "city": "City name",
+        "country": "Country name"
+      },
+      "suggestedDate": "YYYY-MM-DD",
+      "capacity": 50,
+      "isFree": true/false,
+      "suggestedPrice": 0,
+      "categoryRecommendations": ["tag1", "tag2"]
+    }`;
+
     // Try Deepseek first if API key is available
     if (deepseekApiKey) {
       try {
@@ -56,23 +83,7 @@ serve(async (req) => {
             messages: [
               { 
                 role: 'system', 
-                content: `You are an event planning assistant. Create an event based on the category and description provided by the user. 
-                          Your response should be a JSON object with these fields:
-                          {
-                            "title": "Event title",
-                            "description": "Detailed event description",
-                            "location": {
-                              "name": "Venue name",
-                              "address": "Venue address",
-                              "city": "City name",
-                              "country": "Country name"
-                            },
-                            "suggestedDate": "YYYY-MM-DD",
-                            "capacity": 50,
-                            "isFree": true/false,
-                            "suggestedPrice": 0,
-                            "categoryRecommendations": ["tag1", "tag2"]
-                          }` 
+                content: instructionsPrompt
               },
               { 
                 role: 'user', 
@@ -142,23 +153,7 @@ serve(async (req) => {
             messages: [
               { 
                 role: 'system', 
-                content: `You are an event planning assistant. Create an event based on the category and description provided by the user. 
-                          Your response should be a JSON object with these fields:
-                          {
-                            "title": "Event title",
-                            "description": "Detailed event description",
-                            "location": {
-                              "name": "Venue name",
-                              "address": "Venue address",
-                              "city": "City name",
-                              "country": "Country name"
-                            },
-                            "suggestedDate": "YYYY-MM-DD",
-                            "capacity": 50,
-                            "isFree": true/false,
-                            "suggestedPrice": 0,
-                            "categoryRecommendations": ["tag1", "tag2"]
-                          }` 
+                content: instructionsPrompt 
               },
               { 
                 role: 'user', 
