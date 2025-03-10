@@ -47,7 +47,7 @@ const EventTicketCard = ({ event, isPreview = false, onEdit }: EventTicketCardPr
               <div className="flex flex-col">
                 <span className="text-sm text-gray-500">Date & Time</span>
                 <span className="font-medium">
-                  {event.start_date ? format(new Date(event.start_date), 'EEE, MMM d, yyyy • h:mm aaa') : 'Date to be announced'}
+                  {event.date && event.date.start ? format(new Date(event.date.start), 'EEE, MMM d, yyyy • h:mm aaa') : 'Date to be announced'}
                 </span>
               </div>
               {onEdit && (
@@ -65,7 +65,7 @@ const EventTicketCard = ({ event, isPreview = false, onEdit }: EventTicketCardPr
               <div className="flex flex-col">
                 <span className="text-sm text-gray-500">Location</span>
                 <span className="font-medium">
-                  {event.location_name ? `${event.location_name}, ${event.location_city}` : 'Location to be announced'}
+                  {event.location ? `${event.location.name}, ${event.location.city}` : 'Location to be announced'}
                 </span>
               </div>
               {onEdit && (

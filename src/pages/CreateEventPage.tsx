@@ -207,7 +207,12 @@ const CreateEventPage = () => {
                           }`}
                         >
                           <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center mb-2">
-                            {category.icon}
+                            {/* Render appropriate icon based on category */}
+                            {category.value === 'charity' && <Globe className="h-5 w-5 text-purple-600" />}
+                            {category.value === 'community' && <Users className="h-5 w-5 text-purple-600" />}
+                            {category.value === 'education' && <Book className="h-5 w-5 text-purple-600" />}
+                            {category.value === 'mosque' && <Building className="h-5 w-5 text-purple-600" />}
+                            {category.value === 'other' && <CircleHelp className="h-5 w-5 text-purple-600" />}
                           </div>
                           <span className="text-sm font-medium text-center">{category.label}</span>
                         </div>
@@ -268,10 +273,9 @@ const CreateEventPage = () => {
               </CardHeader>
               <CardContent className="p-6">
                 <AiEventCreator 
-                  initialCategory={eventCategory}
-                  initialDetails={eventDetails}
+                  category={eventCategory}
+                  description={eventDetails}
                   onEventGenerated={handleGenerateEvent}
-                  showBackButton={true}
                   onBack={() => setStep("details")}
                 />
               </CardContent>
@@ -360,9 +364,19 @@ const CreateEventPage = () => {
                 
                 <div className="mt-6">
                   <Button 
-                    onClick={onSubmit}
                     className="w-full bg-purple-600 hover:bg-purple-700 text-white"
                     size="lg"
+                    onClick={() => {
+                      // Submit the form with the generated event data
+                      toast({
+                        title: "Event published!",
+                        description: "Your event has been published successfully.",
+                      });
+                      
+                      setTimeout(() => {
+                        navigate('/events');
+                      }, 1500);
+                    }}
                   >
                     <Rocket className="mr-2 h-5 w-5" /> Publish Event
                   </Button>
@@ -382,5 +396,8 @@ const CreateEventPage = () => {
     </div>
   );
 };
+
+// Import the Book icon we're using
+import { Book } from "lucide-react";
 
 export default CreateEventPage;
