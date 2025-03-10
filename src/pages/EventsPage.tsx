@@ -58,7 +58,7 @@ const EventsPage = () => {
             title: event.title,
             description: event.description,
             shortDescription: event.short_description || "", // Map short_description to shortDescription
-            categories: event.categories,
+            categories: event.categories || [],
             date: {
               start: event.start_date,
               end: event.end_date || undefined
@@ -71,17 +71,17 @@ const EventsPage = () => {
             },
             image: event.image || '/placeholder.svg',
             organizer: {
-              id: event.organizer_id,
+              id: event.organizer_id || 'default',
               name: "Event Organizer",
               avatar: "/placeholder.svg",
-              organizationType: "company"
+              organizationType: "company" // Added required organizationType
             },
             attendeeType: event.attendee_type || 'mixed',
             featured: event.featured || false,
-            capacity: event.capacity,
+            capacity: event.capacity || 100,
             attendees: [],
-            isFree: event.is_free,
-            price: event.base_price
+            isFree: event.is_free || true,
+            price: event.base_price || 0
           }));
           
           setEvents(formattedEvents);
