@@ -5,7 +5,7 @@ import { Search } from "lucide-react";
 import PageWrapper from "@/components/PageWrapper";
 import EventSearch from "@/components/EventSearch";
 import EventGrid from "@/components/EventGrid";
-import { Event, EventCategory } from "@/types";
+import { Event, EventCategory, AttendeeType } from "@/types";
 import { getEventsByCategory, getEventsByAttendeeType } from "@/lib/data/queries";
 import { supabase } from "@/integrations/supabase/client";
 import { mockEvents } from "@/lib/data/events";
@@ -46,7 +46,8 @@ const EventsPage = () => {
           if (categoryParam) {
             filteredMockEvents = getEventsByCategory(categoryParam);
           } else if (typeParam) {
-            filteredMockEvents = getEventsByAttendeeType(typeParam);
+            // Cast typeParam to AttendeeType to fix the type error
+            filteredMockEvents = getEventsByAttendeeType(typeParam as AttendeeType);
           }
           
           setEvents(filteredMockEvents);
