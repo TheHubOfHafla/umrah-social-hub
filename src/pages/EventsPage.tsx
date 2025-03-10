@@ -6,10 +6,7 @@ import PageWrapper from "@/components/PageWrapper";
 import EventSearch from "@/components/EventSearch";
 import EventGrid from "@/components/EventGrid";
 import { Event, EventCategory } from "@/types";
-import { 
-  getEventsByCategory,
-  getEventsByAttendeeType 
-} from "@/lib/data/queries";
+import { getEventsByCategory, getEventsByAttendeeType } from "@/lib/data/queries";
 import { supabase } from "@/integrations/supabase/client";
 import { mockEvents } from "@/lib/data/events";
 
@@ -44,18 +41,15 @@ const EventsPage = () => {
         if (error) {
           console.error("Error fetching events from Supabase:", error);
           // Fallback to mock data
-          let mockEvents;
+          let filteredMockEvents = mockEvents;
           
           if (categoryParam) {
-            mockEvents = getEventsByCategory(categoryParam);
+            filteredMockEvents = getEventsByCategory(categoryParam);
           } else if (typeParam) {
-            mockEvents = getEventsByAttendeeType(typeParam as any); // Type cast as any to fix type error
-          } else {
-            // Use the imported mockEvents directly
-            mockEvents = mockEvents;
+            filteredMockEvents = getEventsByAttendeeType(typeParam);
           }
           
-          setEvents(mockEvents);
+          setEvents(filteredMockEvents);
         } else if (data && data.length > 0) {
           // Map Supabase data to Event type
           const formattedEvents: Event[] = data.map((event: any) => ({
@@ -65,7 +59,7 @@ const EventsPage = () => {
             shortDescription: event.short_description || "", // Map short_description to shortDescription
             categories: event.categories,
             date: {
-              start: event.start_date, // Keep as ISO string
+              start: event.start_date,
               end: event.end_date || undefined
             },
             location: {
@@ -74,17 +68,17 @@ const EventsPage = () => {
               city: event.location_city || '',
               country: event.location_country || ''
             },
-            image: event.image,
+            image: event.image || '/placeholder.svg',
             organizer: {
               id: event.organizer_id,
-              name: "Event Organizer", // Ideally join with organizer data
+              name: "Event Organizer",
               avatar: "/placeholder.svg",
-              organizationType: "company" // Default value to satisfy type
+              organizationType: "company"
             },
-            attendeeType: event.attendee_type,
-            featured: event.featured,
+            attendeeType: event.attendee_type || 'mixed',
+            featured: event.featured || false,
             capacity: event.capacity,
-            attendees: [], // Would need a separate query to get attendees
+            attendees: [],
             isFree: event.is_free,
             price: event.base_price
           }));
@@ -125,7 +119,7 @@ const EventsPage = () => {
         <div className="mb-8">
           <EventSearch 
             onSearch={setSearchQuery}
-            initialLocation={categoryParam || ""} // Use initialLocation instead
+            initialLocation={categoryParam || ""}
           />
         </div>
         
