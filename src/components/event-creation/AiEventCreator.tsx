@@ -147,46 +147,77 @@ const AiEventCreator = () => {
     setProgress(0);
     setError(null);
     
+    let generationPromise: Promise<any>;
+    let minimumTimePromise: Promise<void>;
+    
     progressIntervalRef.current = window.setInterval(() => {
       setProgress(prev => {
         if (prev >= 95) {
           return 95;
         }
-        return prev + 1;
+        return prev + Math.random() * 2;
       });
     }, 100);
-
+    
+    minimumTimePromise = new Promise(resolve => setTimeout(resolve, 5000));
+    
+    generationPromise = fetchGeneratedEvent(selectedCategory, values.details);
+    
     try {
-      const { data, error } = await supabase.functions.invoke('ai-event-generator', {
-        body: {
-          eventCategory: selectedCategory,
-          eventDetails: values.details
-        }
-      });
-
-      if (progressIntervalRef.current) {
-        clearInterval(progressIntervalRef.current);
-      }
-
-      if (error) {
-        console.error("Error generating event:", error);
-        setError("Failed to generate event. Using fallback generator.");
+      const [eventData] = await Promise.all([generationPromise, minimumTimePromise]);
+      
+      clearInterval(progressIntervalRef.current);
+      progressIntervalRef.current = null;
+      setProgress(100);
+      
+      if (eventData) {
+        handleGeneratedEventData(eventData);
+      } else {
+        const fallbackEvent = generateBasicEvent(selectedCategory, values.details);
+        handleGeneratedEventData(fallbackEvent);
+        
         toast({
           title: "Using Fallback Generator",
           description: "We couldn't connect to the AI service, but we've created a basic event for you to edit.",
           variant: "destructive"
         });
-        
-        const fallbackEvent = generateBasicEvent(selectedCategory, values.details);
-        handleGeneratedEventData(fallbackEvent);
-        return;
       }
-
+    } catch (err) {
+      console.error("Error in generation process:", err);
+      
+      await minimumTimePromise;
+      clearInterval(progressIntervalRef.current);
+      progressIntervalRef.current = null;
       setProgress(100);
       
-      if (data?.event) {
-        handleGeneratedEventData(data.event);
+      setTimeout(() => {
+        const fallbackEvent = generateBasicEvent(selectedCategory, values.details);
+        handleGeneratedEventData(fallbackEvent);
         
+        toast({
+          title: "Using Fallback Generator",
+          description: "We ran into an issue, but we've created a basic event for you to edit.",
+          variant: "destructive"
+        });
+      }, 500);
+    }
+  };
+
+  const fetchGeneratedEvent = async (category: string, details: string) => {
+    try {
+      const { data, error } = await supabase.functions.invoke('ai-event-generator', {
+        body: {
+          eventCategory: category,
+          eventDetails: details
+        }
+      });
+      
+      if (error) {
+        console.error("Error from Supabase function:", error);
+        throw new Error("Failed to generate event");
+      }
+      
+      if (data?.event) {
         if (data.source === 'fallback') {
           toast({
             title: "Using Simplified Generator",
@@ -199,31 +230,13 @@ const AiEventCreator = () => {
             description: "Your AI-generated event is ready for review.",
           });
         }
+        return data.event;
       } else {
-        setError("Invalid response format. Please try again.");
-        toast({
-          title: "Generation Failed",
-          description: "Unexpected response format. Please try again.",
-          variant: "destructive"
-        });
-        setStage("add-details");
+        throw new Error("Invalid response format");
       }
     } catch (err) {
       console.error("Error calling AI function:", err);
-      setError("Failed to connect to AI service. Using fallback generator.");
-      toast({
-        title: "Using Fallback Generator",
-        description: "We couldn't connect to the AI service, but we've created a basic event for you to edit.",
-        variant: "destructive"
-      });
-      
-      const fallbackEvent = generateBasicEvent(selectedCategory, values.details);
-      handleGeneratedEventData(fallbackEvent);
-    } finally {
-      if (progressIntervalRef.current) {
-        clearInterval(progressIntervalRef.current);
-        progressIntervalRef.current = null;
-      }
+      throw err;
     }
   };
 
