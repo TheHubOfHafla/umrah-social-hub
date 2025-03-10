@@ -21,7 +21,7 @@ export const extractAppContext = () => {
   const eventCategories = categories.map(cat => ({
     value: cat.value,
     label: cat.label,
-    description: cat.description || `Events related to ${cat.label}`
+    description: `Events related to ${cat.label}`
   }));
 
   return {
