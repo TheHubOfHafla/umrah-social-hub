@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Search, Filter, ChevronUp, ChevronDown } from "lucide-react";
@@ -133,7 +132,7 @@ const EventsPage = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 pt-24 pb-8">
+    <div className="container mx-auto px-4 pt-16 pb-8">
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">Browse Events</h1>
         <p className="text-muted-foreground">
