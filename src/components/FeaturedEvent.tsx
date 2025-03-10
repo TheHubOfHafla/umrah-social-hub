@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { CalendarIcon, Clock, MapPin } from "lucide-react";
@@ -65,10 +66,7 @@ const FeaturedEvent = ({ event }: FeaturedEventProps) => {
             </div>
           </div>
         </div>
-        <CardContent className={cn(
-          "p-4 transition-all duration-300 group-hover:bg-primary/5",
-          isFeatured && "px-0 pt-3"
-        )}>
+        <CardContent className="p-4 transition-all duration-300 group-hover:bg-primary/5">
           <div className="flex justify-between items-center">
             <div className="flex items-center space-x-2">
               <img
