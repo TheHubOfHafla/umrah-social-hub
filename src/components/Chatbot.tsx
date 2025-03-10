@@ -1,6 +1,6 @@
 
 import { useState, useRef, useEffect } from "react";
-import { X, Send, Loader2, User, Bot, ChevronDown, CornerDownLeft, ThumbsUp, ThumbsDown, Copy, Check } from "lucide-react";
+import { X, Send, Loader2, User, Bot, ChevronDown, CornerDownLeft, ThumbsUp, ThumbsDown, Copy, Check, Sparkles } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -9,6 +9,8 @@ import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useToast } from "@/components/ui/use-toast";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { useNavigate } from "react-router-dom";
+import { callDeepseekChat } from "@/lib/aiHelpers";
 
 interface Message {
   id: string;
@@ -17,6 +19,7 @@ interface Message {
   timestamp: Date;
   status: "sending" | "sent" | "error";
   feedback?: "like" | "dislike";
+  source?: "deepseek" | "openai" | "fallback" | "error";
 }
 
 interface SuggestedPrompt {
@@ -47,6 +50,7 @@ const Chatbot = ({ isOpen, onClose, initialMessage = "Hi there! How can I help y
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   // Initialize with welcome message
   useEffect(() => {
@@ -57,7 +61,8 @@ const Chatbot = ({ isOpen, onClose, initialMessage = "Hi there! How can I help y
           content: initialMessage,
           role: "assistant",
           timestamp: new Date(),
-          status: "sent"
+          status: "sent",
+          source: "deepseek"
         }
       ]);
     }
@@ -100,52 +105,69 @@ const Chatbot = ({ isOpen, onClose, initialMessage = "Hi there! How can I help y
       // Show typing indicator
       setIsTyping(true);
       
-      // Simulate AI response with a delay
-      // In a real implementation, you would call your AI service here
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      // Get message history for context (excluding the user message we just added)
+      const messageHistory = messages.map(msg => ({
+        role: msg.role,
+        content: msg.content
+      }));
+      
+      // Call the DeepSeek function
+      const response = await callDeepseekChat(input, messageHistory);
       
       setIsTyping(false);
-      
-      // Sample responses - in a real implementation, this would come from your AI service
-      const responses = [
-        "That's a great question! I'd be happy to help with that.",
-        "I understand what you're looking for. Here's what I can tell you...",
-        "Thanks for asking! Based on what you're describing, I would recommend...",
-        "I'm here to help with any questions about our events platform.",
-        "Great! I can definitely assist with finding events that match your interests."
-      ];
-      
-      const responseIndex = Math.floor(Math.random() * responses.length);
       
       // Add AI response to chat
       const aiMessage: Message = {
         id: crypto.randomUUID(),
-        content: responses[responseIndex],
+        content: response.message,
         role: "assistant",
         timestamp: new Date(),
-        status: "sent"
+        status: "sent",
+        source: response.source
       };
       
       setMessages(prev => [...prev, aiMessage]);
       
+      // Check if response contains navigation intent
+      const navigationCheck = checkForNavigation(response.message);
+      if (navigationCheck.shouldNavigate) {
+        toast({
+          title: "Navigation assistance",
+          description: `I can take you to ${navigationCheck.pageName}. Click to navigate.`,
+          action: (
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => {
+                navigate(navigationCheck.path);
+                onClose();
+              }}
+            >
+              Go to {navigationCheck.pageName}
+            </Button>
+          ),
+        });
+      }
+      
       // Generate new suggested prompts based on the conversation
-      setSuggestedPrompts([
-        { id: "details", text: "Tell me more details" },
-        { id: "alternatives", text: "Any alternatives?" },
-        { id: "pricing", text: "What about pricing?" },
-        { id: "next", text: "What should I do next?" },
-      ]);
+      generateSuggestedPrompts(aiMessage.content);
+      
     } catch (error) {
       console.error("Error sending message:", error);
       
-      // Update the message status to error
-      setMessages(prev => 
-        prev.map(msg => 
-          msg.id === messageId 
-            ? { ...msg, status: "error" as const } 
-            : msg
-        )
-      );
+      setIsTyping(false);
+      
+      // Add AI error response
+      const errorMessage: Message = {
+        id: crypto.randomUUID(),
+        content: "I'm sorry, I'm having trouble responding right now. Please try again later.",
+        role: "assistant",
+        timestamp: new Date(),
+        status: "error",
+        source: "error"
+      };
+      
+      setMessages(prev => [...prev, errorMessage]);
       
       toast({
         title: "Error sending message",
@@ -155,6 +177,68 @@ const Chatbot = ({ isOpen, onClose, initialMessage = "Hi there! How can I help y
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const checkForNavigation = (message: string): { shouldNavigate: boolean, path: string, pageName: string } => {
+    // Default response
+    const defaultResponse = { shouldNavigate: false, path: "/", pageName: "home" };
+    
+    // Check for navigation intents in the message
+    const navigationPatterns = [
+      { regex: /go to (event|events|all events)/i, path: "/events", pageName: "Events" },
+      { regex: /create (an |a |)event/i, path: "/events/create", pageName: "Create Event" },
+      { regex: /view (my |)dashboard/i, path: "/dashboard", pageName: "Dashboard" },
+      { regex: /check (my |)profile/i, path: "/dashboard/profile", pageName: "Profile" },
+      { regex: /my events/i, path: "/dashboard/events", pageName: "My Events" },
+      { regex: /sign (in|up)|login|register/i, path: "/login", pageName: "Login" },
+      { regex: /about/i, path: "/about", pageName: "About Us" },
+      { regex: /help/i, path: "/help", pageName: "Help Center" },
+      { regex: /home/i, path: "/", pageName: "Home" },
+    ];
+    
+    for (const pattern of navigationPatterns) {
+      if (pattern.regex.test(message)) {
+        return { shouldNavigate: true, path: pattern.path, pageName: pattern.pageName };
+      }
+    }
+    
+    return defaultResponse;
+  };
+  
+  const generateSuggestedPrompts = (aiResponse: string) => {
+    // Base prompts that are always relevant
+    const basePrompts = [
+      { id: "help", text: "What can you help me with?" },
+      { id: "features", text: "What features does this app have?" },
+    ];
+    
+    // Contextual prompts based on conversation
+    const contextualPrompts: SuggestedPrompt[] = [];
+    
+    // Add event-related prompts
+    if (aiResponse.toLowerCase().includes("event")) {
+      contextualPrompts.push({ id: "create", text: "How do I create an event?" });
+      contextualPrompts.push({ id: "find", text: "Find events near me" });
+    }
+    
+    // Add dashboard-related prompts
+    if (aiResponse.toLowerCase().includes("dashboard")) {
+      contextualPrompts.push({ id: "dashboard", text: "What can I do in my dashboard?" });
+    }
+    
+    // Add profile-related prompts
+    if (aiResponse.toLowerCase().includes("profile")) {
+      contextualPrompts.push({ id: "edit", text: "How do I edit my profile?" });
+    }
+    
+    // Add ticket-related prompts
+    if (aiResponse.toLowerCase().includes("ticket")) {
+      contextualPrompts.push({ id: "refund", text: "What's the refund policy?" });
+    }
+    
+    // Combine and limit prompts
+    const allPrompts = [...contextualPrompts, ...basePrompts];
+    setSuggestedPrompts(allPrompts.slice(0, 4));
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -296,8 +380,18 @@ const Chatbot = ({ isOpen, onClose, initialMessage = "Hi there! How can I help y
                           </AvatarFallback>
                         </Avatar>
                       )}
-                      <span className="text-[10px] sm:text-xs font-medium">
+                      <span className="text-[10px] sm:text-xs font-medium flex items-center">
                         {message.role === "user" ? "You" : "Event Buddy"}
+                        {message.source === "deepseek" && (
+                          <Tooltip>
+                            <TooltipTrigger>
+                              <Sparkles className="ml-1 h-2 w-2 sm:h-3 sm:w-3 text-purple-500" />
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p className="text-xs">Powered by DeepSeek AI</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        )}
                       </span>
                     </div>
                     <p className="text-xs sm:text-sm leading-relaxed whitespace-pre-wrap">{message.content}</p>
@@ -401,6 +495,7 @@ const Chatbot = ({ isOpen, onClose, initialMessage = "Hi there! How can I help y
                     placeholder="Type your message..."
                     className="min-h-[50px] sm:min-h-[60px] max-h-[100px] sm:max-h-[120px] py-2 pr-8 sm:pr-10 resize-none text-xs sm:text-sm shadow-sm focus-visible:ring-primary/50"
                     disabled={isLoading || isTyping}
+                    autoResize={true}
                   />
                   <CornerDownLeft 
                     className="absolute right-2 sm:right-3 bottom-2 sm:bottom-3 h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground pointer-events-none" 
