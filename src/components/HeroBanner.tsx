@@ -36,7 +36,7 @@ const HeroBanner = ({ user, onLocationSelect, isAuthenticated = true }: HeroBann
   return (
     <section className="relative">
       {/* Banner Image */}
-      <div className="w-full h-[100vh] relative overflow-hidden">
+      <div className="w-full h-[80vh] relative overflow-hidden">
         <div className={cn(
           "absolute inset-0 bg-gradient-to-b from-background/0 via-background/0 to-background z-10",
           !bannerLoaded && "animate-pulse bg-muted"
@@ -45,7 +45,7 @@ const HeroBanner = ({ user, onLocationSelect, isAuthenticated = true }: HeroBann
           src="/lovable-uploads/3fa0e5f2-adb1-4481-b5cd-7871743c9ab3.png" 
           alt="Islamic community gathering" 
           className={cn(
-            "w-full h-full object-cover transition-all duration-1000",
+            "w-full h-full object-cover object-top transition-all duration-1000",
             bannerLoaded ? "opacity-100 scale-100" : "opacity-0 scale-110"
           )}
           onLoad={() => setBannerLoaded(true)}

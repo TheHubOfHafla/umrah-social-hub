@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import FeaturedEvent from "@/components/FeaturedEvent";
@@ -54,13 +53,15 @@ const Index = ({ isAuthenticated = false }: { isAuthenticated?: boolean }) => {
   return (
     <div className="min-h-screen overflow-hidden">
       <main className="pb-8 md:pb-16">
-        <HeroBanner 
-          user={isAuthenticated ? currentUser : undefined} 
-          onLocationSelect={handleLocationSelect}
-          isAuthenticated={isAuthenticated} 
-        />
+        <div className="-mt-16">
+          <HeroBanner 
+            user={isAuthenticated ? currentUser : undefined} 
+            onLocationSelect={handleLocationSelect}
+            isAuthenticated={isAuthenticated} 
+          />
+        </div>
         
-        <div className={`w-full transition-all duration-700 delay-100 ${animateContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+        <div className={`w-full -mt-32 transition-all duration-700 delay-100 ${animateContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
           <TopicsAndPicks />
         </div>
         
