@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -65,7 +66,7 @@ const Navbar = ({ isAuthenticated = true }: { isAuthenticated?: boolean }) => {
             <NavigationMenuList>
               {navigation.map(item => <NavigationMenuItem key={item.href}>
                   <NavigationMenuLink asChild className={cn(
-                    "px-3 md:px-4 py-2 text-base md:text-lg lg:text-xl tracking-wide transition-all duration-200 rounded-md",
+                    "px-3 md:px-4 py-2 text-base md:text-md lg:text-lg font-semibold tracking-wide transition-all duration-200 rounded-md",
                     "hover:text-primary hover:bg-primary/10 hover:scale-105",
                     item.active 
                       ? "text-primary border-b-2 border-primary" 
@@ -164,7 +165,7 @@ const Navbar = ({ isAuthenticated = true }: { isAuthenticated?: boolean }) => {
                 key={item.href} 
                 onClick={() => handleNavigation(item.href)}
                 className={cn(
-                  "px-4 py-2.5 text-lg rounded-md transition-all duration-200 w-full text-left", 
+                  "px-4 py-2.5 text-lg rounded-md transition-all duration-200 font-semibold w-full text-left", 
                   item.active 
                     ? "bg-primary/10 text-primary" 
                     : "text-foreground/90 hover:bg-primary/10 hover:text-primary"
