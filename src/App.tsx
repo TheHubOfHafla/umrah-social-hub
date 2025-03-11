@@ -236,6 +236,7 @@ const App = () => {
                   <ContactUs />
                 </PageWrapper>
               } />
+              <Route path="/events/:eventId/verify/:confirmationCode" element={<VerifyTicketPage />} />
               <Route path="*" element={
                 <PageWrapper>
                   <NotFound />

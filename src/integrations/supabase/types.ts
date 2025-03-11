@@ -117,6 +117,45 @@ export type Database = {
           },
         ]
       }
+      event_confirmations: {
+        Row: {
+          confirmation_code: string
+          created_at: string | null
+          email_sent: boolean | null
+          event_id: string
+          id: string
+          qr_code_url: string | null
+          status: string | null
+          ticket_type: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          confirmation_code: string
+          created_at?: string | null
+          email_sent?: boolean | null
+          event_id: string
+          id?: string
+          qr_code_url?: string | null
+          status?: string | null
+          ticket_type?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          confirmation_code?: string
+          created_at?: string | null
+          email_sent?: boolean | null
+          event_id?: string
+          id?: string
+          qr_code_url?: string | null
+          status?: string | null
+          ticket_type?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       events: {
         Row: {
           attendee_type: string | null

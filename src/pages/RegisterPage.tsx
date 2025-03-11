@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
@@ -5,6 +6,7 @@ import { format } from "date-fns";
 import { ChevronLeft, Calendar, MapPin, Clock, Info, CreditCard, Check } from "lucide-react";
 
 import { getEventById, registerForEvent } from "@/lib/data/queries";
+import { supabase } from "@/integrations/supabase/client";
 import Button from "@/components/Button";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -24,6 +26,10 @@ const RegisterPage = () => {
   const [email, setEmail] = useState("");
   const [confirmationOpen, setConfirmationOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [confirmationData, setConfirmationData] = useState<{
+    confirmationCode: string;
+    qrCodeUrl: string;
+  } | null>(null);
 
   const { data: event, isLoading } = useQuery({
     queryKey: ['event', eventId],
@@ -31,20 +37,113 @@ const RegisterPage = () => {
     enabled: !!eventId,
   });
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsSubmitting(true);
     
-    // Simulate form submission with a timeout
-    setTimeout(() => {
+    try {
+      // Check if user is authenticated
+      const { data: { session } } = await supabase.auth.getSession();
+      let userId = session?.user?.id;
+      
+      // If not authenticated, create a new account or sign in
+      if (!session) {
+        // Check if user already exists
+        const { data: existingUser, error: checkError } = await supabase
+          .from('profiles')
+          .select('id')
+          .eq('email', email)
+          .maybeSingle();
+        
+        if (checkError) {
+          throw new Error('Error checking user account');
+        }
+        
+        if (existingUser) {
+          // User exists, send magic link
+          const { error: signInError } = await supabase.auth.signInWithOtp({
+            email,
+            options: {
+              emailRedirectTo: window.location.href,
+            }
+          });
+          
+          if (signInError) throw new Error(signInError.message);
+          
+          toast({
+            title: "Login link sent!",
+            description: "Please check your email to complete your registration.",
+          });
+          
+          setIsSubmitting(false);
+          return;
+        } else {
+          // Create new account
+          const { data: newUser, error: signUpError } = await supabase.auth.signUp({
+            email,
+            password: Math.random().toString(36).slice(2, 10), // Generate random password
+            options: {
+              data: {
+                name: `${firstName} ${lastName}`,
+              },
+            }
+          });
+          
+          if (signUpError) throw new Error(signUpError.message);
+          userId = newUser?.user?.id;
+        }
+      }
+      
+      if (!userId) {
+        throw new Error('Could not authenticate user');
+      }
+      
       // Register the user for the event
       if (event) {
+        // Call the registerForEvent function to update the local state
         registerForEvent(event.id);
+
+        // Send the booking confirmation
+        const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-booking-confirmation`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${session?.access_token || ''}`
+          },
+          body: JSON.stringify({
+            eventId: event.id,
+            userId,
+            userName: `${firstName} ${lastName}`,
+            userEmail: email,
+            eventTitle: event.title,
+            eventDate: event.date.start,
+            eventLocation: `${event.location.name}, ${event.location.city}`,
+            ticketType: event.isFree ? 'Free' : 'Standard'
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to send booking confirmation');
+        }
+
+        const data = await response.json();
+        setConfirmationData({
+          confirmationCode: data.confirmationCode,
+          qrCodeUrl: data.qrCodeUrl
+        });
       }
       
       setIsSubmitting(false);
       setConfirmationOpen(true);
-    }, 1500);
+    } catch (error) {
+      console.error('Registration error:', error);
+      toast({
+        title: "Registration failed",
+        description: error instanceof Error ? error.message : "Please try again later.",
+        variant: "destructive"
+      });
+      setIsSubmitting(false);
+    }
   };
 
   const handleConfirm = () => {
@@ -234,6 +333,22 @@ const RegisterPage = () => {
             <p className="text-center text-sm text-muted-foreground">
               We've sent a confirmation email to <span className="font-medium">{email}</span> with all the details.
             </p>
+            
+            {confirmationData && (
+              <div className="mt-4 border rounded-md p-4 w-full">
+                <h3 className="text-center font-medium mb-2">Your Ticket</h3>
+                <div className="flex justify-center mb-3">
+                  <img 
+                    src={confirmationData.qrCodeUrl} 
+                    alt="QR Code" 
+                    className="w-36 h-36"
+                  />
+                </div>
+                <p className="text-center text-xs font-medium">
+                  Confirmation Code: {confirmationData.confirmationCode}
+                </p>
+              </div>
+            )}
           </div>
           <DialogFooter className="sm:justify-center">
             <Button onClick={handleConfirm} className="w-full sm:w-auto">
