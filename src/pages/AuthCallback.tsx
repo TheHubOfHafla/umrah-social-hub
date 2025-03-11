@@ -46,7 +46,7 @@ const AuthCallback = () => {
           description: "You've successfully signed in.",
         });
         
-        // If we were in the middle of a event registration, continue with that
+        // If we were in the middle of an event registration, continue with that
         if (redirectTo.includes('/events/') && redirectTo.includes('/register')) {
           navigate(redirectTo);
         } else {

@@ -71,10 +71,13 @@ const App = () => {
           if (userData) {
             setCurrentUser(userData);
             setUserEventsAttending(userData.eventsAttending || []);
+            console.log("User data loaded:", userData);
           }
         } catch (error) {
           console.error("Error fetching user data:", error);
         }
+      } else {
+        console.log("No active session found");
       }
       
       setIsLoading(false);
@@ -83,17 +86,25 @@ const App = () => {
     checkAuth();
     
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log("Auth state changed:", event);
+      
       if (event === 'SIGNED_IN' && session) {
         setIsAuthenticated(true);
-        const userData = await fetchCurrentUser();
-        if (userData) {
-          setCurrentUser(userData);
-          setUserEventsAttending(userData.eventsAttending || []);
+        try {
+          const userData = await fetchCurrentUser();
+          if (userData) {
+            setCurrentUser(userData);
+            setUserEventsAttending(userData.eventsAttending || []);
+            console.log("User data loaded after sign in:", userData);
+          }
+        } catch (error) {
+          console.error("Error fetching user data after sign in:", error);
         }
       } else if (event === 'SIGNED_OUT') {
         setIsAuthenticated(false);
         setCurrentUser(null);
         setUserEventsAttending([]);
+        console.log("User signed out");
       }
     });
     
@@ -103,22 +114,44 @@ const App = () => {
   }, []);
 
   const handleRegisterForEvent = async (eventId: string) => {
-    if (!currentUser) return;
+    if (!currentUser) {
+      console.log("Cannot register: user not authenticated");
+      return;
+    }
     
     const updatedEvents = [...userEventsAttending, eventId];
     setUserEventsAttending(updatedEvents);
     
-    await supabase
-      .from('profiles')
-      .update({ events_attending: updatedEvents })
-      .eq('id', currentUser.id);
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({ events_attending: updatedEvents })
+        .eq('id', currentUser.id);
+        
+      if (error) {
+        console.error("Error updating user events:", error);
+      } else {
+        console.log("Successfully registered for event:", eventId);
+      }
+    } catch (error) {
+      console.error("Failed to update profile:", error);
+    }
   };
   
   const handleSignOut = async () => {
-    await supabase.auth.signOut();
-    setIsAuthenticated(false);
-    setCurrentUser(null);
-    setUserEventsAttending([]);
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        console.error("Error signing out:", error);
+      } else {
+        setIsAuthenticated(false);
+        setCurrentUser(null);
+        setUserEventsAttending([]);
+        console.log("User successfully signed out");
+      }
+    } catch (error) {
+      console.error("Failed to sign out:", error);
+    }
   };
 
   const contextValue = {
