@@ -1,4 +1,3 @@
-
 import { useState, useRef, useEffect } from "react";
 import { X, Send, Loader2, User, Bot, ChevronDown, CornerDownLeft, ThumbsUp, ThumbsDown, Copy, Check, Sparkles } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -52,7 +51,6 @@ const Chatbot = ({ isOpen, onClose, initialMessage = "Hi there! How can I help y
   const { toast } = useToast();
   const navigate = useNavigate();
 
-  // Initialize with welcome message
   useEffect(() => {
     if (isOpen && messages.length === 0) {
       setMessages([
@@ -68,12 +66,10 @@ const Chatbot = ({ isOpen, onClose, initialMessage = "Hi there! How can I help y
     }
   }, [isOpen, initialMessage, messages.length]);
 
-  // Scroll to bottom when messages change
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  // Focus input when chat opens
   useEffect(() => {
     if (isOpen) {
       setTimeout(() => {
@@ -85,10 +81,8 @@ const Chatbot = ({ isOpen, onClose, initialMessage = "Hi there! How can I help y
   const handleSendMessage = async () => {
     if (!input.trim()) return;
     
-    // Generate a unique ID for the message
     const messageId = crypto.randomUUID();
     
-    // Add user message to chat
     const userMessage: Message = {
       id: messageId,
       content: input,
@@ -102,33 +96,28 @@ const Chatbot = ({ isOpen, onClose, initialMessage = "Hi there! How can I help y
     setIsLoading(true);
     
     try {
-      // Show typing indicator
       setIsTyping(true);
       
-      // Get message history for context (excluding the user message we just added)
       const messageHistory = messages.map(msg => ({
         role: msg.role,
         content: msg.content
       }));
       
-      // Call the DeepSeek function
       const response = await callDeepseekChat(input, messageHistory);
       
       setIsTyping(false);
       
-      // Add AI response to chat
       const aiMessage: Message = {
         id: crypto.randomUUID(),
         content: response.message,
         role: "assistant",
         timestamp: new Date(),
         status: "sent",
-        source: response.source
+        source: response.source as "deepseek" | "openai" | "fallback" | "error"
       };
       
       setMessages(prev => [...prev, aiMessage]);
       
-      // Check if response contains navigation intent
       const navigationCheck = checkForNavigation(response.message);
       if (navigationCheck.shouldNavigate) {
         toast({
@@ -149,7 +138,6 @@ const Chatbot = ({ isOpen, onClose, initialMessage = "Hi there! How can I help y
         });
       }
       
-      // Generate new suggested prompts based on the conversation
       generateSuggestedPrompts(aiMessage.content);
       
     } catch (error) {
@@ -157,7 +145,6 @@ const Chatbot = ({ isOpen, onClose, initialMessage = "Hi there! How can I help y
       
       setIsTyping(false);
       
-      // Add AI error response
       const errorMessage: Message = {
         id: crypto.randomUUID(),
         content: "I'm sorry, I'm having trouble responding right now. Please try again later.",
@@ -180,10 +167,8 @@ const Chatbot = ({ isOpen, onClose, initialMessage = "Hi there! How can I help y
   };
 
   const checkForNavigation = (message: string): { shouldNavigate: boolean, path: string, pageName: string } => {
-    // Default response
     const defaultResponse = { shouldNavigate: false, path: "/", pageName: "home" };
     
-    // Check for navigation intents in the message
     const navigationPatterns = [
       { regex: /go to (event|events|all events)/i, path: "/events", pageName: "Events" },
       { regex: /create (an |a |)event/i, path: "/events/create", pageName: "Create Event" },
@@ -206,43 +191,35 @@ const Chatbot = ({ isOpen, onClose, initialMessage = "Hi there! How can I help y
   };
   
   const generateSuggestedPrompts = (aiResponse: string) => {
-    // Base prompts that are always relevant
     const basePrompts = [
       { id: "help", text: "What can you help me with?" },
       { id: "features", text: "What features does this app have?" },
     ];
     
-    // Contextual prompts based on conversation
     const contextualPrompts: SuggestedPrompt[] = [];
     
-    // Add event-related prompts
     if (aiResponse.toLowerCase().includes("event")) {
       contextualPrompts.push({ id: "create", text: "How do I create an event?" });
       contextualPrompts.push({ id: "find", text: "Find events near me" });
     }
     
-    // Add dashboard-related prompts
     if (aiResponse.toLowerCase().includes("dashboard")) {
       contextualPrompts.push({ id: "dashboard", text: "What can I do in my dashboard?" });
     }
     
-    // Add profile-related prompts
     if (aiResponse.toLowerCase().includes("profile")) {
       contextualPrompts.push({ id: "edit", text: "How do I edit my profile?" });
     }
     
-    // Add ticket-related prompts
     if (aiResponse.toLowerCase().includes("ticket")) {
       contextualPrompts.push({ id: "refund", text: "What's the refund policy?" });
     }
     
-    // Combine and limit prompts
     const allPrompts = [...contextualPrompts, ...basePrompts];
     setSuggestedPrompts(allPrompts.slice(0, 4));
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    // Send message on Enter (without shift for new line)
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleSendMessage();
@@ -259,7 +236,6 @@ const Chatbot = ({ isOpen, onClose, initialMessage = "Hi there! How can I help y
       duration: 2000,
     });
     
-    // Reset copy icon after 2 seconds
     setTimeout(() => {
       setCopiedMessageId(null);
     }, 2000);
@@ -291,7 +267,6 @@ const Chatbot = ({ isOpen, onClose, initialMessage = "Hi there! How can I help y
   return (
     <div className="fixed bottom-16 sm:bottom-24 right-4 sm:right-6 z-50 w-[92%] sm:w-full max-w-[380px] rounded-lg shadow-xl transition-all duration-300 ease-in-out">
       <div className="flex flex-col h-[60vh] sm:h-[500px] bg-card border border-border rounded-lg overflow-hidden animate-in slide-in-from-bottom-5">
-        {/* Header */}
         <div className="flex items-center justify-between bg-primary/90 backdrop-blur-sm px-3 sm:px-4 py-2 sm:py-3 text-primary-foreground border-b">
           <div className="flex items-center space-x-2">
             <Avatar className="h-6 w-6 sm:h-8 sm:w-8 ring-2 ring-background/20">
@@ -344,7 +319,6 @@ const Chatbot = ({ isOpen, onClose, initialMessage = "Hi there! How can I help y
           </div>
         </div>
         
-        {/* Chat content */}
         {isExpanded && (
           <>
             <ScrollArea className="flex-grow p-3 sm:p-4 bg-accent/5">
@@ -396,7 +370,6 @@ const Chatbot = ({ isOpen, onClose, initialMessage = "Hi there! How can I help y
                     </div>
                     <p className="text-xs sm:text-sm leading-relaxed whitespace-pre-wrap">{message.content}</p>
                     
-                    {/* Message actions */}
                     {message.role === "assistant" && (
                       <div className="mt-2 flex items-center justify-between">
                         <div className="flex space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -450,7 +423,6 @@ const Chatbot = ({ isOpen, onClose, initialMessage = "Hi there! How can I help y
                 </div>
               ))}
               
-              {/* Typing indicator */}
               {isTyping && (
                 <div className="flex items-center space-x-2 mb-4 max-w-[60%] animate-in fade-in-50">
                   <div className="bg-muted p-3 rounded-lg rounded-tl-none">
@@ -466,7 +438,6 @@ const Chatbot = ({ isOpen, onClose, initialMessage = "Hi there! How can I help y
               <div ref={messagesEndRef} />
             </ScrollArea>
             
-            {/* Suggested prompts */}
             {messages.length > 0 && !isLoading && !isTyping && (
               <div className="px-3 pt-2">
                 <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
@@ -483,7 +454,6 @@ const Chatbot = ({ isOpen, onClose, initialMessage = "Hi there! How can I help y
               </div>
             )}
             
-            {/* Input area */}
             <div className="border-t p-2 sm:p-3 bg-background">
               <div className="flex items-end space-x-2">
                 <div className="flex-grow relative">
