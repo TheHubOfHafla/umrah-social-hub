@@ -86,8 +86,10 @@ gcp_jwt_path = "supabase/gcloud.json"
 port = 54329
 
 # Function-specific configurations
-[functions.ai-event-generator]
+[[functions.function]]
+name = "ai-event-generator"
 verify_jwt = false
 
-[functions.deepseek-chat]
+[[functions.function]]
+name = "deepseek-chat"
 verify_jwt = false
