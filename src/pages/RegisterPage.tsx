@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
@@ -95,9 +96,10 @@ const RegisterPage = () => {
       if (event) {
         await registerForEvent(event.id, userId);
 
-        const supabaseUrl = supabase.supabaseUrl;
+        // Access Supabase URL from a fixed value instead of using the protected property
+        const supabaseUrl = "https://annunwfjlsgrrcqfkykd.supabase.co";
         if (!supabaseUrl) {
-          throw new Error('Missing Supabase URL in environment variables');
+          throw new Error('Missing Supabase URL');
         }
         
         const response = await fetch(`${supabaseUrl}/functions/v1/send-booking-confirmation`, {

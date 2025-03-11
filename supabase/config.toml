@@ -93,3 +93,7 @@ verify_jwt = false
 [[functions.function]]
 name = "deepseek-chat"
 verify_jwt = false
+
+[[functions.function]]
+name = "send-booking-confirmation"
+verify_jwt = false
