@@ -1,5 +1,5 @@
 
-import { User, EventCategory } from '@/types';
+import { User, EventCategory, UserRole } from '@/types';
 import { supabase } from '@/integrations/supabase/client';
 
 export const currentUser: User = {
@@ -51,7 +51,7 @@ export const fetchCurrentUser = async (): Promise<User | null> => {
       .eq('user_id', user.id)
       .single();
     
-    const role = organizer ? 'organizer' : 'attendee';
+    const role: UserRole = organizer ? 'organizer' : 'attendee';
     
     console.log("User profile loaded:", profile);
     

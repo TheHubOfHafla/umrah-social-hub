@@ -1,3 +1,4 @@
+
 export type EventCategory = 
   | 'charity'
   | 'community'
@@ -32,6 +33,8 @@ export type EventOrganizer = {
 
 export type AttendeeType = 'ladies-only' | 'couples' | 'mixed' | 'men-only';
 
+export type UserRole = 'attendee' | 'organizer';
+
 export type User = {
   id: string;
   name: string;
@@ -46,6 +49,7 @@ export type User = {
   email?: string; // Added for CRM
   phone?: string; // Added for CRM
   signupDate?: string; // Added for CRM
+  role?: UserRole; // Added for role-based access control
 };
 
 export type EventAttendee = {
