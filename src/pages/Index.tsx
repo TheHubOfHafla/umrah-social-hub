@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { Link } from "react-router-dom";
 import FeaturedEvent from "@/components/FeaturedEvent";
 import HeroBanner from "@/components/HeroBanner";
@@ -13,15 +13,16 @@ import Button from "@/components/Button";
 import EventGrid from "@/components/EventGrid";
 import { EventCategory } from "@/types";
 import { categories } from "@/lib/data/categories";
-import { currentUser } from "@/lib/data/users";
 import { 
   getFeaturedEvents,
   getRecommendedEvents, 
   getEventsByCategory,
   getPopularEvents,
 } from "@/lib/data/queries";
+import { AuthContext } from "@/App";
 
-const Index = ({ isAuthenticated = false }: { isAuthenticated?: boolean }) => {
+const Index = () => {
+  const { isAuthenticated, currentUser } = useContext(AuthContext);
   const [selectedCategories, setSelectedCategories] = useState<EventCategory[]>([]);
   const [selectedLocation, setSelectedLocation] = useState("");
   const [featuredEvents, setFeaturedEvents] = useState(getFeaturedEvents());
@@ -29,7 +30,7 @@ const Index = ({ isAuthenticated = false }: { isAuthenticated?: boolean }) => {
   const [trendingEvents, setTrendingEvents] = useState(getPopularEvents().slice(3, 9));
   const [upcomingEvents, setUpcomingEvents] = useState(getFeaturedEvents().slice(1, 7));
   const [recommendedEvents, setRecommendedEvents] = useState(
-    isAuthenticated 
+    isAuthenticated && currentUser
       ? getRecommendedEvents(currentUser.id).slice(0, 12) // Get up to 12 events for the 3x4 grid
       : [] // No recommendations for guests
   );
@@ -39,6 +40,15 @@ const Index = ({ isAuthenticated = false }: { isAuthenticated?: boolean }) => {
   useEffect(() => {
     setTimeout(() => setAnimateContent(true), 300);
   }, []);
+
+  useEffect(() => {
+    // Update recommended events when auth state changes
+    if (isAuthenticated && currentUser) {
+      setRecommendedEvents(getRecommendedEvents(currentUser.id).slice(0, 12));
+    } else {
+      setRecommendedEvents([]);
+    }
+  }, [isAuthenticated, currentUser]);
 
   const handleLocationSelect = (location: string) => {
     setSelectedLocation(location);

@@ -1,13 +1,16 @@
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { NavigationMenu, NavigationMenuItem, NavigationMenuLink, NavigationMenuList } from "@/components/ui/navigation-menu";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Bell, Calendar, ChevronDown, LogIn, Menu, User, UserPlus, X, Plus, UserRound, Zap } from "lucide-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
+import { Bell, Calendar, ChevronDown, LogIn, Menu, User, UserPlus, X, Plus, UserRound, Zap, LogOut, Settings, Building } from "lucide-react";
 import UserAvatar from "./UserAvatar";
 import { currentUser } from "@/lib/data/users";
+import { AuthContext } from "@/App";
+import { Badge } from "@/components/ui/badge";
+import { motion } from "framer-motion";
 
 interface NavItem {
   label: string;
@@ -31,6 +34,10 @@ const Navbar = ({ isAuthenticated = true }: { isAuthenticated?: boolean }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
+  const auth = useContext(AuthContext);
+  
+  const userRole = auth.currentUser?.role || 'attendee';
+  const isOrganizer = userRole === 'organizer';
 
   useEffect(() => {
     const handleScroll = () => {
@@ -59,13 +66,13 @@ const Navbar = ({ isAuthenticated = true }: { isAuthenticated?: boolean }) => {
       className={cn(
         "fixed top-0 left-0 right-0 z-50 transition-all duration-300", 
         isScrolled 
-          ? "py-2 bg-background/90 backdrop-blur-md shadow-sm border-b border-primary/10" 
+          ? "py-2 bg-background/95 backdrop-blur-md shadow-sm border-b border-primary/10" 
           : "py-2 md:py-3 bg-transparent"
       )}
     >
       <div className="container flex items-center justify-between">
         {/* Logo */}
-        <div className="absolute left-1/2 transform -translate-x-1/2 z-10">
+        <div className="relative flex items-center z-10">
           <button 
             onClick={() => handleNavigation("/")} 
             className="flex items-center gap-1 md:gap-2 group"
@@ -77,9 +84,9 @@ const Navbar = ({ isAuthenticated = true }: { isAuthenticated?: boolean }) => {
           </button>
         </div>
 
-        {/* Left Side Navigation */}
-        <div className="flex items-center flex-shrink-0">
-          <NavigationMenu className="hidden md:flex">
+        {/* Center Navigation */}
+        <div className="hidden md:flex items-center justify-center absolute left-1/2 transform -translate-x-1/2">
+          <NavigationMenu>
             <NavigationMenuList>
               {navigation.map(item => (
                 <NavigationMenuItem key={item.href}>
@@ -121,12 +128,21 @@ const Navbar = ({ isAuthenticated = true }: { isAuthenticated?: boolean }) => {
             {isAuthenticated ? (
               <>
                 {/* Notifications */}
-                <Button variant="ghost" size="icon" className="hover:bg-primary/10 hover:text-primary transition-all duration-200">
+                <Button variant="ghost" size="icon" className="hover:bg-primary/10 hover:text-primary transition-all duration-200 relative">
                   <Bell className="h-4 w-4" />
+                  <motion.div 
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    className="absolute -top-1 -right-1"
+                  >
+                    <Badge variant="destructive" className="h-4 w-4 p-0 flex items-center justify-center text-[10px]">
+                      3
+                    </Badge>
+                  </motion.div>
                 </Button>
                 
                 {/* Profile Quick Access */}
-                <button onClick={() => handleNavigation("/dashboard/profile")}>
+                <button onClick={() => handleNavigation(isOrganizer ? "/organizer/profile" : "/dashboard/profile")}>
                   <Button variant="outline" size="sm" className="flex items-center gap-1 hover:bg-primary/10 hover:text-primary transition-all duration-200 hidden lg:flex">
                     <UserRound className="h-3 w-3 md:h-4 md:w-4" />
                     <span className="text-xs md:text-sm">Profile</span>
@@ -137,18 +153,60 @@ const Navbar = ({ isAuthenticated = true }: { isAuthenticated?: boolean }) => {
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" size="sm" className="flex items-center gap-1 hover:bg-primary/10 hover:text-primary transition-all duration-200 px-1">
-                      <UserAvatar user={currentUser} size="sm" />
+                      <UserAvatar user={auth.currentUser || currentUser} size="sm" />
                       <ChevronDown className="h-3 w-3 md:h-4 md:w-4 text-muted-foreground" />
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-48 md:w-56">
-                    <DropdownMenuItem className="hover:bg-primary/10 hover:text-primary" onClick={() => handleNavigation("/dashboard")}>
+                    <div className="flex items-center gap-2 p-2 border-b">
+                      <UserAvatar user={auth.currentUser || currentUser} size="sm" />
+                      <div className="flex flex-col">
+                        <span className="font-medium text-sm">{auth.currentUser?.name || currentUser.name}</span>
+                        <span className="text-xs text-muted-foreground">
+                          {isOrganizer ? (
+                            <span className="flex items-center gap-1">
+                              <Building className="h-3 w-3" />
+                              Organizer
+                            </span>
+                          ) : (
+                            <span className="flex items-center gap-1">
+                              <UserRound className="h-3 w-3" />
+                              Attendee
+                            </span>
+                          )}
+                        </span>
+                      </div>
+                    </div>
+
+                    <DropdownMenuItem className="hover:bg-primary/10 hover:text-primary" onClick={() => 
+                      handleNavigation(isOrganizer ? "/organizer" : "/dashboard")
+                    }>
                       <User className="mr-2 h-4 w-4" />
                       Dashboard
                     </DropdownMenuItem>
-                    <DropdownMenuItem className="hover:bg-primary/10 hover:text-primary" onClick={() => handleNavigation("/dashboard/events")}>
+
+                    <DropdownMenuItem className="hover:bg-primary/10 hover:text-primary" onClick={() => 
+                      handleNavigation(isOrganizer ? "/organizer/events" : "/dashboard/events")
+                    }>
                       <Calendar className="mr-2 h-4 w-4" />
-                      My Events
+                      {isOrganizer ? "My Events" : "Events I'm Attending"}
+                    </DropdownMenuItem>
+
+                    <DropdownMenuItem className="hover:bg-primary/10 hover:text-primary" onClick={() => 
+                      handleNavigation(isOrganizer ? "/organizer/profile" : "/dashboard/profile")
+                    }>
+                      <Settings className="mr-2 h-4 w-4" />
+                      Settings
+                    </DropdownMenuItem>
+
+                    <DropdownMenuSeparator />
+                    
+                    <DropdownMenuItem 
+                      className="hover:bg-red-50 hover:text-red-600 focus:bg-red-50 focus:text-red-600" 
+                      onClick={auth.onSignOut}
+                    >
+                      <LogOut className="mr-2 h-4 w-4" />
+                      Sign Out
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -191,6 +249,28 @@ const Navbar = ({ isAuthenticated = true }: { isAuthenticated?: boolean }) => {
         )}
       >
         <div className="container py-4">
+          {isAuthenticated && (
+            <div className="flex items-center gap-3 p-4 mb-3 border rounded-lg bg-muted/30">
+              <UserAvatar user={auth.currentUser || currentUser} size="md" />
+              <div className="flex flex-col">
+                <span className="font-medium">{auth.currentUser?.name || currentUser.name}</span>
+                <span className="text-xs text-muted-foreground flex items-center gap-1">
+                  {isOrganizer ? (
+                    <>
+                      <Building className="h-3 w-3" />
+                      Organizer Account
+                    </>
+                  ) : (
+                    <>
+                      <UserRound className="h-3 w-3" />
+                      Attendee Account
+                    </>
+                  )}
+                </span>
+              </div>
+            </div>
+          )}
+
           <div className="flex flex-col space-y-3">
             {navigation.map(item => (
               <button 
@@ -220,25 +300,32 @@ const Navbar = ({ isAuthenticated = true }: { isAuthenticated?: boolean }) => {
             {isAuthenticated ? (
               <>
                 <button 
-                  onClick={() => handleNavigation("/dashboard/profile")} 
+                  onClick={() => handleNavigation(isOrganizer ? "/organizer/profile" : "/dashboard/profile")} 
                   className="px-4 py-2.5 text-base rounded-md hover:bg-primary/10 hover:text-primary transition-all duration-200 flex items-center w-full text-left"
                 >
                   <UserRound className="mr-2 h-4 w-4" />
                   My Profile
                 </button>
                 <button 
-                  onClick={() => handleNavigation("/dashboard")} 
+                  onClick={() => handleNavigation(isOrganizer ? "/organizer" : "/dashboard")} 
                   className="px-4 py-2.5 text-base rounded-md hover:bg-primary/10 hover:text-primary transition-all duration-200 flex items-center w-full text-left"
                 >
                   <User className="mr-2 h-4 w-4" />
                   Dashboard
                 </button>
                 <button 
-                  onClick={() => handleNavigation("/dashboard/events")} 
+                  onClick={() => handleNavigation(isOrganizer ? "/organizer/events" : "/dashboard/events")} 
                   className="px-4 py-2.5 text-base rounded-md hover:bg-primary/10 hover:text-primary transition-all duration-200 flex items-center w-full text-left"
                 >
                   <Calendar className="mr-2 h-4 w-4" />
-                  My Events
+                  {isOrganizer ? "My Events" : "Events I'm Attending"}
+                </button>
+                <button 
+                  onClick={auth.onSignOut} 
+                  className="px-4 py-2.5 text-base rounded-md hover:bg-red-100 text-red-600 transition-all duration-200 flex items-center w-full text-left mt-4"
+                >
+                  <LogOut className="mr-2 h-4 w-4" />
+                  Sign Out
                 </button>
               </>
             ) : (
