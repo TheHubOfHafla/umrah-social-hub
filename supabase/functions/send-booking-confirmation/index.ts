@@ -17,6 +17,7 @@ serve(async (req) => {
   try {
     const { eventId, userId, userName, userEmail, eventTitle, eventDate, eventLocation, ticketType } = await req.json();
     
+    // Check for required fields
     if (!eventId || !userId || !userEmail || !eventTitle) {
       return new Response(
         JSON.stringify({ error: 'Missing required parameters' }),
@@ -26,28 +27,36 @@ serve(async (req) => {
 
     console.log(`Processing booking confirmation for event "${eventTitle}" for user "${userName}" (${userEmail})`);
 
-    // Generate a unique confirmation code
-    const confirmationCode = `${eventId.substring(0, 6)}-${Date.now().toString(36)}`;
+    // Generate a unique confirmation code - ensure eventId is a string
+    const eventIdString = String(eventId);
+    const confirmationCode = `${eventIdString.substring(0, 6)}-${Date.now().toString(36)}`;
     
-    // Generate QR code
-    const verificationUrl = `${new URL(req.url).origin}/events/${eventId}/verify/${confirmationCode}`;
+    // Generate QR code with proper URL
+    const requestUrl = new URL(req.url);
+    const verificationUrl = `${requestUrl.origin}/events/${eventId}/verify/${confirmationCode}`;
     console.log(`Generated verification URL: ${verificationUrl}`);
-    const qrCodeDataURL = await QRCode.toDataURL(verificationUrl);
     
-    // In a production environment, we would store booking confirmation in the database
-    // and send an email to the user with the QR code
-    
-    console.log(`Booking confirmation processed successfully for ${userName} (${userEmail}) for event ${eventTitle}`);
-    
-    return new Response(
-      JSON.stringify({ 
-        success: true, 
-        message: 'Booking confirmation created successfully',
-        confirmationCode,
-        qrCodeUrl: qrCodeDataURL
-      }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    );
+    try {
+      const qrCodeDataURL = await QRCode.toDataURL(verificationUrl);
+      
+      console.log(`Booking confirmation processed successfully for ${userName} (${userEmail}) for event ${eventTitle}`);
+      
+      return new Response(
+        JSON.stringify({ 
+          success: true, 
+          message: 'Booking confirmation created successfully',
+          confirmationCode,
+          qrCodeUrl: qrCodeDataURL
+        }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    } catch (qrError) {
+      console.error('QR code generation error:', qrError);
+      return new Response(
+        JSON.stringify({ error: 'Failed to generate QR code' }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
   } catch (error) {
     console.error('Error in send-booking-confirmation function:', error);
     return new Response(

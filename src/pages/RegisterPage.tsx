@@ -95,7 +95,7 @@ const RegisterPage = () => {
       if (event) {
         await registerForEvent(event.id, userId);
 
-        const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+        const supabaseUrl = supabase.supabaseUrl;
         if (!supabaseUrl) {
           throw new Error('Missing Supabase URL in environment variables');
         }
