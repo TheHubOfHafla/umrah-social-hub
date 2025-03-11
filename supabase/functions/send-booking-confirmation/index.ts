@@ -32,12 +32,12 @@ serve(async (req) => {
     const confirmationCode = `${Date.now().toString(36)}-${Math.random().toString(36).substring(2, 8)}`;
     
     // Generate QR code with proper URL
-    const requestUrl = new URL(req.url);
-    // Use the original eventId for the verification URL, whether it's a UUID or not
-    const verificationUrl = `${requestUrl.origin}/events/${eventId}/verify/${confirmationCode}`;
-    console.log(`Generated verification URL: ${verificationUrl}`);
-    
     try {
+      const requestUrl = new URL(req.url);
+      // Use the original eventId for the verification URL, whether it's a UUID or not
+      const verificationUrl = `${requestUrl.origin}/events/${eventId}/verify/${confirmationCode}`;
+      console.log(`Generated verification URL: ${verificationUrl}`);
+      
       const qrCodeDataURL = await QRCode.toDataURL(verificationUrl);
       
       console.log(`Booking confirmation processed successfully for ${userName} (${userEmail}) for event ${eventTitle}`);

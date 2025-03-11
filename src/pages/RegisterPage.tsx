@@ -17,6 +17,7 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 
 const SUPABASE_URL = "https://annunwfjlsgrrcqfkykd.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFubnVud2ZqbHNncnJjcWZreWtkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDEyMjM2NTIsImV4cCI6MjA1Njc5OTY1Mn0._Is_Kgi8wTHsQ3Z1h87JkrliCtj8lWijCJaRBJBPBCU";
 
 const RegisterPage = () => {
   const { eventId } = useParams<{ eventId: string }>();
@@ -104,7 +105,7 @@ const RegisterPage = () => {
               headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${session?.access_token || ''}`,
-                'apikey': supabase.supabaseKey,
+                'apikey': SUPABASE_ANON_KEY,
               },
               body: JSON.stringify({
                 event_id: event.id,
@@ -124,7 +125,8 @@ const RegisterPage = () => {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
-              'Authorization': `Bearer ${session?.access_token || ''}`
+              'Authorization': `Bearer ${session?.access_token || ''}`,
+              'apikey': SUPABASE_ANON_KEY
             },
             body: JSON.stringify({
               eventId: event.id,
