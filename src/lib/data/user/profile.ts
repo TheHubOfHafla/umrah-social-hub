@@ -1,5 +1,5 @@
 
-import { User, UserRole } from '@/types';
+import { User, UserRole, EventCategory } from '@/types';
 import { supabase } from '@/integrations/supabase/client';
 
 // Fetch the currently authenticated user profile
