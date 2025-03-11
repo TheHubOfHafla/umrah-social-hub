@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
@@ -42,13 +41,10 @@ const RegisterPage = () => {
     setIsSubmitting(true);
     
     try {
-      // Check if user is authenticated
       const { data: { session } } = await supabase.auth.getSession();
       let userId = session?.user?.id;
       
-      // If not authenticated, create a new account or sign in
       if (!session) {
-        // Check if user already exists
         const { data: existingUser, error: checkError } = await supabase
           .from('profiles')
           .select('id')
@@ -60,7 +56,6 @@ const RegisterPage = () => {
         }
         
         if (existingUser) {
-          // User exists, send magic link
           const { error: signInError } = await supabase.auth.signInWithOtp({
             email,
             options: {
@@ -78,10 +73,9 @@ const RegisterPage = () => {
           setIsSubmitting(false);
           return;
         } else {
-          // Create new account
           const { data: newUser, error: signUpError } = await supabase.auth.signUp({
             email,
-            password: Math.random().toString(36).slice(2, 10), // Generate random password
+            password: Math.random().toString(36).slice(2, 10),
             options: {
               data: {
                 name: `${firstName} ${lastName}`,
@@ -98,12 +92,9 @@ const RegisterPage = () => {
         throw new Error('Could not authenticate user');
       }
       
-      // Register the user for the event
       if (event) {
-        // Call the registerForEvent function to update the local state
-        registerForEvent(event.id);
+        await registerForEvent(event.id, userId);
 
-        // Send the booking confirmation
         const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-booking-confirmation`, {
           method: 'POST',
           headers: {
