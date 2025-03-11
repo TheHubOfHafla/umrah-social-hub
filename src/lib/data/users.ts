@@ -44,13 +44,22 @@ export const fetchCurrentUser = async (): Promise<User | null> => {
       return null;
     }
     
+    // Check if user is an organizer
+    const { data: organizer } = await supabase
+      .from('organizers')
+      .select('*')
+      .eq('user_id', user.id)
+      .single();
+    
+    const role = organizer ? 'organizer' : 'attendee';
+    
     console.log("User profile loaded:", profile);
     
     return {
       id: profile.id,
       name: profile.name || '',
       avatar: profile.avatar || '/placeholder.svg',
-      interests: (profile.interests || []) as EventCategory[], // Explicitly cast to EventCategory[]
+      interests: (profile.interests || []) as EventCategory[],
       location: {
         city: profile.city || '',
         country: profile.country || '',
@@ -60,6 +69,7 @@ export const fetchCurrentUser = async (): Promise<User | null> => {
       email: profile.email,
       phone: profile.phone,
       signupDate: profile.signup_date,
+      role: role,
     };
   } catch (error) {
     console.error("Error in fetchCurrentUser:", error);

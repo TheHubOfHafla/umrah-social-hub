@@ -12,9 +12,10 @@ const AuthCallback = () => {
   const [message, setMessage] = useState("Completing authentication...");
 
   useEffect(() => {
-    // Parse the URL to get any redirect path
+    // Parse the URL to get any redirect path and role preference
     const params = new URLSearchParams(location.search);
     const redirectTo = params.get('redirectTo') || '/';
+    const preferredRole = params.get('role') || 'attendee';
     
     // Handle the OAuth callback
     const handleAuthCallback = async () => {
@@ -41,15 +42,56 @@ const AuthCallback = () => {
         // User is authenticated
         setMessage("Authentication successful! Redirecting...");
         
+        // Get the user's metadata to determine if they're new and need role setup
+        const { data: userData } = await supabase.auth.getUser();
+        const userId = userData?.user?.id;
+        const userMetadata = userData?.user?.user_metadata;
+        const isNewUser = userData?.user?.app_metadata?.provider === 'google' && 
+                         !userMetadata?.role;
+        
+        // For new Google users, we need to update their profile with a role
+        if (isNewUser && userId) {
+          try {
+            // Update user metadata with the preferred role
+            await supabase.auth.updateUser({
+              data: {
+                role: preferredRole,
+                name: userMetadata?.full_name || userMetadata?.name || 'User'
+              }
+            });
+            
+            // If they chose to be an organizer, create an organizer profile
+            if (preferredRole === 'organizer') {
+              const { error: organizerError } = await supabase
+                .from('organizers')
+                .insert({
+                  user_id: userId,
+                  name: userMetadata?.full_name || userMetadata?.name || 'Organizer'
+                });
+                
+              if (organizerError) {
+                console.error("Error creating organizer profile:", organizerError);
+              }
+            }
+          } catch (updateError) {
+            console.error("Error updating user:", updateError);
+          }
+        }
+        
         toast({
           title: "Welcome to HaflaHub!",
           description: "You've successfully signed in.",
         });
         
-        // If we were in the middle of an event registration, continue with that
+        // Determine where to redirect the user based on role and context
         if (redirectTo.includes('/events/') && redirectTo.includes('/register')) {
+          // Continue with event registration
           navigate(redirectTo);
+        } else if (userMetadata?.role === 'organizer' || preferredRole === 'organizer') {
+          // Redirect organizers to their dashboard
+          navigate("/organizer");
         } else {
+          // Regular attendees go to home page
           navigate("/");
         }
       } else {

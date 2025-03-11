@@ -1,9 +1,10 @@
+
 import { useState, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Eye, EyeOff, LogIn, Mail, Lock, AlertCircle, Loader2, Github } from "lucide-react";
+import { Eye, EyeOff, LogIn, Mail, Lock, AlertCircle, Loader2, UserRound, Building } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -16,6 +17,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Separator } from "@/components/ui/separator";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useToast } from "@/hooks/use-toast";
 import { AuthContext } from "@/App";
 import { supabase } from "@/integrations/supabase/client";
@@ -33,6 +35,7 @@ const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
+  const [preferredRole, setPreferredRole] = useState<'attendee' | 'organizer'>('attendee');
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -59,12 +62,21 @@ const Login = () => {
         throw error;
       }
       
+      // Check user metadata for role
+      const userData = await supabase.auth.getUser();
+      const userRole = userData?.data?.user?.user_metadata?.role;
+      
       toast({
         title: "Welcome back!",
         description: "You have successfully signed in.",
       });
       
-      navigate("/");
+      // Redirect based on role
+      if (userRole === 'organizer') {
+        navigate("/organizer");
+      } else {
+        navigate("/");
+      }
     } catch (error: any) {
       console.error("Login error:", error);
       setAuthError(error.message || "Invalid email or password. Please try again.");
@@ -82,7 +94,11 @@ const Login = () => {
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
+          redirectTo: `${window.location.origin}/auth/callback?role=${preferredRole}`,
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'consent',
+          },
         },
       });
       
@@ -177,14 +193,6 @@ const Login = () => {
               )}
             />
 
-            <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                <Link to="#" className="text-sm font-medium text-primary hover:underline">
-                  Forgot password?
-                </Link>
-              </div>
-            </div>
-
             <Button 
               type="submit" 
               className="w-full" 
@@ -217,7 +225,37 @@ const Login = () => {
             </div>
           </div>
 
-          <div className="mt-6 grid grid-cols-1 gap-3">
+          <div className="mt-4 space-y-4">
+            <div className="space-y-2">
+              <p className="text-sm text-muted-foreground text-center">Select account type for Google Sign In:</p>
+              <RadioGroup
+                value={preferredRole}
+                onValueChange={(value: 'attendee' | 'organizer') => setPreferredRole(value)}
+                className="flex flex-col space-y-1"
+              >
+                <div className="flex items-center space-x-2 rounded-md border p-2 hover:bg-accent">
+                  <RadioGroupItem value="attendee" id="google-attendee" />
+                  <label
+                    htmlFor="google-attendee"
+                    className="flex flex-1 cursor-pointer items-center gap-2"
+                  >
+                    <UserRound className="h-4 w-4 text-primary" />
+                    <span className="text-sm">Attendee</span>
+                  </label>
+                </div>
+                <div className="flex items-center space-x-2 rounded-md border p-2 hover:bg-accent">
+                  <RadioGroupItem value="organizer" id="google-organizer" />
+                  <label
+                    htmlFor="google-organizer"
+                    className="flex flex-1 cursor-pointer items-center gap-2"
+                  >
+                    <Building className="h-4 w-4 text-primary" />
+                    <span className="text-sm">Organizer</span>
+                  </label>
+                </div>
+              </RadioGroup>
+            </div>
+
             <Button
               type="button"
               variant="outline"
@@ -228,7 +266,7 @@ const Login = () => {
               <svg className="mr-2 h-4 w-4" aria-hidden="true" focusable="false" data-prefix="fab" data-icon="google" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 488 512">
                 <path fill="currentColor" d="M488 261.8C488 403.3 391.1 504 248 504 110.8 504 0 393.2 0 256S110.8 8 248 8c66.8 0 123 24.5 166.3 64.9l-67.5 64.9C258.5 52.6 94.3 116.6 94.3 256c0 86.5 69.1 156.6 153.7 156.6 98.2 0 135-70.4 140.8-106.9H248v-85.3h236.1c2.3 12.7 3.9 24.9 3.9 41.4z"></path>
               </svg>
-              Google
+              Sign in with Google
             </Button>
           </div>
         </div>
