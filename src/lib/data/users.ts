@@ -51,7 +51,13 @@ export const fetchCurrentUser = async (): Promise<User | null> => {
       .eq('user_id', user.id)
       .single();
     
-    const role: UserRole = organizer ? 'organizer' : 'attendee';
+    // Get role from user metadata or determine based on organizer record
+    let role: UserRole;
+    if (user.user_metadata?.role === 'organizer' || organizer) {
+      role = 'organizer';
+    } else {
+      role = 'attendee';
+    }
     
     console.log("User profile loaded:", profile);
     

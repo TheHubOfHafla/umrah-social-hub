@@ -91,8 +91,8 @@ const AuthCallback = () => {
           // Redirect organizers to their dashboard
           navigate("/organizer");
         } else {
-          // Regular attendees go to home page
-          navigate("/");
+          // Regular attendees go to dashboard
+          navigate("/dashboard");
         }
       } else {
         // No session found

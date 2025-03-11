@@ -99,7 +99,7 @@ const Signup = () => {
       if (values.role === "organizer") {
         navigate("/organizer");
       } else {
-        navigate("/");
+        navigate("/dashboard");
       }
     } catch (error: any) {
       console.error("Signup error:", error);

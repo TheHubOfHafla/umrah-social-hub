@@ -1,6 +1,6 @@
 
 import React from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
@@ -12,12 +12,15 @@ import {
   User, 
   Users, 
   Menu, 
-  X
+  X,
+  LogOut
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import UserAvatar from "@/components/UserAvatar";
 import { User as UserType } from "@/types";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -33,6 +36,8 @@ interface NavItem {
 
 const DashboardLayout = ({ children, user, type }: DashboardLayoutProps) => {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { toast } = useToast();
   const [sidebarOpen, setSidebarOpen] = React.useState(false);
 
   const baseRoute = type === "user" ? "/dashboard" : "/organizer";
@@ -68,6 +73,28 @@ const DashboardLayout = ({ children, user, type }: DashboardLayoutProps) => {
       icon: Settings,
     });
   }
+
+  const handleSignOut = async () => {
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        console.error("Error signing out:", error);
+        toast({
+          title: "Error",
+          description: "Failed to sign out. Please try again.",
+          variant: "destructive"
+        });
+      } else {
+        toast({
+          title: "Signed out",
+          description: "You have been successfully signed out."
+        });
+        navigate("/");
+      }
+    } catch (error) {
+      console.error("Error in sign out:", error);
+    }
+  };
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -132,7 +159,16 @@ const DashboardLayout = ({ children, user, type }: DashboardLayoutProps) => {
             </div>
           </ScrollArea>
 
-          <div className="absolute bottom-0 left-0 right-0 border-t p-4">
+          <div className="absolute bottom-0 left-0 right-0 border-t p-4 space-y-2">
+            <Button 
+              variant="destructive" 
+              className="w-full justify-start" 
+              size="sm"
+              onClick={handleSignOut}
+            >
+              <LogOut className="mr-2 h-4 w-4" />
+              Sign Out
+            </Button>
             <Link to="/">
               <Button 
                 variant="outline" 
