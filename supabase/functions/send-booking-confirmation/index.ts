@@ -26,13 +26,14 @@ serve(async (req) => {
     }
 
     console.log(`Processing booking confirmation for event "${eventTitle}" for user "${userName}" (${userEmail})`);
+    console.log(`Event ID: ${eventId}, User ID: ${userId}`);
 
-    // Generate a unique confirmation code - ensure eventId is a string
-    const eventIdString = String(eventId);
-    const confirmationCode = `${eventIdString.substring(0, 6)}-${Date.now().toString(36)}`;
+    // Generate a more robust confirmation code
+    const confirmationCode = `${Date.now().toString(36)}-${Math.random().toString(36).substring(2, 8)}`;
     
     // Generate QR code with proper URL
     const requestUrl = new URL(req.url);
+    // Use the original eventId for the verification URL, whether it's a UUID or not
     const verificationUrl = `${requestUrl.origin}/events/${eventId}/verify/${confirmationCode}`;
     console.log(`Generated verification URL: ${verificationUrl}`);
     
@@ -53,7 +54,7 @@ serve(async (req) => {
     } catch (qrError) {
       console.error('QR code generation error:', qrError);
       return new Response(
-        JSON.stringify({ error: 'Failed to generate QR code' }),
+        JSON.stringify({ error: 'Failed to generate QR code', details: qrError instanceof Error ? qrError.message : String(qrError) }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }

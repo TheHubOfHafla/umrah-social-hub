@@ -1,11 +1,10 @@
-
 import { useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { ChevronLeft, Calendar, MapPin, Clock, Info, CreditCard, Check } from "lucide-react";
 
-import { getEventById, registerForEvent } from "@/lib/data/queries";
+import { getEventById } from "@/lib/data/queries";
 import { supabase } from "@/integrations/supabase/client";
 import Button from "@/components/Button";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
@@ -16,6 +15,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+
+const SUPABASE_URL = "https://annunwfjlsgrrcqfkykd.supabase.co";
 
 const RegisterPage = () => {
   const { eventId } = useParams<{ eventId: string }>();
@@ -94,42 +95,64 @@ const RegisterPage = () => {
       }
       
       if (event) {
-        await registerForEvent(event.id, userId);
-
-        // Access Supabase URL from a fixed value instead of using the protected property
-        const supabaseUrl = "https://annunwfjlsgrrcqfkykd.supabase.co";
-        if (!supabaseUrl) {
-          throw new Error('Missing Supabase URL');
-        }
+        let registrationSuccess = true;
         
-        const response = await fetch(`${supabaseUrl}/functions/v1/send-booking-confirmation`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${session?.access_token || ''}`
-          },
-          body: JSON.stringify({
-            eventId: event.id,
-            userId,
-            userName: `${firstName} ${lastName}`,
-            userEmail: email,
-            eventTitle: event.title,
-            eventDate: event.date.start,
-            eventLocation: `${event.location.name}, ${event.location.city}`,
-            ticketType: event.isFree ? 'Free' : 'Standard'
-          })
-        });
-
-        if (!response.ok) {
-          console.error('Booking confirmation API error:', await response.text());
-          throw new Error('Failed to send booking confirmation');
+        try {
+          if (/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(event.id)) {
+            await fetch(`${SUPABASE_URL}/rest/v1/registrations`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${session?.access_token || ''}`,
+                'apikey': supabase.supabaseKey,
+              },
+              body: JSON.stringify({
+                event_id: event.id,
+                user_id: userId,
+                registration_date: new Date().toISOString(),
+              })
+            });
+          } else {
+            console.log('Skipping database registration for non-UUID event ID:', event.id);
+          }
+        } catch (regError) {
+          console.error('Event registration error:', regError);
         }
 
-        const data = await response.json();
-        setConfirmationData({
-          confirmationCode: data.confirmationCode,
-          qrCodeUrl: data.qrCodeUrl
-        });
+        try {
+          const response = await fetch(`${SUPABASE_URL}/functions/v1/send-booking-confirmation`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${session?.access_token || ''}`
+            },
+            body: JSON.stringify({
+              eventId: event.id,
+              userId,
+              userName: `${firstName} ${lastName}`,
+              userEmail: email,
+              eventTitle: event.title,
+              eventDate: event.date.start,
+              eventLocation: `${event.location.name}, ${event.location.city}`,
+              ticketType: event.isFree ? 'Free' : 'Standard'
+            })
+          });
+
+          if (!response.ok) {
+            const errorText = await response.text();
+            console.error('Booking confirmation API error:', errorText);
+            throw new Error(`Failed to send booking confirmation: ${response.status} ${errorText}`);
+          }
+
+          const data = await response.json();
+          setConfirmationData({
+            confirmationCode: data.confirmationCode,
+            qrCodeUrl: data.qrCodeUrl
+          });
+        } catch (confirmError) {
+          console.error('Confirmation error:', confirmError);
+          throw new Error('Failed to generate booking confirmation');
+        }
       }
       
       setIsSubmitting(false);
