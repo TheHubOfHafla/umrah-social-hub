@@ -95,7 +95,12 @@ const RegisterPage = () => {
       if (event) {
         await registerForEvent(event.id, userId);
 
-        const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-booking-confirmation`, {
+        const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+        if (!supabaseUrl) {
+          throw new Error('Missing Supabase URL in environment variables');
+        }
+        
+        const response = await fetch(`${supabaseUrl}/functions/v1/send-booking-confirmation`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -114,6 +119,7 @@ const RegisterPage = () => {
         });
 
         if (!response.ok) {
+          console.error('Booking confirmation API error:', await response.text());
           throw new Error('Failed to send booking confirmation');
         }
 
