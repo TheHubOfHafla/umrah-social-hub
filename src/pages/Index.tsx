@@ -52,7 +52,7 @@ const Index = ({ isAuthenticated = false }: { isAuthenticated?: boolean }) => {
   };
 
   return (
-    <div className="min-h-screen overflow-hidden">
+    <div className="min-h-screen overflow-hidden bg-background">
       <main className="pb-8 md:pb-16">
         <HeroBanner 
           user={isAuthenticated ? currentUser : undefined} 
@@ -75,12 +75,12 @@ const Index = ({ isAuthenticated = false }: { isAuthenticated?: boolean }) => {
             <RecommendedEvents events={recommendedEvents} />
           </div>
         ) : (
-          <section className={`container mx-auto px-4 py-12 transition-all duration-700 delay-300 ${animateContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-            <div className="mb-8">
+          <section className={`container mx-auto px-4 py-8 md:py-12 transition-all duration-700 delay-300 ${animateContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+            <div className="mb-6 md:mb-8">
               <h2 className="text-2xl font-bold mb-2">Popular Events</h2>
               <p className="text-muted-foreground">Discover what's trending in the community</p>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
               {popularEvents.slice(0, 6).map((event, index) => (
                 <div key={event.id} className={`transition-all duration-500 ${animateContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`} style={{transitionDelay: `${300 + index * 100}ms`}}>
                   <EventCard event={event} />
@@ -91,7 +91,7 @@ const Index = ({ isAuthenticated = false }: { isAuthenticated?: boolean }) => {
         )}
         
         {/* Trending Events Section */}
-        <section className={`container mx-auto px-4 py-12 transition-all duration-700 delay-400 ${animateContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+        <section className={`container mx-auto px-4 py-8 md:py-12 transition-all duration-700 delay-400 ${animateContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
           <div className="flex items-center justify-between mb-6">
             <div>
               <h2 className="text-2xl font-bold tracking-tight">Trending Now</h2>
@@ -117,7 +117,7 @@ const Index = ({ isAuthenticated = false }: { isAuthenticated?: boolean }) => {
         )}
         
         {/* Upcoming Events Section */}
-        <section className={`container mx-auto px-4 py-12 transition-all duration-700 delay-500 ${animateContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+        <section className={`container mx-auto px-4 py-8 md:py-12 transition-all duration-700 delay-500 ${animateContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
           <div className="flex items-center justify-between mb-6">
             <div>
               <h2 className="text-2xl font-bold tracking-tight">Upcoming Events</h2>
