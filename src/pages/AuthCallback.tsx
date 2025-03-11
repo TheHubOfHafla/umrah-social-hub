@@ -73,6 +73,29 @@ const AuthCallback = () => {
                 console.error("Error creating organizer profile:", organizerError);
               }
             }
+            
+            // Ensure a profile exists for the user
+            const { data: profile, error: profileError } = await supabase
+              .from('profiles')
+              .select('*')
+              .eq('id', userId)
+              .single();
+              
+            if (profileError && profileError.code === 'PGRST116') {
+              // Profile doesn't exist, create one
+              const { error: insertError } = await supabase
+                .from('profiles')
+                .insert({
+                  id: userId,
+                  name: userMetadata?.full_name || userMetadata?.name || 'User',
+                  email: userData.user.email,
+                  events_attending: []
+                });
+                
+              if (insertError) {
+                console.error("Error creating user profile:", insertError);
+              }
+            }
           } catch (updateError) {
             console.error("Error updating user:", updateError);
           }

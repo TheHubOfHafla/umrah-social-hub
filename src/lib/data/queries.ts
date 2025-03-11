@@ -1,6 +1,7 @@
 import { Event, EventCategory, AttendeeType } from '@/types';
 import { mockEvents } from './events';
-import { currentUser } from './users';
+import { currentUser, addEventToUserAttending } from './users';
+import { supabase } from '@/integrations/supabase/client';
 
 export const getFeaturedEvents = (): Event[] => {
   return mockEvents.filter(event => event.featured);
@@ -121,32 +122,44 @@ export const getOrganizerPastEvents = (organizerId: string): Event[] => {
 /**
  * Register a user for an event
  */
-export const registerForEvent = (eventId: string): boolean => {
-  // In a real app, this would make an API call
-  if (!currentUser.eventsAttending) {
-    currentUser.eventsAttending = [];
-  }
-  
-  if (!currentUser.eventsAttending.includes(eventId)) {
-    currentUser.eventsAttending.push(eventId);
+export const registerForEvent = async (eventId: string, userId: string): Promise<boolean> => {
+  // In a real app with Supabase, we need to update the database
+  try {
+    // Add this event to the user's attending list
+    const success = await addEventToUserAttending(userId, eventId);
     
-    // Add the user to the event's attendees list
-    const event = mockEvents.find(e => e.id === eventId);
-    if (event) {
-      if (!event.attendees) {
-        event.attendees = [];
-      }
+    if (!success) {
+      console.error("Failed to update user's attending events");
+      return false;
+    }
+    
+    // For mock data (can be removed in production)
+    if (!currentUser.eventsAttending) {
+      currentUser.eventsAttending = [];
+    }
+    
+    if (!currentUser.eventsAttending.includes(eventId)) {
+      currentUser.eventsAttending.push(eventId);
       
-      event.attendees.push({
-        userId: currentUser.id,
-        name: currentUser.name,
-        avatar: currentUser.avatar,
-        purchaseDate: new Date().toISOString()
-      });
+      // Add the user to the event's attendees list
+      const event = mockEvents.find(e => e.id === eventId);
+      if (event) {
+        if (!event.attendees) {
+          event.attendees = [];
+        }
+        
+        event.attendees.push({
+          userId: currentUser.id,
+          name: currentUser.name,
+          avatar: currentUser.avatar,
+          purchaseDate: new Date().toISOString()
+        });
+      }
     }
     
     return true;
+  } catch (error) {
+    console.error("Error registering for event:", error);
+    return false;
   }
-  
-  return false;
 };
