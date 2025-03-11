@@ -1,6 +1,6 @@
 import { Event, EventCategory, AttendeeType } from '@/types';
 import { mockEvents } from './events';
-import { currentUser, addEventToUserAttending, saveEventForUser, unsaveEventForUser } from './users';
+import { currentUser, saveEventForUser, unsaveEventForUser } from './users';
 import { supabase } from '@/integrations/supabase/client';
 
 export const getFeaturedEvents = (): Event[] => {
@@ -136,10 +136,40 @@ export const registerForEvent = async (eventId: string, userId: string): Promise
   // In a real app with Supabase, we need to update the database
   try {
     // Add this event to the user's attending list
-    const success = await addEventToUserAttending(userId, eventId);
+    // First, get the current user profile to get the current events list
+    const { data: profile, error: fetchError } = await supabase
+      .from('profiles')
+      .select('events_attending')
+      .eq('id', userId)
+      .single();
     
-    if (!success) {
-      console.error("Failed to update user's attending events");
+    if (fetchError) {
+      console.error("Error fetching profile for event attendance:", fetchError);
+      return false;
+    }
+    
+    // Create a new array with the existing events and the new one
+    const currentEvents = profile?.events_attending || [];
+    
+    // Check if event is already in the list
+    if (currentEvents.includes(eventId)) {
+      console.log("Event already in user's attending list:", eventId);
+      return true; // Already attending, so consider this a success
+    }
+    
+    const updatedEvents = [...currentEvents, eventId];
+    
+    // Update the profile with the new events list
+    const { error: updateError } = await supabase
+      .from('profiles')
+      .update({
+        events_attending: updatedEvents,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', userId);
+    
+    if (updateError) {
+      console.error("Error updating profile with new event:", updateError);
       return false;
     }
     
