@@ -1,4 +1,5 @@
-import { useEffect } from "react";
+
+import { useEffect, useContext } from "react";
 import { Link } from "react-router-dom";
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
 import DashboardStats from "@/components/dashboard/DashboardStats";
@@ -7,15 +8,20 @@ import { Calendar, BarChart2, Users, Bookmark } from "lucide-react";
 import EventCard from "@/components/EventCard";
 import Button from "@/components/Button";
 import { currentUser } from "@/lib/data/users";
-import { getRecommendedEvents, getUserEvents } from "@/lib/data/queries";
+import { getRecommendedEvents, getUserEvents, getSavedEvents } from "@/lib/data/queries";
+import { AuthContext } from "@/App";
 
 const Dashboard = () => {
   useEffect(() => {
     document.title = "User Dashboard | Islamic Social";
   }, []);
 
-  const userEvents = getUserEvents(currentUser.id);
-  const recommendedEvents = getRecommendedEvents(currentUser.id).slice(0, 3);
+  const { currentUser: authUser } = useContext(AuthContext);
+  const user = authUser || currentUser;
+  
+  const userEvents = getUserEvents(user.id);
+  const savedEvents = getSavedEvents(user.id);
+  const recommendedEvents = getRecommendedEvents(user.id).slice(0, 3);
 
   const stats = [
     {
@@ -25,13 +31,10 @@ const Dashboard = () => {
       description: "Upcoming events you're attending",
     },
     {
-      title: "Total Tickets",
-      value: userEvents.length + 3, // Just for demonstration
+      title: "Saved Events",
+      value: savedEvents.length,
       icon: Bookmark,
-      change: {
-        value: 12,
-        type: "increase" as const,
-      },
+      description: "Events you've saved for later",
     },
     {
       title: "Communities",
@@ -48,19 +51,19 @@ const Dashboard = () => {
   ];
 
   return (
-    <DashboardLayout user={currentUser} type="user">
+    <DashboardLayout user={user} type="user">
       <div className="space-y-8">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
           <p className="text-muted-foreground">
-            Welcome back, {currentUser.name}! Here's what's happening.
+            Welcome back, {user.name}! Here's what's happening.
           </p>
         </div>
 
         <DashboardStats stats={stats} />
 
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          <div className="col-span-2">
+          <div className="md:col-span-2">
             <Card className="h-full">
               <CardHeader>
                 <CardTitle>Your Upcoming Events</CardTitle>
@@ -129,38 +132,48 @@ const Dashboard = () => {
           <div>
             <Card className="h-full">
               <CardHeader>
-                <CardTitle>Recommended For You</CardTitle>
+                <CardTitle>Saved Events</CardTitle>
                 <CardDescription>
-                  Based on your interests and location
+                  Events you've saved for later
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {recommendedEvents.map((event) => (
-                    <Link to={`/events/${event.id}`} key={event.id}>
-                      <div className="flex items-center space-x-3 rounded-lg border p-3 hover:bg-secondary/50 transition-colors">
-                        <div className="h-12 w-12 overflow-hidden rounded">
-                          <img
-                            src={event.image}
-                            alt={event.title}
-                            className="h-full w-full object-cover"
-                          />
-                        </div>
-                        <div>
-                          <p className="font-medium">{event.title}</p>
-                          <p className="text-xs text-muted-foreground">
-                            {new Date(event.date.start).toLocaleDateString()}
-                          </p>
-                        </div>
+                  {savedEvents.length === 0 ? (
+                    <div className="flex h-40 items-center justify-center rounded-md border border-dashed">
+                      <div className="text-center">
+                        <p className="text-sm text-muted-foreground">
+                          You haven't saved any events yet
+                        </p>
                       </div>
-                    </Link>
-                  ))}
+                    </div>
+                  ) : (
+                    savedEvents.slice(0, 3).map((event) => (
+                      <Link to={`/events/${event.id}`} key={event.id}>
+                        <div className="flex items-center space-x-3 rounded-lg border p-3 hover:bg-secondary/50 transition-colors">
+                          <div className="h-12 w-12 overflow-hidden rounded">
+                            <img
+                              src={event.image}
+                              alt={event.title}
+                              className="h-full w-full object-cover"
+                            />
+                          </div>
+                          <div>
+                            <p className="font-medium">{event.title}</p>
+                            <p className="text-xs text-muted-foreground">
+                              {new Date(event.date.start).toLocaleDateString()}
+                            </p>
+                          </div>
+                        </div>
+                      </Link>
+                    ))
+                  )}
                 </div>
               </CardContent>
               <CardFooter>
-                <Link to="/events">
+                <Link to="/dashboard/events?tab=saved">
                   <Button variant="outline" size="sm">
-                    Explore More
+                    View All Saved
                   </Button>
                 </Link>
               </CardFooter>

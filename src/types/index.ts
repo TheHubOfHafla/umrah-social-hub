@@ -1,4 +1,3 @@
-
 export type EventCategory = 
   | 'charity'
   | 'community'
@@ -35,22 +34,23 @@ export type AttendeeType = 'ladies-only' | 'couples' | 'mixed' | 'men-only';
 
 export type UserRole = 'attendee' | 'organizer';
 
-export type User = {
+export interface User {
   id: string;
   name: string;
-  avatar: string;
+  avatar?: string;
+  email?: string;
+  phone?: string;
   interests?: EventCategory[];
+  signupDate?: string;
   location?: {
     city: string;
     country: string;
   };
-  following?: string[]; // organizer IDs
-  eventsAttending?: string[]; // event IDs
-  email?: string; // Added for CRM
-  phone?: string; // Added for CRM
-  signupDate?: string; // Added for CRM
-  role?: UserRole; // Added for role-based access control
-};
+  following?: string[];
+  eventsAttending?: string[];
+  savedEvents?: string[];
+  role?: UserRole;
+}
 
 export type EventAttendee = {
   userId: string;

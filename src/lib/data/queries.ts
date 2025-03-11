@@ -1,6 +1,6 @@
 import { Event, EventCategory, AttendeeType } from '@/types';
 import { mockEvents } from './events';
-import { currentUser, addEventToUserAttending } from './users';
+import { currentUser, addEventToUserAttending, saveEventForUser, unsaveEventForUser } from './users';
 import { supabase } from '@/integrations/supabase/client';
 
 export const getFeaturedEvents = (): Event[] => {
@@ -98,6 +98,16 @@ export const getEventsHistory = (userId: string): Event[] => {
 };
 
 /**
+ * Get saved events for a user
+ */
+export const getSavedEvents = (userId: string): Event[] => {
+  const user = currentUser;
+  if (!user || !user.savedEvents) return [];
+  
+  return mockEvents.filter(event => user.savedEvents?.includes(event.id));
+};
+
+/**
  * Get upcoming events for an organizer
  */
 export const getOrganizerEvents = (organizerId: string): Event[] => {
@@ -160,6 +170,58 @@ export const registerForEvent = async (eventId: string, userId: string): Promise
     return true;
   } catch (error) {
     console.error("Error registering for event:", error);
+    return false;
+  }
+};
+
+/**
+ * Save an event for a user
+ */
+export const saveEvent = async (eventId: string, userId: string): Promise<boolean> => {
+  try {
+    const success = await saveEventForUser(userId, eventId);
+    
+    if (!success) {
+      console.error("Failed to update user's saved events");
+      return false;
+    }
+    
+    // For mock data (can be removed in production)
+    if (!currentUser.savedEvents) {
+      currentUser.savedEvents = [];
+    }
+    
+    if (!currentUser.savedEvents.includes(eventId)) {
+      currentUser.savedEvents.push(eventId);
+    }
+    
+    return true;
+  } catch (error) {
+    console.error("Error saving event:", error);
+    return false;
+  }
+};
+
+/**
+ * Unsave an event for a user
+ */
+export const unsaveEvent = async (eventId: string, userId: string): Promise<boolean> => {
+  try {
+    const success = await unsaveEventForUser(userId, eventId);
+    
+    if (!success) {
+      console.error("Failed to update user's saved events");
+      return false;
+    }
+    
+    // For mock data (can be removed in production)
+    if (currentUser.savedEvents) {
+      currentUser.savedEvents = currentUser.savedEvents.filter(id => id !== eventId);
+    }
+    
+    return true;
+  } catch (error) {
+    console.error("Error unsaving event:", error);
     return false;
   }
 };

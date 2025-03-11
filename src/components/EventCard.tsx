@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { Link } from "react-router-dom";
 import { format, formatDistanceToNow } from "date-fns";
 import { CalendarIcon, Clock, MapPin } from "lucide-react";
@@ -12,6 +12,8 @@ import { cn } from "@/lib/utils";
 import Button from "./Button";
 import AttendeesList from "./AttendeesList";
 import TicketAlert from "./TicketAlert";
+import SaveEventButton from "./SaveEventButton";
+import { AuthContext } from "@/App";
 
 interface EventCardProps {
   event: Event;
@@ -21,6 +23,7 @@ interface EventCardProps {
 
 const EventCard = ({ event, className, variant = "default" }: EventCardProps) => {
   const [imageLoaded, setImageLoaded] = useState(false);
+  const { isAuthenticated, currentUser } = useContext(AuthContext);
 
   const isFeatured = variant === "featured";
   const displayDate = format(new Date(event.date.start), "EEE, MMM d • h:mm a");
@@ -38,6 +41,9 @@ const EventCard = ({ event, className, variant = "default" }: EventCardProps) =>
     }
     return "";
   };
+
+  // Check if the event is saved by the current user
+  const isEventSaved = isAuthenticated && currentUser?.savedEvents?.includes(event.id);
 
   return (
     <Link to={`/events/${event.id}`}>
@@ -67,6 +73,15 @@ const EventCard = ({ event, className, variant = "default" }: EventCardProps) =>
               Featured
             </Badge>
           )}
+
+          <div className="absolute top-3 right-3 z-20">
+            <SaveEventButton 
+              eventId={event.id} 
+              isSaved={isEventSaved} 
+              variant="icon" 
+              className="bg-white/80 hover:bg-white/90 backdrop-blur-sm"
+            />
+          </div>
 
           {/* Ticket Activity Alerts */}
           {event.ticketActivity && (
@@ -167,4 +182,3 @@ const EventCard = ({ event, className, variant = "default" }: EventCardProps) =>
 };
 
 export default EventCard;
-
