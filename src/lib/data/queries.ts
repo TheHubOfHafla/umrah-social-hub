@@ -1,6 +1,7 @@
+
 import { Event, EventCategory, AttendeeType } from '@/types';
 import { mockEvents } from './events';
-import { currentUser, saveEventForUser, unsaveEventForUser } from './users';
+import { currentUser, saveEventForUser, unsaveEventForUser } from './user';
 import { supabase } from '@/integrations/supabase/client';
 
 export const getFeaturedEvents = (): Event[] => {
