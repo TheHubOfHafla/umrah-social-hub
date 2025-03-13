@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { toast } from "@/components/ui/use-toast";
+import { toast } from "@/hooks/use-toast";
 
 export type AnalyticsData = {
   events: any[];
@@ -38,9 +38,11 @@ export const useOrganizerAnalytics = () => {
       // Get the access token
       const accessToken = sessionData.session.access_token;
       
-      // Use the config endpoint URL for the Supabase project
-      // Fix: Use environment URL instead of protected supabaseUrl property
-      const functionUrl = `${import.meta.env.VITE_SUPABASE_URL || 'https://annunwfjlsgrrcqfkykd.supabase.co'}/functions/v1/get-organizer-analytics`;
+      // Use the URL from the Supabase client
+      const supabaseUrl = supabase.supabaseUrl || 'https://annunwfjlsgrrcqfkykd.supabase.co';
+      const functionUrl = `${supabaseUrl}/functions/v1/get-organizer-analytics`;
+      
+      console.log('Fetching analytics from:', functionUrl);
       
       // Fetch data from the edge function
       const response = await fetch(functionUrl, {
