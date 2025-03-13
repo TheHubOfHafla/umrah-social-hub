@@ -85,7 +85,7 @@ gcp_jwt_path = "supabase/gcloud.json"
 # Port used for functions webserver.
 port = 54329
 
-# Function-specific configurations - correct format using [[functions.function]]
+# The following section has been corrected to follow the proper TOML format for arrays of tables
 [[functions.function]]
 name = "ai-event-generator"
 verify_jwt = false
@@ -96,8 +96,4 @@ verify_jwt = false
 
 [[functions.function]]
 name = "send-booking-confirmation"
-verify_jwt = false
-
-[[functions.function]]
-name = "get-organizer-analytics"
 verify_jwt = false
