@@ -11,60 +11,22 @@ import { currentUser } from "@/lib/data/users";
 import { getOrganizerEvents } from "@/lib/data/queries";
 import { EventCategory } from "@/types";
 import { Container } from "@/components/ui/container";
+import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
-// Import our new components
+// Import our components
 import GoalTracker from "@/components/dashboard/organizer/GoalTracker";
 import GrowthMetrics from "@/components/dashboard/organizer/GrowthMetrics";
 import UpcomingEventsList from "@/components/dashboard/organizer/UpcomingEventsList";
 import EventsFilter from "@/components/dashboard/organizer/EventsFilter";
-
-// Sample data for metrics
-const growthMetricsData = {
-  attendance: {
-    data: [
-      { month: "Jan", value: 120, previousYear: 100 },
-      { month: "Feb", value: 150, previousYear: 120 },
-      { month: "Mar", value: 180, previousYear: 130 },
-      { month: "Apr", value: 220, previousYear: 170 },
-      { month: "May", value: 280, previousYear: 190 },
-      { month: "Jun", value: 310, previousYear: 210 },
-      { month: "Jul", value: 350, previousYear: 230 },
-      { month: "Aug", value: 370, previousYear: 250 },
-      { month: "Sep", value: 400, previousYear: 270 },
-      { month: "Oct", value: 430, previousYear: 290 },
-      { month: "Nov", value: 450, previousYear: 300 },
-      { month: "Dec", value: 480, previousYear: 320 },
-    ],
-    growth: 32
-  },
-  donations: {
-    data: [
-      { month: "Jan", value: 1200, previousYear: 1000 },
-      { month: "Feb", value: 1500, previousYear: 1200 },
-      { month: "Mar", value: 2000, previousYear: 1300 },
-      { month: "Apr", value: 2300, previousYear: 1700 },
-      { month: "May", value: 2800, previousYear: 1900 },
-      { month: "Jun", value: 3100, previousYear: 2100 },
-      { month: "Jul", value: 3500, previousYear: 2300 },
-      { month: "Aug", value: 3700, previousYear: 2500 },
-      { month: "Sep", value: 4000, previousYear: 2700 },
-      { month: "Oct", value: 4300, previousYear: 2900 },
-      { month: "Nov", value: 4600, previousYear: 3000 },
-      { month: "Dec", value: 5000, previousYear: 3200 },
-    ],
-    growth: 45
-  },
-  events: {
-    total: 32,
-    growth: 28
-  },
-  averageAttendance: {
-    value: 85,
-    growth: 15
-  }
-};
+import SalesPerformanceChart from "@/components/dashboard/organizer/SalesPerformanceChart";
+import UserEngagementMetrics from "@/components/dashboard/organizer/UserEngagementMetrics";
+import AISalesAssistant from "@/components/dashboard/organizer/AISalesAssistant";
+import SelloutPrediction from "@/components/dashboard/organizer/SelloutPrediction";
 
 const OrganizerDashboard = () => {
+  const { toast } = useToast();
+  
   useEffect(() => {
     document.title = "Organizer Dashboard | Islamic Social";
   }, []);
@@ -72,10 +34,60 @@ const OrganizerDashboard = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [categoryFilter, setCategoryFilter] = useState<EventCategory | "all">("all");
   const [viewMode, setViewMode] = useState<'list' | 'chart'>('list');
+  const [isLoading, setIsLoading] = useState(true);
+  const [dashboardData, setDashboardData] = useState<any>(null);
 
   const organizerEvents = getOrganizerEvents(currentUser.id);
   
-  // Calculate metrics
+  // Function to fetch dashboard data from our edge function
+  const fetchDashboardData = async () => {
+    setIsLoading(true);
+    try {
+      // First, try to get the organizer profile for this user
+      const { data: organizerData, error: organizerError } = await supabase
+        .from('organizers')
+        .select('id')
+        .eq('user_id', currentUser.id)
+        .single();
+      
+      if (organizerError) {
+        console.error("Error fetching organizer ID:", organizerError);
+        setIsLoading(false);
+        return;
+      }
+      
+      // Call our edge function with the organizer ID
+      const { data, error } = await supabase.functions.invoke('get-organizer-analytics', {
+        query: { organizerId: organizerData.id }
+      });
+      
+      if (error) {
+        console.error("Error fetching analytics:", error);
+        toast({
+          title: "Failed to load dashboard data",
+          description: "Please try again later",
+          variant: "destructive"
+        });
+      } else {
+        setDashboardData(data);
+        console.log("Loaded dashboard data:", data);
+      }
+    } catch (error) {
+      console.error("Error in dashboard data fetch:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
+  useEffect(() => {
+    fetchDashboardData();
+  }, []);
+  
+  // Transform mock data for our components
+  // In a real implementation, this would use the data from our API
+  // For now, we'll use a mix of real and mock data
+  
+  // For the stats cards
   const totalAttendees = organizerEvents.reduce(
     (total, event) => total + (event.attendees?.length || 0),
     0
@@ -128,28 +140,101 @@ const OrganizerDashboard = () => {
     },
   ];
 
-  // Helper function to filter tips based on goals
-  const getTips = () => {
-    const tips = [
-      {
-        title: "Boost your attendance",
-        description: "Share your events on social media at least 3 times before the event date for maximum visibility.",
-        icon: Users,
+  // Sample engagement data - would come from our backend in real implementation
+  const mockEngagementData = {
+    total: {
+      view_event: 1872,
+      click_event: 573,
+      view_profile: 432
+    },
+    byEvent: {
+      'event1': {
+        title: "Islamic Art Workshop",
+        view_event: 350,
+        click_event: 120,
+        conversion_rate: 0.34
       },
-      {
-        title: "Increase donations",
-        description: "Adding a compelling story with specific goals can increase donation amounts by up to 45%.",
-        icon: Ticket,
+      'event2': {
+        title: "Ramadan Charity Drive",
+        view_event: 520,
+        click_event: 280,
+        conversion_rate: 0.54
       },
-      {
-        title: "Optimize event timing",
-        description: "Events scheduled on weekends tend to have 30% higher attendance than weekday events.",
-        icon: Calendar,
-      },
-    ];
-    
-    return tips;
+      'event3': {
+        title: "Islamic History Lecture",
+        view_event: 480,
+        click_event: 95,
+        conversion_rate: 0.20
+      }
+    }
   };
+
+  // Recommendation data - would come from our AI model in backend
+  const mockRecommendations = [
+    {
+      eventId: "event1",
+      eventTitle: "Islamic Art Workshop",
+      type: "conversion",
+      message: "Your event is getting views but has a low conversion rate. Consider offering an early bird discount to boost sales."
+    },
+    {
+      eventId: "event2",
+      eventTitle: "Ramadan Charity Drive",
+      type: "engagement",
+      message: "This event has high user interest. Try sending a targeted marketing campaign to users who viewed but didn't purchase."
+    },
+    {
+      eventId: "event3",
+      eventTitle: "Islamic History Lecture",
+      type: "sales_speed",
+      message: "At the current rate, tickets might not sell out before the event. Consider boosting visibility through social media."
+    },
+    {
+      type: "general",
+      message: "Posting photos from previous events can increase user trust and boost ticket sales by up to 30%."
+    }
+  ];
+
+  // Sample ticket sales data
+  const mockTicketSales = Array.from({ length: 60 }, (_, i) => {
+    const date = new Date();
+    date.setDate(date.getDate() - 60 + i);
+    
+    return {
+      event_id: i % 3 === 0 ? "event1" : i % 3 === 1 ? "event2" : "event3",
+      sale_date: date.toISOString().split('T')[0],
+      tickets_sold: Math.floor(Math.random() * 10) + 1,
+      revenue: (Math.floor(Math.random() * 10) + 1) * 25
+    };
+  });
+
+  // Mock events with sellout predictions
+  const mockSelloutEvents = [
+    {
+      id: "event1",
+      title: "Ramadan Charity Gala",
+      start_date: "2023-12-15T19:00:00",
+      capacity: 200,
+      tickets_remaining: 45,
+      estimated_sellout_days: 12
+    },
+    {
+      id: "event2",
+      title: "Islamic Calligraphy Workshop",
+      start_date: "2023-12-10T10:00:00",
+      capacity: 30,
+      tickets_remaining: 5,
+      estimated_sellout_days: 3
+    },
+    {
+      id: "event3",
+      title: "Monthly Community Iftar",
+      start_date: "2024-01-20T18:00:00",
+      capacity: 100,
+      tickets_remaining: 68,
+      estimated_sellout_days: 35
+    }
+  ];
 
   return (
     <DashboardLayout user={currentUser} type="organizer">
@@ -186,82 +271,41 @@ const OrganizerDashboard = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="md:col-span-2">
-            <Card className="h-full">
-              <CardHeader className="pb-0">
-                <CardTitle className="text-lg flex items-center">
-                  <TrendingUp className="h-5 w-5 mr-2 text-[#8B5CF6]" />
-                  Performance Overview
-                </CardTitle>
-                <CardDescription>
-                  Track improvements and growth over time
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="pt-6">
-                <EventsFilter 
-                  searchQuery={searchQuery}
-                  setSearchQuery={setSearchQuery}
-                  categoryFilter={categoryFilter}
-                  setCategoryFilter={setCategoryFilter}
-                  viewMode={viewMode}
-                  onViewModeChange={setViewMode}
-                />
-                
-                <div className="mt-6">
-                  <GrowthMetrics data={growthMetricsData} />
-                </div>
-              </CardContent>
-            </Card>
+            <SalesPerformanceChart 
+              salesData={mockTicketSales}
+              events={[
+                { id: "event1", title: "Islamic Art Workshop" },
+                { id: "event2", title: "Ramadan Charity Drive" },
+                { id: "event3", title: "Islamic History Lecture" }
+              ]}
+            />
           </div>
           
           <div>
-            <Card className="h-full">
-              <CardHeader>
-                <CardTitle className="text-lg flex items-center">
-                  <Lightbulb className="h-5 w-5 mr-2 text-[#8B5CF6]" />
-                  Tips & Insights
-                </CardTitle>
-                <CardDescription>
-                  Personalized recommendations
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="pb-0">
-                <div className="space-y-4">
-                  {getTips().map((tip, index) => (
-                    <motion.div 
-                      key={index}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: index * 0.1, duration: 0.4 }}
-                      className="p-3 rounded-lg border bg-card/50 hover:bg-card transition-colors duration-300"
-                    >
-                      <div className="flex items-start gap-3">
-                        <div className="rounded-full bg-[#8B5CF6]/10 p-2">
-                          <tip.icon className="h-4 w-4 text-[#8B5CF6]" />
-                        </div>
-                        <div>
-                          <h4 className="text-sm font-medium">{tip.title}</h4>
-                          <p className="text-xs text-muted-foreground mt-1">
-                            {tip.description}
-                          </p>
-                        </div>
-                      </div>
-                    </motion.div>
-                  ))}
-                </div>
-              </CardContent>
-              <CardFooter className="pt-4">
-                <Button variant="outline" size="sm" className="text-xs w-full">View All Tips</Button>
-              </CardFooter>
-            </Card>
+            <AISalesAssistant 
+              recommendations={mockRecommendations}
+              isLoading={isLoading}
+              onRefresh={fetchDashboardData}
+            />
           </div>
         </div>
 
         <div className="grid gap-6 md:grid-cols-5">
           <div className="md:col-span-3">
-            <UpcomingEventsList events={organizerEvents.slice(0, 3)} />
+            <UserEngagementMetrics engagementData={mockEngagementData} />
           </div>
           
           <div className="md:col-span-2">
+            <SelloutPrediction events={mockSelloutEvents} />
+          </div>
+        </div>
+
+        <div className="grid gap-6 md:grid-cols-2">
+          <div>
+            <UpcomingEventsList events={organizerEvents.slice(0, 3)} />
+          </div>
+          
+          <div>
             <GoalTracker />
           </div>
         </div>
