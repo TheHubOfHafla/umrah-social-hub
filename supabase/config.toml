@@ -97,3 +97,7 @@ verify_jwt = false
 [[functions.function]]
 name = "send-booking-confirmation"
 verify_jwt = false
+
+[[functions.function]]
+name = "get-organizer-analytics"
+verify_jwt = false

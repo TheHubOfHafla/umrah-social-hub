@@ -156,6 +156,44 @@ export type Database = {
         }
         Relationships: []
       }
+      event_metrics: {
+        Row: {
+          clicks_count: number | null
+          conversion_rate: number | null
+          created_at: string | null
+          event_id: string | null
+          id: string
+          updated_at: string | null
+          views_count: number | null
+        }
+        Insert: {
+          clicks_count?: number | null
+          conversion_rate?: number | null
+          created_at?: string | null
+          event_id?: string | null
+          id?: string
+          updated_at?: string | null
+          views_count?: number | null
+        }
+        Update: {
+          clicks_count?: number | null
+          conversion_rate?: number | null
+          created_at?: string | null
+          event_id?: string | null
+          id?: string
+          updated_at?: string | null
+          views_count?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_metrics_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       events: {
         Row: {
           attendee_type: string | null
@@ -165,6 +203,7 @@ export type Database = {
           created_at: string
           description: string
           end_date: string | null
+          estimated_sellout_days: number | null
           featured: boolean | null
           id: string
           image: string | null
@@ -178,6 +217,7 @@ export type Database = {
           organizer_id: string
           short_description: string | null
           start_date: string
+          tickets_remaining: number | null
           title: string
           updated_at: string
         }
@@ -189,6 +229,7 @@ export type Database = {
           created_at?: string
           description: string
           end_date?: string | null
+          estimated_sellout_days?: number | null
           featured?: boolean | null
           id?: string
           image?: string | null
@@ -202,6 +243,7 @@ export type Database = {
           organizer_id: string
           short_description?: string | null
           start_date: string
+          tickets_remaining?: number | null
           title: string
           updated_at?: string
         }
@@ -213,6 +255,7 @@ export type Database = {
           created_at?: string
           description?: string
           end_date?: string | null
+          estimated_sellout_days?: number | null
           featured?: boolean | null
           id?: string
           image?: string | null
@@ -226,6 +269,7 @@ export type Database = {
           organizer_id?: string
           short_description?: string | null
           start_date?: string
+          tickets_remaining?: number | null
           title?: string
           updated_at?: string
         }
@@ -326,6 +370,41 @@ export type Database = {
         }
         Relationships: []
       }
+      ticket_sales_daily: {
+        Row: {
+          created_at: string | null
+          event_id: string | null
+          id: string
+          revenue: number | null
+          sale_date: string
+          tickets_sold: number | null
+        }
+        Insert: {
+          created_at?: string | null
+          event_id?: string | null
+          id?: string
+          revenue?: number | null
+          sale_date: string
+          tickets_sold?: number | null
+        }
+        Update: {
+          created_at?: string | null
+          event_id?: string | null
+          id?: string
+          revenue?: number | null
+          sale_date?: string
+          tickets_sold?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ticket_sales_daily_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ticket_types: {
         Row: {
           available: boolean | null
@@ -369,6 +448,48 @@ export type Database = {
             columns: ["event_id"]
             isOneToOne: false
             referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_engagement: {
+        Row: {
+          created_at: string | null
+          engagement_type: string
+          event_id: string | null
+          id: string
+          organizer_id: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          engagement_type: string
+          event_id?: string | null
+          id?: string
+          organizer_id?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          engagement_type?: string
+          event_id?: string | null
+          id?: string
+          organizer_id?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_engagement_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_engagement_organizer_id_fkey"
+            columns: ["organizer_id"]
+            isOneToOne: false
+            referencedRelation: "organizers"
             referencedColumns: ["id"]
           },
         ]

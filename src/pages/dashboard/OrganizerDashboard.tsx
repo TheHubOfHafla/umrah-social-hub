@@ -11,6 +11,7 @@ import { currentUser } from "@/lib/data/users";
 import { getOrganizerEvents } from "@/lib/data/queries";
 import { EventCategory } from "@/types";
 import { Container } from "@/components/ui/container";
+import { supabase } from "@/integrations/supabase/client";
 
 // Import our new components
 import GoalTracker from "@/components/dashboard/organizer/GoalTracker";
