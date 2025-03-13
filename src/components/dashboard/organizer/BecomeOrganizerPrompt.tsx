@@ -1,6 +1,6 @@
 
 import { Link } from "react-router-dom";
-import { Building } from "lucide-react";
+import { Building, Calendar, Users } from "lucide-react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 

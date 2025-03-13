@@ -88,14 +88,17 @@ const OrganizerSignup = () => {
 
       // Update user role to organizer
       if (!error) {
-        const { error: profileError } = await supabase
-          .from("profiles")
-          .update({ role: "organizer" })
-          .eq("id", user.id);
+        // Instead of updating the profile directly, add a row to a user_roles table
+        const { error: roleError } = await supabase
+          .from("user_roles")
+          .insert({
+            user_id: user.id,
+            role: "organizer"
+          });
 
-        if (profileError) {
-          console.error("Error updating profile:", profileError);
-          throw new Error("Failed to update profile.");
+        if (roleError) {
+          console.error("Error adding role:", roleError);
+          throw new Error("Failed to update user role.");
         }
 
         toast({

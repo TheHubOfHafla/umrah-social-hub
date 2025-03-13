@@ -82,7 +82,12 @@ const Dashboard = () => {
           </div>
         </div>
 
-        <UserAnalyticsCard />
+        <UserAnalyticsCard 
+          totalUsers={125} 
+          newUsersThisMonth={18} 
+          topCity="London" 
+          topInterest="Education" 
+        />
       </div>
     </DashboardLayout>
   );
