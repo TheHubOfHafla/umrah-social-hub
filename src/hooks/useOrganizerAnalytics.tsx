@@ -38,11 +38,12 @@ export const useOrganizerAnalytics = () => {
       // Get the access token
       const accessToken = sessionData.session.access_token;
       
-      // Get the current Supabase URL
-      const supabaseUrl = supabase.supabaseUrl;
+      // Use the config endpoint URL for the Supabase project
+      // Fix: Use environment URL instead of protected supabaseUrl property
+      const functionUrl = `${import.meta.env.VITE_SUPABASE_URL || 'https://annunwfjlsgrrcqfkykd.supabase.co'}/functions/v1/get-organizer-analytics`;
       
       // Fetch data from the edge function
-      const response = await fetch(`${supabaseUrl}/functions/v1/get-organizer-analytics`, {
+      const response = await fetch(functionUrl, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',

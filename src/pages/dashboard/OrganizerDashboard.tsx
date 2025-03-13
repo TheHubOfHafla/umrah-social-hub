@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { 
   PieChart, 
@@ -23,10 +22,43 @@ import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { UpcomingEventsList } from "@/components/dashboard/organizer";
 import { Container } from "@/components/ui/container";
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
 import { useOrganizerAnalytics } from "@/hooks/useOrganizerAnalytics";
+
+const UpcomingEventsList = ({ events, isLoading }: { events: any[], isLoading: boolean }) => {
+  if (isLoading) {
+    return (
+      <div className="space-y-4">
+        <div className="h-16 bg-secondary/50 animate-pulse rounded"></div>
+        <div className="h-16 bg-secondary/50 animate-pulse rounded"></div>
+        <div className="h-16 bg-secondary/50 animate-pulse rounded"></div>
+      </div>
+    );
+  }
+
+  if (!events || events.length === 0) {
+    return <p className="text-muted-foreground text-center py-4">No upcoming events</p>;
+  }
+
+  return (
+    <div className="space-y-4">
+      {events.map((event, index) => (
+        <div key={event.id || index} className="flex items-center gap-3 border-b pb-3">
+          <div className="w-12 h-12 bg-primary/10 rounded-md flex items-center justify-center">
+            <Calendar className="h-6 w-6 text-primary" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <h4 className="font-medium text-sm truncate">{event.title}</h4>
+            <p className="text-xs text-muted-foreground">
+              {new Date(event.date || event.date?.start).toLocaleDateString()}
+            </p>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+};
 
 const OrganizerDashboard = () => {
   const { events, recommendations, isLoading, error, refetch } = useOrganizerAnalytics();
@@ -36,8 +68,14 @@ const OrganizerDashboard = () => {
     setActiveTab(value);
   };
 
+  const mockUser = {
+    id: "1",
+    name: "Organizer",
+    role: "organizer"
+  };
+
   return (
-    <DashboardLayout title="Organizer Dashboard" role="organizer">
+    <DashboardLayout user={mockUser} type="organizer">
       <Container>
         <div className="mb-6 flex items-center justify-between">
           <div>
