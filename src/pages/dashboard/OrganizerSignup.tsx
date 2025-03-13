@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { z } from "zod";
@@ -86,35 +85,23 @@ const OrganizerSignup = () => {
         })
         .select();
 
-      // Update user role to organizer
-      if (!error) {
-        // Instead of updating the profile directly, add a row to a user_roles table
-        const { error: roleError } = await supabase
-          .from("user_roles")
-          .insert({
-            user_id: user.id,
-            role: "organizer"
-          });
-
-        if (roleError) {
-          console.error("Error adding role:", roleError);
-          throw new Error("Failed to update user role.");
-        }
-
-        toast({
-          title: "Success!",
-          description: "Your organizer account has been created.",
-        });
-
-        // Redirect to the organizer dashboard
-        navigate("/organizer");
-        
-        // Refresh the page to update auth context
-        window.location.reload();
-      } else {
+      if (error) {
         console.error("Error creating organizer:", error);
         throw new Error("Failed to create organizer profile.");
       }
+
+      // Since we don't have a user_roles table, we can leverage the existing auth context
+      // instead of trying to update a non-existent table
+      toast({
+        title: "Success!",
+        description: "Your organizer account has been created.",
+      });
+
+      // Redirect to the organizer dashboard
+      navigate("/organizer");
+      
+      // Refresh the page to update auth context
+      window.location.reload();
     } catch (error) {
       console.error("Error in submission:", error);
       toast({
