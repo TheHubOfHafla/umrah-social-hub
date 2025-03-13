@@ -85,7 +85,7 @@ gcp_jwt_path = "supabase/gcloud.json"
 # Port used for functions webserver.
 port = 54329
 
-# Function-specific configurations - correct format using [[functions.function]]
+# Function-specific configurations
 [[functions.function]]
 name = "ai-event-generator"
 verify_jwt = false
