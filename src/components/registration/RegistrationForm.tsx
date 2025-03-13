@@ -1,17 +1,12 @@
 
 import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
 import { supabase } from "@/integrations/supabase/client";
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import Button from "@/components/Button";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import Button from "@/components/Button";
 import { useToast } from "@/hooks/use-toast";
-import { AlertCircle } from "lucide-react";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 
 interface RegistrationFormProps {
   eventId: string;
@@ -26,35 +21,15 @@ interface RegistrationFormProps {
 const SUPABASE_URL = "https://annunwfjlsgrrcqfkykd.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFubnVud2ZqbHNncnJjcWZreWtkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDEyMjM2NTIsImV4cCI6MjA1Njc5OTY1Mn0._Is_Kgi8wTHsQ3Z1h87JkrliCtj8lWijCJaRBJBPBCU";
 
-// Create a schema for form validation
-const registrationFormSchema = z.object({
-  firstName: z.string().min(2, "First name must be at least 2 characters"),
-  lastName: z.string().min(2, "Last name must be at least 2 characters"),
-  email: z.string().email("Please enter a valid email address"),
-  termsAccepted: z.boolean().refine(val => val === true, {
-    message: "You must accept the terms and conditions"
-  })
-});
-
-type RegistrationFormValues = z.infer<typeof registrationFormSchema>;
-
 const RegistrationForm = ({ eventId, eventTitle, onRegistrationSuccess }: RegistrationFormProps) => {
   const { toast } = useToast();
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [apiError, setApiError] = useState<string | null>(null);
 
-  const form = useForm<RegistrationFormValues>({
-    resolver: zodResolver(registrationFormSchema),
-    defaultValues: {
-      firstName: "",
-      lastName: "",
-      email: "",
-      termsAccepted: false
-    }
-  });
-
-  const handleSubmit = async (values: RegistrationFormValues) => {
-    setApiError(null);
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     setIsSubmitting(true);
     
     try {
@@ -65,16 +40,16 @@ const RegistrationForm = ({ eventId, eventTitle, onRegistrationSuccess }: Regist
         const { data: existingUser, error: checkError } = await supabase
           .from('profiles')
           .select('id')
-          .eq('email', values.email)
+          .eq('email', email)
           .maybeSingle();
         
         if (checkError) {
-          throw new Error('Error checking user account: ' + checkError.message);
+          throw new Error('Error checking user account');
         }
         
         if (existingUser) {
           const { error: signInError } = await supabase.auth.signInWithOtp({
-            email: values.email,
+            email,
             options: {
               emailRedirectTo: window.location.href,
             }
@@ -91,11 +66,11 @@ const RegistrationForm = ({ eventId, eventTitle, onRegistrationSuccess }: Regist
           return;
         } else {
           const { data: newUser, error: signUpError } = await supabase.auth.signUp({
-            email: values.email,
+            email,
             password: Math.random().toString(36).slice(2, 10),
             options: {
               data: {
-                name: `${values.firstName} ${values.lastName}`,
+                name: `${firstName} ${lastName}`,
               },
             }
           });
@@ -129,7 +104,6 @@ const RegistrationForm = ({ eventId, eventTitle, onRegistrationSuccess }: Regist
         }
       } catch (regError) {
         console.error('Event registration error:', regError);
-        // We continue despite this error to try the booking confirmation
       }
 
       try {
@@ -143,8 +117,8 @@ const RegistrationForm = ({ eventId, eventTitle, onRegistrationSuccess }: Regist
           body: JSON.stringify({
             eventId: eventId,
             userId,
-            userName: `${values.firstName} ${values.lastName}`,
-            userEmail: values.email,
+            userName: `${firstName} ${lastName}`,
+            userEmail: email,
             eventTitle: eventTitle,
             eventDate: new Date().toISOString(), // This would ideally come from props
             eventLocation: "Event Location", // This would ideally come from props
@@ -160,19 +134,18 @@ const RegistrationForm = ({ eventId, eventTitle, onRegistrationSuccess }: Regist
 
         const data = await response.json();
         onRegistrationSuccess({
-          email: values.email,
+          email,
           confirmationCode: data.confirmationCode,
           qrCodeUrl: data.qrCodeUrl
         });
       } catch (confirmError) {
         console.error('Confirmation error:', confirmError);
-        throw new Error('Failed to generate booking confirmation. Please try again later.');
+        throw new Error('Failed to generate booking confirmation');
       }
       
       setIsSubmitting(false);
     } catch (error) {
       console.error('Registration error:', error);
-      setApiError(error instanceof Error ? error.message : "An unexpected error occurred. Please try again later.");
       toast({
         title: "Registration failed",
         description: error instanceof Error ? error.message : "Please try again later.",
@@ -183,128 +156,75 @@ const RegistrationForm = ({ eventId, eventTitle, onRegistrationSuccess }: Regist
   };
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleSubmit)}>
-        <div className="shadow-sm rounded-lg overflow-hidden">
-          <div className="bg-primary/5 border-b px-6 py-4">
-            <h2 className="text-xl font-semibold">Your Information</h2>
-          </div>
-          <div className="p-6 space-y-6">
-            {apiError && (
-              <Alert variant="destructive" className="mb-6">
-                <AlertCircle className="h-4 w-4" />
-                <AlertDescription>{apiError}</AlertDescription>
-              </Alert>
-            )}
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <FormField
-                control={form.control}
-                name="firstName"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>First Name</FormLabel>
-                    <FormControl>
-                      <Input 
-                        placeholder="Enter your first name" 
-                        {...field} 
-                        disabled={isSubmitting}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="lastName"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Last Name</FormLabel>
-                    <FormControl>
-                      <Input 
-                        placeholder="Enter your last name" 
-                        {...field} 
-                        disabled={isSubmitting}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
+    <Card className="shadow-sm">
+      <CardHeader className="bg-primary/5 border-b">
+        <h2 className="text-xl font-semibold">Your Information</h2>
+      </CardHeader>
+      <CardContent className="p-6">
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-2">
+              <Label htmlFor="firstName">First Name</Label>
+              <Input 
+                id="firstName" 
+                value={firstName} 
+                onChange={(e) => setFirstName(e.target.value)} 
+                required 
+                placeholder="Enter your first name"
               />
             </div>
-
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Email Address</FormLabel>
-                  <FormControl>
-                    <Input 
-                      type="email" 
-                      placeholder="Enter your email address" 
-                      {...field} 
-                      disabled={isSubmitting}
-                    />
-                  </FormControl>
-                  <FormDescription>
-                    Your confirmation and event details will be sent to this email.
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <Separator />
-
-            <div className="space-y-4">
-              <h3 className="font-medium">Terms & Conditions</h3>
-              <div className="text-sm text-muted-foreground">
-                <p>By registering for this event, you agree to the following:</p>
-                <ul className="list-disc pl-5 mt-2 space-y-1">
-                  <li>Event details may be subject to change</li>
-                  <li>Your information will be shared with the event organizer</li>
-                  <li>You may receive updates about this and similar events</li>
-                </ul>
-              </div>
+            <div className="space-y-2">
+              <Label htmlFor="lastName">Last Name</Label>
+              <Input 
+                id="lastName" 
+                value={lastName} 
+                onChange={(e) => setLastName(e.target.value)} 
+                required 
+                placeholder="Enter your last name"
+              />
             </div>
-
-            <FormField
-              control={form.control}
-              name="termsAccepted"
-              render={({ field }) => (
-                <FormItem className="flex flex-row items-start space-x-3 space-y-0 pt-2">
-                  <FormControl>
-                    <input
-                      type="checkbox"
-                      checked={field.value}
-                      onChange={field.onChange}
-                      className="mt-1"
-                    />
-                  </FormControl>
-                  <div className="space-y-1 leading-none">
-                    <FormLabel>I accept the terms and conditions</FormLabel>
-                    <FormMessage />
-                  </div>
-                </FormItem>
-              )}
-            />
-
-            <Button 
-              type="submit" 
-              className="w-full md:w-auto transition-transform hover:scale-[1.02] active:scale-[0.98]"
-              size="lg"
-              loading={isSubmitting}
-              disabled={isSubmitting}
-            >
-              Complete Registration
-            </Button>
           </div>
-        </div>
-      </form>
-    </Form>
+
+          <div className="space-y-2">
+            <Label htmlFor="email">Email Address</Label>
+            <Input 
+              id="email" 
+              type="email" 
+              value={email} 
+              onChange={(e) => setEmail(e.target.value)} 
+              required 
+              placeholder="Enter your email address"
+            />
+            <p className="text-xs text-muted-foreground mt-1">
+              Your confirmation and event details will be sent to this email.
+            </p>
+          </div>
+
+          <Separator />
+
+          <div className="space-y-4">
+            <h3 className="font-medium">Terms & Conditions</h3>
+            <div className="text-sm text-muted-foreground">
+              <p>By registering for this event, you agree to the following:</p>
+              <ul className="list-disc pl-5 mt-2 space-y-1">
+                <li>Event details may be subject to change</li>
+                <li>Your information will be shared with the event organizer</li>
+                <li>You may receive updates about this and similar events</li>
+              </ul>
+            </div>
+          </div>
+
+          <Button 
+            type="submit" 
+            className="w-full md:w-auto transition-transform hover:scale-[1.02] active:scale-[0.98]"
+            size="lg"
+            loading={isSubmitting}
+          >
+            Complete Registration
+          </Button>
+        </form>
+      </CardContent>
+    </Card>
   );
 };
 
