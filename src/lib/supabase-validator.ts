@@ -51,7 +51,7 @@ export const validateSupabaseIntegrations = async () => {
   return results;
 };
 
-// Function to validate a specific table integration with type safety
+// Function to validate a specific table integration with proper type safety
 export const validateTableIntegration = async (
   tableName: 'attendees' | 'events' | 'ticket_types' | 'chat_messages' | 
             'event_confirmations' | 'event_metrics' | 'organizers' | 
