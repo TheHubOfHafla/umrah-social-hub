@@ -8,7 +8,7 @@ export default function CreateEventPage() {
   const { isCheckingAuth } = useEventCreationAuth();
 
   if (isCheckingAuth) {
-    return <LoadingSpinner />;
+    return <LoadingSpinner message="Verifying credentials..." />;
   }
 
   return (

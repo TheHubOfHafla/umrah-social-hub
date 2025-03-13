@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -13,7 +13,8 @@ import {
   Users, 
   Menu, 
   X,
-  LogOut
+  LogOut,
+  ChevronRight
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -38,7 +39,13 @@ const DashboardLayout = ({ children, user, type }: DashboardLayoutProps) => {
   const location = useLocation();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [sidebarOpen, setSidebarOpen] = React.useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+
+  // Close sidebar on mobile when navigating
+  useEffect(() => {
+    setSidebarOpen(false);
+  }, [location.pathname]);
 
   const baseRoute = type === "user" ? "/dashboard" : "/organizer";
   
@@ -97,7 +104,7 @@ const DashboardLayout = ({ children, user, type }: DashboardLayoutProps) => {
   };
 
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className="flex min-h-screen flex-col bg-background">
       <Navbar />
       
       <div className="flex flex-1 pt-16">
@@ -120,23 +127,41 @@ const DashboardLayout = ({ children, user, type }: DashboardLayoutProps) => {
         {/* Sidebar */}
         <div
           className={cn(
-            "fixed inset-y-0 left-0 z-30 w-64 transform border-r bg-sidebar transition-transform duration-300 md:translate-x-0 pt-16",
-            sidebarOpen ? "translate-x-0" : "-translate-x-full"
+            "fixed inset-y-0 left-0 z-30 bg-card border-r border-border transition-all duration-300 pt-16 shadow-sm",
+            sidebarCollapsed ? "w-20" : "w-64",
+            sidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
           )}
         >
-          <ScrollArea className="h-full py-6">
-            <div className="px-4 py-4">
-              <div className="mb-6 flex items-center space-x-3 px-2">
-                <UserAvatar user={user} size="md" />
-                <div>
-                  <p className="font-medium">{user.name}</p>
-                  <p className="text-xs text-muted-foreground">
-                    {type === "user" ? "User Dashboard" : "Organizer Dashboard"}
-                  </p>
-                </div>
+          {/* Collapse toggle button (desktop only) */}
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="absolute right-2 top-20 hidden md:flex" 
+            onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+          >
+            {sidebarCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
+          </Button>
+          
+          <ScrollArea className="h-[calc(100%-8rem)] py-6">
+            <div className={cn("px-3 py-2", sidebarCollapsed ? "items-center" : "")}>
+              <div className={cn(
+                "mb-6 flex items-center px-2 py-1.5 rounded-md", 
+                !sidebarCollapsed && "space-x-3",
+                sidebarCollapsed && "flex-col justify-center"
+              )}>
+                <UserAvatar user={user} size={sidebarCollapsed ? "md" : "sm"} />
+                
+                {!sidebarCollapsed && (
+                  <div className="overflow-hidden">
+                    <p className="font-medium truncate">{user.name}</p>
+                    <p className="text-xs text-muted-foreground truncate">
+                      {type === "user" ? "User Dashboard" : "Organizer Dashboard"}
+                    </p>
+                  </div>
+                )}
               </div>
 
-              <nav className="space-y-1">
+              <nav className="space-y-1 px-1">
                 {navItems.map((item) => {
                   const isActive = location.pathname === item.href;
                   return (
@@ -144,14 +169,16 @@ const DashboardLayout = ({ children, user, type }: DashboardLayoutProps) => {
                       key={item.href}
                       to={item.href}
                       className={cn(
-                        "flex items-center space-x-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
+                        "flex items-center rounded-md px-3 py-2.5 text-sm font-medium transition-colors",
                         isActive
-                          ? "bg-sidebar-accent text-sidebar-accent-foreground"
-                          : "text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground"
+                          ? "bg-primary/10 text-primary font-semibold"
+                          : "text-muted-foreground hover:bg-secondary hover:text-foreground",
+                        sidebarCollapsed && "justify-center p-2"
                       )}
+                      title={sidebarCollapsed ? item.label : undefined}
                     >
-                      <item.icon className={cn("h-5 w-5", isActive ? "text-primary" : "")} />
-                      <span>{item.label}</span>
+                      <item.icon className={cn("h-5 w-5", isActive ? "text-primary" : "opacity-70")} />
+                      {!sidebarCollapsed && <span className="ml-3">{item.label}</span>}
                     </Link>
                   );
                 })}
@@ -159,24 +186,36 @@ const DashboardLayout = ({ children, user, type }: DashboardLayoutProps) => {
             </div>
           </ScrollArea>
 
-          <div className="absolute bottom-0 left-0 right-0 border-t p-4 space-y-2">
+          <div className={cn(
+            "absolute bottom-0 left-0 right-0 border-t p-3",
+            sidebarCollapsed ? "flex flex-col items-center space-y-2" : "space-y-2"
+          )}>
             <Button 
               variant="destructive" 
-              className="w-full justify-start" 
+              className={cn(
+                "justify-start", 
+                sidebarCollapsed && "w-10 h-10 p-0 justify-center"
+              )} 
               size="sm"
               onClick={handleSignOut}
+              title={sidebarCollapsed ? "Sign Out" : undefined}
             >
-              <LogOut className="mr-2 h-4 w-4" />
-              Sign Out
+              <LogOut className={cn("h-4 w-4", sidebarCollapsed ? "" : "mr-2")} />
+              {!sidebarCollapsed && "Sign Out"}
             </Button>
-            <Link to="/">
+            
+            <Link to="/" className={sidebarCollapsed ? "flex justify-center" : ""}>
               <Button 
                 variant="outline" 
-                className="w-full justify-start" 
+                className={cn(
+                  "justify-start w-full", 
+                  sidebarCollapsed && "w-10 h-10 p-0 justify-center"
+                )} 
                 size="sm"
+                title={sidebarCollapsed ? "Back to Home" : undefined}
               >
-                <ChevronLeft className="mr-2 h-4 w-4" />
-                Back to Home
+                <ChevronLeft className={cn("h-4 w-4", sidebarCollapsed ? "" : "mr-2")} />
+                {!sidebarCollapsed && "Back to Home"}
               </Button>
             </Link>
           </div>
@@ -184,8 +223,8 @@ const DashboardLayout = ({ children, user, type }: DashboardLayoutProps) => {
 
         {/* Main content */}
         <div className={cn(
-          "flex-1 transition-all duration-300 transform md:pl-64",
-          sidebarOpen ? "md:pl-64" : "md:pl-64"
+          "flex-1 transition-all duration-300",
+          sidebarCollapsed ? "md:pl-20" : "md:pl-64"
         )}>
           <main className="container py-8">
             {children}
@@ -193,7 +232,10 @@ const DashboardLayout = ({ children, user, type }: DashboardLayoutProps) => {
         </div>
       </div>
 
-      <div className="mt-auto md:pl-64">
+      <div className={cn(
+        "mt-auto",
+        sidebarCollapsed ? "md:pl-20" : "md:pl-64"
+      )}>
         <Footer />
       </div>
     </div>
