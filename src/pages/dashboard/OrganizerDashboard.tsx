@@ -1,272 +1,273 @@
 
-import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import { motion } from "framer-motion";
-import DashboardLayout from "@/components/dashboard/DashboardLayout";
-import DashboardStats from "@/components/dashboard/DashboardStats";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Calendar, BarChart2, Users, Ticket, PlusCircle, Target, TrendingUp, Lightbulb } from "lucide-react";
+import { useState } from "react";
+import { 
+  PieChart, 
+  BarChart, 
+  Activity, 
+  Users, 
+  Calendar,
+  TrendingUp,
+  AlertCircle,
+  RefreshCw
+} from "lucide-react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { currentUser } from "@/lib/data/users";
-import { getOrganizerEvents } from "@/lib/data/queries";
-import { EventCategory } from "@/types";
+import { Progress } from "@/components/ui/progress";
+import { Separator } from "@/components/ui/separator";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { UpcomingEventsList } from "@/components/dashboard/organizer";
 import { Container } from "@/components/ui/container";
-import { supabase } from "@/integrations/supabase/client";
-
-// Import our new components
-import GoalTracker from "@/components/dashboard/organizer/GoalTracker";
-import GrowthMetrics from "@/components/dashboard/organizer/GrowthMetrics";
-import UpcomingEventsList from "@/components/dashboard/organizer/UpcomingEventsList";
-import EventsFilter from "@/components/dashboard/organizer/EventsFilter";
-
-// Sample data for metrics
-const growthMetricsData = {
-  attendance: {
-    data: [
-      { month: "Jan", value: 120, previousYear: 100 },
-      { month: "Feb", value: 150, previousYear: 120 },
-      { month: "Mar", value: 180, previousYear: 130 },
-      { month: "Apr", value: 220, previousYear: 170 },
-      { month: "May", value: 280, previousYear: 190 },
-      { month: "Jun", value: 310, previousYear: 210 },
-      { month: "Jul", value: 350, previousYear: 230 },
-      { month: "Aug", value: 370, previousYear: 250 },
-      { month: "Sep", value: 400, previousYear: 270 },
-      { month: "Oct", value: 430, previousYear: 290 },
-      { month: "Nov", value: 450, previousYear: 300 },
-      { month: "Dec", value: 480, previousYear: 320 },
-    ],
-    growth: 32
-  },
-  donations: {
-    data: [
-      { month: "Jan", value: 1200, previousYear: 1000 },
-      { month: "Feb", value: 1500, previousYear: 1200 },
-      { month: "Mar", value: 2000, previousYear: 1300 },
-      { month: "Apr", value: 2300, previousYear: 1700 },
-      { month: "May", value: 2800, previousYear: 1900 },
-      { month: "Jun", value: 3100, previousYear: 2100 },
-      { month: "Jul", value: 3500, previousYear: 2300 },
-      { month: "Aug", value: 3700, previousYear: 2500 },
-      { month: "Sep", value: 4000, previousYear: 2700 },
-      { month: "Oct", value: 4300, previousYear: 2900 },
-      { month: "Nov", value: 4600, previousYear: 3000 },
-      { month: "Dec", value: 5000, previousYear: 3200 },
-    ],
-    growth: 45
-  },
-  events: {
-    total: 32,
-    growth: 28
-  },
-  averageAttendance: {
-    value: 85,
-    growth: 15
-  }
-};
+import DashboardLayout from "@/components/dashboard/DashboardLayout";
+import { useOrganizerAnalytics } from "@/hooks/useOrganizerAnalytics";
 
 const OrganizerDashboard = () => {
-  useEffect(() => {
-    document.title = "Organizer Dashboard | Islamic Social";
-  }, []);
+  const { events, recommendations, isLoading, error, refetch } = useOrganizerAnalytics();
+  const [activeTab, setActiveTab] = useState("overview");
 
-  const [searchQuery, setSearchQuery] = useState("");
-  const [categoryFilter, setCategoryFilter] = useState<EventCategory | "all">("all");
-  const [viewMode, setViewMode] = useState<'list' | 'chart'>('list');
-
-  const organizerEvents = getOrganizerEvents(currentUser.id);
-  
-  // Calculate metrics
-  const totalAttendees = organizerEvents.reduce(
-    (total, event) => total + (event.attendees?.length || 0),
-    0
-  );
-  
-  const totalRevenue = organizerEvents.reduce((total, event) => {
-    if (event.isFree) return total;
-    if (event.ticketTypes) {
-      return total + event.ticketTypes.reduce(
-        (eventTotal, ticket) => eventTotal + (ticket.price * ticket.sold),
-        0
-      );
-    }
-    return total + ((event.price || 0) * (event.attendees?.length || 0));
-  }, 0);
-
-  const stats = [
-    {
-      title: "Total Events",
-      value: organizerEvents.length,
-      icon: Calendar,
-      change: {
-        value: 20,
-        type: "increase" as const,
-      },
-    },
-    {
-      title: "Total Attendees",
-      value: totalAttendees,
-      icon: Users,
-      change: {
-        value: 15,
-        type: "increase" as const,
-      },
-    },
-    {
-      title: "Total Revenue",
-      value: `£${totalRevenue.toLocaleString()}`,
-      icon: Ticket,
-      change: {
-        value: 10,
-        type: "increase" as const,
-      },
-    },
-    {
-      title: "Avg. Attendance",
-      value: organizerEvents.length ? Math.round(totalAttendees / organizerEvents.length) : 0,
-      icon: BarChart2,
-      description: "Per event",
-    },
-  ];
-
-  // Helper function to filter tips based on goals
-  const getTips = () => {
-    const tips = [
-      {
-        title: "Boost your attendance",
-        description: "Share your events on social media at least 3 times before the event date for maximum visibility.",
-        icon: Users,
-      },
-      {
-        title: "Increase donations",
-        description: "Adding a compelling story with specific goals can increase donation amounts by up to 45%.",
-        icon: Ticket,
-      },
-      {
-        title: "Optimize event timing",
-        description: "Events scheduled on weekends tend to have 30% higher attendance than weekday events.",
-        icon: Calendar,
-      },
-    ];
-    
-    return tips;
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
   };
 
   return (
-    <DashboardLayout user={currentUser} type="organizer">
-      <motion.div 
-        className="space-y-8"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.5 }}
-      >
-        <motion.div 
-          className="flex items-center justify-between"
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
+    <DashboardLayout title="Organizer Dashboard" role="organizer">
+      <Container>
+        <div className="mb-6 flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">Organizer Dashboard</h1>
-            <p className="text-muted-foreground">
-              Track your events, goals, and performance
+            <h1 className="text-2xl font-semibold tracking-tight">Dashboard</h1>
+            <p className="text-sm text-muted-foreground">
+              Overview of your events and analytics
             </p>
           </div>
-          <Link to="/events/create">
-            <Button 
-              className="bg-[#8B5CF6] hover:bg-[#7C5AE2] transition-all duration-300"
-              size="sm"
-            >
-              <PlusCircle className="h-4 w-4 mr-2" />
-              Create Event
-            </Button>
-          </Link>
-        </motion.div>
+          <Button 
+            size="sm" 
+            variant="outline" 
+            className="flex items-center gap-1"
+            onClick={refetch}
+            disabled={isLoading}
+          >
+            <RefreshCw className={`h-4 w-4 ${isLoading ? "animate-spin" : ""}`} />
+            Refresh
+          </Button>
+        </div>
 
-        <DashboardStats stats={stats} />
+        {error && (
+          <Alert variant="destructive" className="mb-4">
+            <AlertCircle className="h-4 w-4" />
+            <AlertTitle>Error</AlertTitle>
+            <AlertDescription>
+              {error.message || "Failed to load analytics data. Please try again."}
+            </AlertDescription>
+          </Alert>
+        )}
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="md:col-span-2">
-            <Card className="h-full">
-              <CardHeader className="pb-0">
-                <CardTitle className="text-lg flex items-center">
-                  <TrendingUp className="h-5 w-5 mr-2 text-[#8B5CF6]" />
-                  Performance Overview
-                </CardTitle>
+        <Tabs defaultValue="overview" value={activeTab} onValueChange={handleTabChange}>
+          <TabsList className="mb-8">
+            <TabsTrigger value="overview">Overview</TabsTrigger>
+            <TabsTrigger value="events">Events</TabsTrigger>
+            <TabsTrigger value="audience">Audience</TabsTrigger>
+            <TabsTrigger value="financials">Financials</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="overview">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">
+                    Active Events
+                  </CardTitle>
+                  <Calendar className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{isLoading ? "..." : events.length}</div>
+                  <p className="text-xs text-muted-foreground">
+                    {isLoading ? "Loading..." : `${events.length} events currently active`}
+                  </p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">
+                    Total Ticket Sales
+                  </CardTitle>
+                  <PieChart className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{isLoading ? "..." : "1,245"}</div>
+                  <p className="text-xs text-muted-foreground">
+                    {isLoading ? "Loading..." : "+20% from last month"}
+                  </p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">
+                    Revenue
+                  </CardTitle>
+                  <BarChart className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{isLoading ? "..." : "$12,234"}</div>
+                  <p className="text-xs text-muted-foreground">
+                    {isLoading ? "Loading..." : "+15% from last month"}
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-8">
+              <Card className="col-span-1">
+                <CardHeader>
+                  <CardTitle>Upcoming Events</CardTitle>
+                  <CardDescription>
+                    Your next scheduled events
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <UpcomingEventsList events={events} isLoading={isLoading} />
+                </CardContent>
+              </Card>
+
+              <Card className="col-span-1">
+                <CardHeader>
+                  <CardTitle>Recommendations</CardTitle>
+                  <CardDescription>
+                    Insights to improve your events
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {isLoading ? (
+                    <div className="space-y-2">
+                      <div className="h-12 bg-secondary/50 animate-pulse rounded"></div>
+                      <div className="h-12 bg-secondary/50 animate-pulse rounded"></div>
+                      <div className="h-12 bg-secondary/50 animate-pulse rounded"></div>
+                    </div>
+                  ) : recommendations && recommendations.length > 0 ? (
+                    <ul className="space-y-3">
+                      {recommendations.map((rec, i) => (
+                        <li key={i} className="flex gap-2 items-start border-l-4 border-primary pl-3 py-1">
+                          <TrendingUp className="h-5 w-5 text-primary shrink-0 mt-0.5" />
+                          <p className="text-sm">{rec.message}</p>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <div className="text-center p-4">
+                      <p className="text-muted-foreground">No recommendations available</p>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Revenue Trend</CardTitle>
                 <CardDescription>
-                  Track improvements and growth over time
+                  Monthly revenue from event ticket sales
                 </CardDescription>
               </CardHeader>
-              <CardContent className="pt-6">
-                <EventsFilter 
-                  searchQuery={searchQuery}
-                  setSearchQuery={setSearchQuery}
-                  categoryFilter={categoryFilter}
-                  setCategoryFilter={setCategoryFilter}
-                  viewMode={viewMode}
-                  onViewModeChange={setViewMode}
-                />
-                
-                <div className="mt-6">
-                  <GrowthMetrics data={growthMetricsData} />
-                </div>
+              <CardContent className="h-80">
+                {isLoading ? (
+                  <div className="w-full h-full flex items-center justify-center">
+                    <div className="h-60 w-full bg-secondary/50 animate-pulse rounded"></div>
+                  </div>
+                ) : (
+                  <div className="flex items-center justify-center h-full">
+                    <p className="text-muted-foreground">Chart will be displayed here</p>
+                  </div>
+                )}
               </CardContent>
             </Card>
-          </div>
-          
-          <div>
-            <Card className="h-full">
+          </TabsContent>
+
+          <TabsContent value="events">
+            <Card>
               <CardHeader>
-                <CardTitle className="text-lg flex items-center">
-                  <Lightbulb className="h-5 w-5 mr-2 text-[#8B5CF6]" />
-                  Tips & Insights
-                </CardTitle>
+                <CardTitle>Event Performance</CardTitle>
                 <CardDescription>
-                  Personalized recommendations
+                  Detailed analytics for your events
                 </CardDescription>
               </CardHeader>
-              <CardContent className="pb-0">
-                <div className="space-y-4">
-                  {getTips().map((tip, index) => (
-                    <motion.div 
-                      key={index}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: index * 0.1, duration: 0.4 }}
-                      className="p-3 rounded-lg border bg-card/50 hover:bg-card transition-colors duration-300"
-                    >
-                      <div className="flex items-start gap-3">
-                        <div className="rounded-full bg-[#8B5CF6]/10 p-2">
-                          <tip.icon className="h-4 w-4 text-[#8B5CF6]" />
+              <CardContent>
+                {isLoading ? (
+                  <div className="space-y-4">
+                    <div className="h-16 bg-secondary/50 animate-pulse rounded"></div>
+                    <div className="h-16 bg-secondary/50 animate-pulse rounded"></div>
+                    <div className="h-16 bg-secondary/50 animate-pulse rounded"></div>
+                  </div>
+                ) : events.length > 0 ? (
+                  <div className="space-y-6">
+                    {events.map((event) => (
+                      <div key={event.id} className="border-b pb-4">
+                        <div className="flex justify-between items-center mb-2">
+                          <h3 className="font-semibold">{event.title}</h3>
+                          <p className="text-sm">{new Date(event.date).toLocaleDateString()}</p>
                         </div>
-                        <div>
-                          <h4 className="text-sm font-medium">{tip.title}</h4>
-                          <p className="text-xs text-muted-foreground mt-1">
-                            {tip.description}
+                        <div className="space-y-2">
+                          <div className="flex justify-between text-sm">
+                            <span>Ticket Sales Progress</span>
+                            <span>{100 - (event.tickets_remaining || 0)}%</span>
+                          </div>
+                          <Progress value={100 - (event.tickets_remaining || 0)} className="h-2" />
+                          <p className="text-xs text-muted-foreground">
+                            Estimated sell-out: {event.estimated_sellout_days || "N/A"} days
                           </p>
                         </div>
                       </div>
-                    </motion.div>
-                  ))}
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center p-8">
+                    <p className="text-muted-foreground">No event data available</p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="audience">
+            <Card>
+              <CardHeader>
+                <CardTitle>Audience Overview</CardTitle>
+                <CardDescription>
+                  Insights about your attendees
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="h-72 flex items-center justify-center">
+                  <p className="text-muted-foreground">Audience data will be displayed here</p>
                 </div>
               </CardContent>
-              <CardFooter className="pt-4">
-                <Button variant="outline" size="sm" className="text-xs w-full">View All Tips</Button>
-              </CardFooter>
             </Card>
-          </div>
-        </div>
+          </TabsContent>
 
-        <div className="grid gap-6 md:grid-cols-5">
-          <div className="md:col-span-3">
-            <UpcomingEventsList events={organizerEvents.slice(0, 3)} />
-          </div>
-          
-          <div className="md:col-span-2">
-            <GoalTracker />
-          </div>
-        </div>
-      </motion.div>
+          <TabsContent value="financials">
+            <Card>
+              <CardHeader>
+                <CardTitle>Financial Overview</CardTitle>
+                <CardDescription>
+                  Summary of your revenue and expenses
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="h-72 flex items-center justify-center">
+                  <p className="text-muted-foreground">Financial data will be displayed here</p>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
+      </Container>
     </DashboardLayout>
   );
 };
