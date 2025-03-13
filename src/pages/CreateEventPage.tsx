@@ -40,6 +40,7 @@ import { EventCategory, EventLocation } from "@/types";
 import { categories } from "@/lib/data";
 import { useToast } from "@/hooks/use-toast";
 import AiEventCreator from "@/components/event-creation/AiEventCreator";
+import { supabase } from "@/lib/supabase";
 
 const eventFormSchema = z.object({
   title: z.string().min(3, { message: "Event title must be at least 3 characters" }),
@@ -74,7 +75,6 @@ const CreateEventPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
   
-  // Check if we have event data from AI to pre-fill
   const prefilledEvent = location.state?.event;
   
   const form = useForm<EventFormValues>({
@@ -94,24 +94,102 @@ const CreateEventPage = () => {
     }
   });
   
-  // If we have prefilled event data, automatically go to manual mode
   useState(() => {
     if (prefilledEvent) {
       setCreationMode("manual");
     }
   });
   
-  const onSubmit = (values: EventFormValues) => {
+  const onSubmit = async (values: EventFormValues) => {
     console.log(values);
-    // Here you would typically send the data to your backend
-    toast({
-      title: "Event created!",
-      description: "Your event has been created successfully.",
-    });
     
-    setTimeout(() => {
-      navigate('/events');
-    }, 1500);
+    try {
+      setIsLoading(true);
+      
+      const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+      
+      if (sessionError || !sessionData.session) {
+        throw new Error("You must be logged in to create an event");
+      }
+      
+      const userId = sessionData.session.user.id;
+      
+      const { data: organizerData, error: organizerError } = await supabase
+        .from('organizers')
+        .select('id')
+        .eq('user_id', userId)
+        .single();
+      
+      let organizerId;
+      
+      if (organizerError || !organizerData) {
+        const { data: newOrganizer, error: createError } = await supabase
+          .from('organizers')
+          .insert([
+            { 
+              user_id: userId,
+              name: sessionData.session.user.email?.split('@')[0] || 'New Organizer',
+            }
+          ])
+          .select('id')
+          .single();
+        
+        if (createError || !newOrganizer) {
+          throw new Error("Failed to create organizer profile");
+        }
+        
+        organizerId = newOrganizer.id;
+      } else {
+        organizerId = organizerData.id;
+      }
+      
+      const { data: eventData, error: eventError } = await supabase
+        .from('events')
+        .insert([
+          {
+            title: values.title,
+            description: values.description,
+            short_description: values.description.substring(0, 120) + '...',
+            organizer_id: organizerId,
+            location_name: values.location.name,
+            location_address: values.location.address,
+            location_city: values.location.city, 
+            location_country: values.location.country,
+            start_date: values.date.start.toISOString(),
+            end_date: values.date.end ? values.date.end.toISOString() : new Date(values.date.start.getTime() + 2 * 60 * 60 * 1000).toISOString(),
+            capacity: values.capacity || 100,
+            is_free: values.isFree,
+            base_price: values.price || 0,
+            categories: [values.category],
+            image: values.image,
+            tickets_remaining: values.capacity || 100
+          }
+        ])
+        .select('id')
+        .single();
+      
+      if (eventError || !eventData) {
+        throw new Error("Failed to create event: " + eventError?.message);
+      }
+      
+      toast({
+        title: "Event created!",
+        description: "Your event has been created successfully.",
+      });
+      
+      setTimeout(() => {
+        navigate('/events/' + eventData.id);
+      }, 1500);
+    } catch (error) {
+      console.error("Error creating event:", error);
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to create event. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleAIMode = () => {
@@ -129,15 +207,12 @@ const CreateEventPage = () => {
   const handleBannerUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      // In a real app, you would upload this file to your server
-      // For now, we'll just create a local URL for preview
       const imageUrl = URL.createObjectURL(file);
       setBannerPreview(imageUrl);
       form.setValue("image", imageUrl);
     }
   };
 
-  // Function to select a sample banner
   const selectSampleBanner = (imageUrl: string) => {
     setBannerPreview(imageUrl);
     form.setValue("image", imageUrl);
@@ -803,3 +878,4 @@ const CreateEventPage = () => {
 };
 
 export default CreateEventPage;
+
