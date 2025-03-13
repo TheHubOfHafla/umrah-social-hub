@@ -51,8 +51,12 @@ export const validateSupabaseIntegrations = async () => {
   return results;
 };
 
-// Function to validate a specific table integration
-export const validateTableIntegration = async (tableName: string): Promise<boolean> => {
+// Function to validate a specific table integration with type safety
+export const validateTableIntegration = async (
+  tableName: 'attendees' | 'events' | 'ticket_types' | 'chat_messages' | 
+            'event_confirmations' | 'event_metrics' | 'organizers' | 
+            'profiles' | 'ticket_sales_daily' | 'user_engagement'
+): Promise<boolean> => {
   try {
     const { data, error } = await supabase.from(tableName).select('id').limit(1);
     if (error) {

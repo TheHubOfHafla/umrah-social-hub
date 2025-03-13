@@ -38,8 +38,8 @@ export const useOrganizerAnalytics = () => {
       // Get the access token
       const accessToken = sessionData.session.access_token;
       
-      // Use the URL from the Supabase client
-      const supabaseUrl = supabase.supabaseUrl || 'https://annunwfjlsgrrcqfkykd.supabase.co';
+      // Use the hardcoded URL since we can't access the protected supabaseUrl property
+      const supabaseUrl = 'https://annunwfjlsgrrcqfkykd.supabase.co';
       const functionUrl = `${supabaseUrl}/functions/v1/get-organizer-analytics`;
       
       console.log('Fetching analytics from:', functionUrl);
