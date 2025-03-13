@@ -74,6 +74,15 @@ const UserMenu = ({ className }: UserMenuProps) => {
             {isOrganizer ? "My Events" : "Events I'm Attending"}
           </DropdownMenuItem>
 
+          {!isOrganizer && (
+            <DropdownMenuItem className="hover:bg-primary/10 hover:text-primary" onClick={() => 
+              handleNavigation("/organizer/signup")
+            }>
+              <Building className="mr-2 h-4 w-4" />
+              Become an Organizer
+            </DropdownMenuItem>
+          )}
+
           <DropdownMenuItem className="hover:bg-primary/10 hover:text-primary" onClick={() => 
             handleNavigation(isOrganizer ? "/organizer/profile" : "/dashboard/profile")
           }>

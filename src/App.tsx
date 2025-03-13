@@ -28,6 +28,7 @@ import UserEvents from "./pages/dashboard/UserEvents";
 import OrganizerEvents from "./pages/dashboard/OrganizerEvents";
 import UserProfile from "./pages/dashboard/UserProfile";
 import OrganizerProfile from "./pages/dashboard/OrganizerProfile";
+import OrganizerSignup from "./pages/dashboard/OrganizerSignup";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import AuthCallback from "./pages/AuthCallback";
@@ -179,6 +180,11 @@ const App = () => {
           <BrowserRouter>
             <Navbar />
             <Routes>
+              <Route path="/organizer/signup" element={
+                <PageWrapper>
+                  {isAuthenticated ? <OrganizerSignup /> : <Navigate to="/login" />}
+                </PageWrapper>
+              } />
               <Route path="/" element={<Index />} />
               <Route path="/events" element={
                 <PageWrapper>
