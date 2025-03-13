@@ -12,7 +12,7 @@ import FinancialOverview from "@/components/dashboard/organizer/FinancialOvervie
 import DashboardHeader from "@/components/dashboard/organizer/DashboardHeader";
 
 const OrganizerDashboard = () => {
-  const { events, recommendations, isLoading, error, refetch } = useOrganizerAnalytics();
+  const { events, metrics, ticketSales, engagement, recommendations, isLoading, error, refetch } = useOrganizerAnalytics();
   const [activeTab, setActiveTab] = useState("overview");
 
   const handleTabChange = (value: string) => {
@@ -52,15 +52,25 @@ const OrganizerDashboard = () => {
           </TabsContent>
 
           <TabsContent value="events">
-            <EventPerformance events={events} isLoading={isLoading} />
+            <EventPerformance 
+              events={events} 
+              metrics={metrics} 
+              isLoading={isLoading} 
+            />
           </TabsContent>
 
           <TabsContent value="audience">
-            <AudienceOverview />
+            <AudienceOverview 
+              engagement={engagement}
+              isLoading={isLoading}
+            />
           </TabsContent>
 
           <TabsContent value="financials">
-            <FinancialOverview />
+            <FinancialOverview 
+              ticketSales={ticketSales}
+              isLoading={isLoading}
+            />
           </TabsContent>
         </Tabs>
       </Container>
