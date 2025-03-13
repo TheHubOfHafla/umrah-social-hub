@@ -1,6 +1,5 @@
-
 import { supabase } from "@/integrations/supabase/client";
-import { Event, EventOrganizer } from "@/types";
+import { Event, EventOrganizer, AttendeeType, EventCategory } from "@/types";
 
 /**
  * Get organizer profile by user ID
@@ -23,7 +22,7 @@ export async function getOrganizerByUserId(userId: string): Promise<EventOrganiz
     avatar: data.avatar,
     bio: data.bio,
     website: data.website,
-    organizationType: data.organization_type,
+    organizationType: data.organization_type as EventOrganizer['organizationType'],
   };
 }
 
@@ -241,10 +240,10 @@ function formatEventFromSupabase(event: any): Event {
       avatar: event.organizer.avatar || "/placeholder.svg",
       bio: event.organizer.bio,
       website: event.organizer.website,
-      organizationType: event.organizer.organization_type,
+      organizationType: event.organizer.organization_type as EventOrganizer['organizationType'],
     },
     categories: event.categories || [],
-    attendeeType: event.attendee_type,
+    attendeeType: event.attendee_type as AttendeeType | undefined,
     featured: event.featured || false,
     ticketTypes: event.ticket_types?.map(ticket => ({
       id: ticket.id,
