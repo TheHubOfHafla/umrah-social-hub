@@ -70,11 +70,11 @@ const OrganizerDashboard = () => {
     setActiveTab(value);
   };
 
-  // Fix: Use the correct UserRole type for the role property
+  // Define mockUser with the correct typing
   const mockUser: User = {
     id: "1",
     name: "Organizer",
-    role: "organizer" as UserRole // Cast to UserRole type
+    role: "organizer" as UserRole // Explicitly cast to UserRole type
   };
 
   return (
