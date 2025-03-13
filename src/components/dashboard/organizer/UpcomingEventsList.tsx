@@ -31,7 +31,7 @@ export const UpcomingEventsList = ({ events, isLoading }: UpcomingEventsListProp
           <div className="flex-1 min-w-0">
             <h4 className="font-medium text-sm truncate">{event.title}</h4>
             <p className="text-xs text-muted-foreground">
-              {new Date(event.date || event.date?.start).toLocaleDateString()}
+              {new Date(event.date || event.date?.start || Date.now()).toLocaleDateString()}
             </p>
           </div>
         </div>

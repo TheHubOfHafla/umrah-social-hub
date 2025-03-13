@@ -1,7 +1,7 @@
 
 import { Button } from "@/components/ui/button";
-import { RefreshCw } from "lucide-react";
-import { Alert, AlertCircle, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { RefreshCw, AlertCircle } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 interface DashboardHeaderProps {
   refetch: () => void;
