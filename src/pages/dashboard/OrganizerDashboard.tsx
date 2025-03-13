@@ -8,11 +8,12 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Calendar, BarChart2, Users, Ticket, PlusCircle, Target, TrendingUp, Lightbulb } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { currentUser } from "@/lib/data/users";
-import { getOrganizerEvents } from "@/lib/data/queries";
 import { EventCategory } from "@/types";
-import { Container } from "@/components/ui/container";
+import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/use-auth";
+import { getOrganizerByUserId, getOrganizerStats, getOrganizerUpcomingEvents } from "@/lib/api/organizer";
 
-// Import our new components
+// Import our components
 import GoalTracker from "@/components/dashboard/organizer/GoalTracker";
 import GrowthMetrics from "@/components/dashboard/organizer/GrowthMetrics";
 import UpcomingEventsList from "@/components/dashboard/organizer/UpcomingEventsList";
@@ -65,68 +66,102 @@ const growthMetricsData = {
 };
 
 const OrganizerDashboard = () => {
-  useEffect(() => {
-    document.title = "Organizer Dashboard | Islamic Social";
-  }, []);
-
+  const { user } = useAuth();
+  const { toast } = useToast();
+  
+  // State for UI
   const [searchQuery, setSearchQuery] = useState("");
   const [categoryFilter, setCategoryFilter] = useState<EventCategory | "all">("all");
   const [viewMode, setViewMode] = useState<'list' | 'chart'>('list');
+  
+  // State for data
+  const [loading, setLoading] = useState(true);
+  const [organizer, setOrganizer] = useState<any>(null);
+  const [events, setEvents] = useState<any[]>([]);
+  const [stats, setStats] = useState<any[]>([]);
 
-  const organizerEvents = getOrganizerEvents(currentUser.id);
-  
-  // Calculate metrics
-  const totalAttendees = organizerEvents.reduce(
-    (total, event) => total + (event.attendees?.length || 0),
-    0
-  );
-  
-  const totalRevenue = organizerEvents.reduce((total, event) => {
-    if (event.isFree) return total;
-    if (event.ticketTypes) {
-      return total + event.ticketTypes.reduce(
-        (eventTotal, ticket) => eventTotal + (ticket.price * ticket.sold),
-        0
-      );
+  // Load organizer data on mount
+  useEffect(() => {
+    document.title = "Organizer Dashboard | Islamic Social";
+    
+    if (!user) return;
+    
+    async function loadData() {
+      setLoading(true);
+      try {
+        // Get organizer profile
+        const organizerData = await getOrganizerByUserId(user.id);
+        
+        if (!organizerData) {
+          toast({
+            title: "Not an organizer",
+            description: "Your account is not set up as an organizer yet.",
+            variant: "destructive"
+          });
+          return;
+        }
+        
+        setOrganizer(organizerData);
+        
+        // Get organizer events
+        const eventsData = await getOrganizerUpcomingEvents(organizerData.id);
+        setEvents(eventsData);
+        
+        // Get stats
+        const statsData = await getOrganizerStats(organizerData.id);
+        
+        // Format stats for the DashboardStats component
+        const formattedStats = [
+          {
+            title: "Total Events",
+            value: statsData.totalEvents,
+            icon: Calendar,
+            change: {
+              value: 20,
+              type: "increase" as const,
+            },
+          },
+          {
+            title: "Total Attendees",
+            value: statsData.totalAttendees,
+            icon: Users,
+            change: {
+              value: 15,
+              type: "increase" as const,
+            },
+          },
+          {
+            title: "Total Revenue",
+            value: `£${statsData.totalRevenue.toLocaleString()}`,
+            icon: Ticket,
+            change: {
+              value: 10,
+              type: "increase" as const,
+            },
+          },
+          {
+            title: "Avg. Attendance",
+            value: statsData.avgAttendance,
+            icon: BarChart2,
+            description: "Per event",
+          },
+        ];
+        
+        setStats(formattedStats);
+      } catch (error) {
+        console.error("Error loading dashboard data:", error);
+        toast({
+          title: "Error loading dashboard",
+          description: "There was a problem loading your dashboard data. Please try again.",
+          variant: "destructive"
+        });
+      } finally {
+        setLoading(false);
+      }
     }
-    return total + ((event.price || 0) * (event.attendees?.length || 0));
-  }, 0);
-
-  const stats = [
-    {
-      title: "Total Events",
-      value: organizerEvents.length,
-      icon: Calendar,
-      change: {
-        value: 20,
-        type: "increase" as const,
-      },
-    },
-    {
-      title: "Total Attendees",
-      value: totalAttendees,
-      icon: Users,
-      change: {
-        value: 15,
-        type: "increase" as const,
-      },
-    },
-    {
-      title: "Total Revenue",
-      value: `£${totalRevenue.toLocaleString()}`,
-      icon: Ticket,
-      change: {
-        value: 10,
-        type: "increase" as const,
-      },
-    },
-    {
-      title: "Avg. Attendance",
-      value: organizerEvents.length ? Math.round(totalAttendees / organizerEvents.length) : 0,
-      icon: BarChart2,
-      description: "Per event",
-    },
-  ];
+    
+    loadData();
+  }, [user, toast]);
 
   // Helper function to filter tips based on goals
   const getTips = () => {
@@ -151,8 +186,45 @@ const OrganizerDashboard = () => {
     return tips;
   };
 
+  // Fall back to mock data if we're still loading or have no data yet
+  const displayStats = stats.length > 0 ? stats : [
+    {
+      title: "Total Events",
+      value: 0,
+      icon: Calendar,
+      change: {
+        value: 0,
+        type: "increase" as const,
+      },
+    },
+    {
+      title: "Total Attendees",
+      value: 0,
+      icon: Users,
+      change: {
+        value: 0,
+        type: "increase" as const,
+      },
+    },
+    {
+      title: "Total Revenue",
+      value: `£0`,
+      icon: Ticket,
+      change: {
+        value: 0,
+        type: "increase" as const,
+      },
+    },
+    {
+      title: "Avg. Attendance",
+      value: 0,
+      icon: BarChart2,
+      description: "Per event",
+    },
+  ];
+
   return (
-    <DashboardLayout user={currentUser} type="organizer">
+    <DashboardLayout user={user || currentUser} type="organizer">
       <motion.div 
         className="space-y-8"
         initial={{ opacity: 0 }}
@@ -182,7 +254,7 @@ const OrganizerDashboard = () => {
           </Link>
         </motion.div>
 
-        <DashboardStats stats={stats} />
+        <DashboardStats stats={displayStats} />
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="md:col-span-2">
@@ -258,7 +330,7 @@ const OrganizerDashboard = () => {
 
         <div className="grid gap-6 md:grid-cols-5">
           <div className="md:col-span-3">
-            <UpcomingEventsList events={organizerEvents.slice(0, 3)} />
+            <UpcomingEventsList events={events} />
           </div>
           
           <div className="md:col-span-2">

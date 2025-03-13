@@ -5,15 +5,53 @@ import { motion } from "framer-motion";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Event } from "@/types";
-import { Calendar, Users, Clock, Share2, PenSquare, ExternalLink } from "lucide-react";
+import { Calendar, Users, Clock, Share2, PenSquare, ExternalLink, AlertCircle } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 interface UpcomingEventsListProps {
   events: Event[];
 }
 
 const UpcomingEventsList = ({ events }: UpcomingEventsListProps) => {
-  // Use the uploaded image
-  const imageSrc = "/lovable-uploads/2b781a41-72aa-4b72-9785-fe84e014bdd7.png";
+  const { toast } = useToast();
+  const [isCreating, setIsCreating] = useState(false);
+  
+  // Placeholder image if one isn't provided
+  const defaultImageSrc = "/lovable-uploads/2b781a41-72aa-4b72-9785-fe84e014bdd7.png";
+
+  // Handle share button click
+  const handleShareClick = (event: Event) => {
+    // Create the URL to share
+    const shareUrl = `${window.location.origin}/events/${event.id}`;
+    
+    // Try to use the Web Share API if available
+    if (navigator.share) {
+      navigator.share({
+        title: event.title,
+        text: event.shortDescription || "Check out this event!",
+        url: shareUrl,
+      })
+      .catch((error) => console.error("Error sharing:", error));
+    } else {
+      // Fallback to copying to clipboard
+      navigator.clipboard.writeText(shareUrl).then(
+        () => {
+          toast({
+            title: "Link copied!",
+            description: "Event link copied to clipboard",
+          });
+        },
+        (err) => {
+          console.error("Could not copy text: ", err);
+          toast({
+            title: "Couldn't copy link",
+            description: "Please try again or share manually",
+            variant: "destructive",
+          });
+        }
+      );
+    }
+  };
 
   return (
     <motion.div
@@ -27,7 +65,14 @@ const UpcomingEventsList = ({ events }: UpcomingEventsListProps) => {
           <Calendar className="mr-2 h-5 w-5 text-[#8B5CF6]" /> Upcoming Events
         </h3>
         <Link to="/events/create">
-          <Button variant="outline" size="sm" className="text-xs">Create Event</Button>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="text-xs"
+            onClick={() => setIsCreating(true)}
+          >
+            Create Event
+          </Button>
         </Link>
       </div>
 
@@ -60,9 +105,13 @@ const UpcomingEventsList = ({ events }: UpcomingEventsListProps) => {
                   <div className="flex flex-col sm:flex-row">
                     <div className="w-full sm:w-24 h-24 sm:h-auto overflow-hidden bg-muted">
                       <img 
-                        src={imageSrc} 
+                        src={event.image || defaultImageSrc} 
                         alt={event.title} 
                         className="w-full h-full object-cover"
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement;
+                          target.src = defaultImageSrc;
+                        }}
                       />
                     </div>
                     <div className="p-4 flex-1 flex flex-col justify-between">
@@ -95,7 +144,12 @@ const UpcomingEventsList = ({ events }: UpcomingEventsListProps) => {
                             <PenSquare className="h-3 w-3 mr-1" /> Edit
                           </Button>
                         </Link>
-                        <Button variant="ghost" size="sm" className="h-7 text-xs">
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className="h-7 text-xs"
+                          onClick={() => handleShareClick(event)}
+                        >
                           <Share2 className="h-3 w-3 mr-1" /> Share
                         </Button>
                       </div>
@@ -112,4 +166,3 @@ const UpcomingEventsList = ({ events }: UpcomingEventsListProps) => {
 };
 
 export default UpcomingEventsList;
-
