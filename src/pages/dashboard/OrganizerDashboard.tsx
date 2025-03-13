@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { 
   PieChart, 
@@ -25,6 +26,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Container } from "@/components/ui/container";
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
 import { useOrganizerAnalytics } from "@/hooks/useOrganizerAnalytics";
+import { User, UserRole } from "@/types"; // Import the User and UserRole types
 
 const UpcomingEventsList = ({ events, isLoading }: { events: any[], isLoading: boolean }) => {
   if (isLoading) {
@@ -68,10 +70,11 @@ const OrganizerDashboard = () => {
     setActiveTab(value);
   };
 
-  const mockUser = {
+  // Fix: Use the correct UserRole type for the role property
+  const mockUser: User = {
     id: "1",
     name: "Organizer",
-    role: "organizer"
+    role: "organizer" as UserRole // Cast to UserRole type
   };
 
   return (
