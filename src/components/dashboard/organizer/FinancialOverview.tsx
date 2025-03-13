@@ -3,7 +3,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { DollarSign, TrendingUp, CreditCard, Wallet } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 
-const FinancialOverview = () => {
+interface FinancialOverviewProps {
+  ticketSales: any[];
+  isLoading: boolean;
+}
+
+const FinancialOverview = ({ ticketSales, isLoading }: FinancialOverviewProps) => {
   // Mockup data - would be replaced with real data in production
   const financialStats = [
     { label: "Total Revenue", value: "$12,845", percentage: 75, trend: "+15%" },
