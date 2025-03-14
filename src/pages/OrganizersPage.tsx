@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Link, useNavigate } from "react-router-dom";
@@ -131,9 +132,12 @@ const OrganizersPage = () => {
                 handleViewProfile(organizer.id);
               }}
             >
-              View Profile 
-              <Eye className="h-3.5 w-3.5 transition-transform duration-300 group-hover:translate-x-0.5" />
-              <span className="absolute inset-0 bg-primary/5 transform scale-x-0 transition-transform duration-300 origin-left group-hover:scale-x-100 -z-10"></span>
+              <span className="relative z-10 flex items-center gap-1.5">
+                View Profile 
+                <Eye className="h-3.5 w-3.5 transition-transform duration-300 group-hover:translate-x-0.5" />
+              </span>
+              <span className="absolute inset-0 bg-primary/10 transform scale-x-0 transition-transform duration-500 origin-left group-hover:scale-x-100"></span>
+              <span className="absolute bottom-0 left-0 w-full h-0.5 bg-primary transform scale-x-0 transition-transform duration-500 origin-left group-hover:scale-x-100"></span>
             </Button>
           </CardFooter>
         </Card>
