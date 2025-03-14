@@ -16,7 +16,7 @@ const ContactUs = () => {
 
   return (
     <div className="pt-16 md:pt-20 pb-12 md:pb-16">
-      <div className="bg-primary/10 py-8 md:py-12 mb-8 md:mb-10">
+      <div className="bg-[#f5f9fc] py-8 md:py-12 mb-8 md:mb-10">
         <Container>
           <h1 className="text-3xl md:text-4xl font-bold text-center mb-3 md:mb-4">Contact Us</h1>
           <p className="text-base md:text-lg text-center max-w-3xl mx-auto text-muted-foreground px-4">
@@ -27,17 +27,19 @@ const ContactUs = () => {
       
       <Container className="max-w-5xl px-4 md:px-6">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
-          <div>
+          <div className="bg-white shadow-md rounded-md p-6">
             <ContactInfo />
             <SocialLinks />
           </div>
           
-          <div>
+          <div className="bg-white shadow-md rounded-md p-6">
             <ContactForm />
           </div>
         </div>
         
-        <Faqs />
+        <div className="bg-white shadow-md rounded-md p-6">
+          <Faqs />
+        </div>
       </Container>
     </div>
   );

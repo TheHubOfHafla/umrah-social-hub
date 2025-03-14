@@ -26,8 +26,8 @@ const FeaturedEvent = ({ event }: FeaturedEventProps) => {
   return (
     <Link to={`/events/${event.id}`}>
       <Card className={cn(
-        "overflow-hidden transition-all duration-700 transform cursor-pointer group relative",
-        "hover:shadow-xl hover:scale-[1.02] hover:border-primary/40",
+        "overflow-hidden transition-all duration-150 cursor-pointer group relative shadow-md",
+        "hover:shadow-lg border-gray-100",
         isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
       )}>
         <div className="relative aspect-[16/9] md:aspect-[21/9]">
@@ -35,51 +35,51 @@ const FeaturedEvent = ({ event }: FeaturedEventProps) => {
           <img
             src={imageSrc}
             alt={event.title}
-            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
           />
           <div className="absolute bottom-0 left-0 right-0 p-3 md:p-6 z-20 text-white">
             <div className="flex items-center gap-2 mb-2 md:mb-3">
-              <Badge className="bg-primary/90 hover:bg-primary transition-all duration-300 group-hover:scale-105 text-xs md:text-sm">Featured Event</Badge>
+              <Badge className="bg-[#4A90E2] hover:bg-[#3A7BC8] transition-all duration-150 text-xs md:text-sm">Featured Event</Badge>
               {event.ticketActivity?.isSellingFast && (
                 <TicketAlert type="selling-fast" className="bg-opacity-80 backdrop-blur-sm" />
               )}
             </div>
-            <h2 className="text-xl md:text-3xl font-bold mb-1 md:mb-2 group-hover:text-primary-foreground transition-colors duration-300 group-hover:text-shadow-sm line-clamp-2 md:line-clamp-none">
+            <h2 className="text-xl md:text-3xl font-bold mb-1 md:mb-2 group-hover:text-white transition-colors duration-150 line-clamp-2 md:line-clamp-none">
               {event.title}
             </h2>
-            <p className="text-sm md:text-lg text-white/90 mb-2 md:mb-4 max-w-2xl transition-opacity duration-300 group-hover:text-white line-clamp-2 md:line-clamp-3">
+            <p className="text-sm md:text-lg text-white/90 mb-2 md:mb-4 max-w-2xl transition-opacity duration-150 group-hover:text-white line-clamp-2 md:line-clamp-3">
               {event.shortDescription}
             </p>
-            <div className="flex flex-wrap gap-2 md:gap-4 text-xs md:text-sm text-white/80 transition-all duration-300 group-hover:text-white/95">
+            <div className="flex flex-wrap gap-2 md:gap-4 text-xs md:text-sm text-white/80 transition-all duration-150 group-hover:text-white/95">
               <div className="flex items-center">
-                <CalendarIcon className="mr-1 md:mr-2 h-3 w-3 md:h-4 md:w-4 transition-colors duration-300 group-hover:text-primary/90" />
+                <CalendarIcon className="mr-1 md:mr-2 h-3 w-3 md:h-4 md:w-4 transition-colors duration-150 group-hover:text-[#4A90E2]" />
                 {new Date(event.date.start).toLocaleDateString()}
               </div>
               <div className="flex items-center">
-                <Clock className="mr-1 md:mr-2 h-3 w-3 md:h-4 md:w-4 transition-colors duration-300 group-hover:text-primary/90" />
+                <Clock className="mr-1 md:mr-2 h-3 w-3 md:h-4 md:w-4 transition-colors duration-150 group-hover:text-[#4A90E2]" />
                 {new Date(event.date.start).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
               </div>
               <div className="flex items-center">
-                <MapPin className="mr-1 md:mr-2 h-3 w-3 md:h-4 md:w-4 transition-colors duration-300 group-hover:text-primary/90" />
+                <MapPin className="mr-1 md:mr-2 h-3 w-3 md:h-4 md:w-4 transition-colors duration-150 group-hover:text-[#4A90E2]" />
                 {event.location.city}, {event.location.country}
               </div>
             </div>
           </div>
         </div>
-        <CardContent className="p-4 transition-all duration-300 group-hover:bg-primary/5">
+        <CardContent className="p-4 transition-all duration-150 bg-white group-hover:bg-gray-50">
           <div className="flex justify-between items-center">
             <div className="flex items-center space-x-2">
               <img
                 src={event.organizer.avatar}
                 alt={event.organizer.name}
-                className="w-8 h-8 md:w-10 md:h-10 rounded-full transition-transform duration-300 group-hover:scale-105"
+                className="w-8 h-8 md:w-10 md:h-10 rounded-full"
               />
               <div>
-                <p className="font-medium transition-colors duration-300 group-hover:text-primary text-sm md:text-base">{event.organizer.name}</p>
-                <p className="text-xs md:text-sm text-muted-foreground transition-colors duration-300 group-hover:text-foreground/80">Event Organizer</p>
+                <p className="font-medium text-sm md:text-base">{event.organizer.name}</p>
+                <p className="text-xs md:text-sm text-muted-foreground">Event Organizer</p>
               </div>
             </div>
-            <Button variant="secondary" className="text-xs md:text-sm px-2 py-1 md:px-4 md:py-2 group-hover:bg-primary group-hover:text-white transition-all duration-300 hover:scale-105">
+            <Button variant="secondary" className="text-xs md:text-sm px-2 py-1 md:px-4 md:py-2 transition-all duration-150">
               Learn More
             </Button>
           </div>

@@ -25,8 +25,8 @@ const PageWrapper = ({
       "flex flex-col min-h-screen",
       {
         "bg-background": background === "default",
-        "bg-gradient-warm": background === "gradient",
-        "bg-secondary/30": background === "subtle",
+        "bg-gradient-cool": background === "gradient",
+        "bg-gray-50": background === "subtle",
       },
       className
     )}>

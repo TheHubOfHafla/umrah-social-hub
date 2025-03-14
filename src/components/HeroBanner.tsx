@@ -56,23 +56,22 @@ const HeroBanner = ({ user, onLocationSelect, isAuthenticated = true }: HeroBann
       <div className="absolute inset-0 z-20 flex items-center justify-center">
         <div className="container mx-auto px-4">
           <div className={cn(
-            "text-center max-w-3xl mx-auto space-y-6 backdrop-blur-sm p-8 rounded-2xl transition-all duration-700 ease-out",
-            contentVisible ? "opacity-100 translate-y-0 bg-background/10" : "opacity-0 translate-y-8 bg-background/0"
+            "text-center max-w-3xl mx-auto space-y-6 p-8 rounded-md transition-all duration-500 ease-out",
+            contentVisible ? "opacity-100 translate-y-0 bg-white/90 shadow-lg" : "opacity-0 translate-y-8 bg-white/0"
           )}>
             <h1 className={cn(
-              "text-4xl sm:text-5xl font-bold tracking-tight font-heading leading-tight text-balance transition-all duration-700 delay-100",
+              "text-4xl sm:text-5xl font-bold tracking-tight font-heading leading-tight text-balance transition-all duration-500 delay-100",
               contentVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
             )}>
               Discover Islamic Events Near You
             </h1>
             
             <div className={cn(
-              "flex flex-col sm:flex-row gap-3 mt-8 justify-center transition-all duration-700 delay-300",
+              "flex flex-col sm:flex-row gap-3 mt-8 justify-center transition-all duration-500 delay-300",
               contentVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
             )}>
               <motion.div 
                 className="w-full sm:w-72"
-                whileHover={{ scale: 1.02 }}
                 transition={{ type: "spring", stiffness: 400, damping: 10 }}
               >
                 <EventSearch 
@@ -82,7 +81,7 @@ const HeroBanner = ({ user, onLocationSelect, isAuthenticated = true }: HeroBann
               </motion.div>
               <Link to="/events">
                 <Button 
-                  className="w-full sm:w-auto hover:scale-105 transition-transform duration-300" 
+                  className="w-full sm:w-auto transition-all duration-150" 
                   icon={<Filter className="w-4 h-4" />}
                 >
                   Browse All Events
@@ -92,13 +91,13 @@ const HeroBanner = ({ user, onLocationSelect, isAuthenticated = true }: HeroBann
             
             {!isAuthenticated && (
               <div className={cn(
-                "mt-6 pt-4 border-t border-primary/20 transition-all duration-700 delay-400",
+                "mt-6 pt-4 border-t border-gray-200 transition-all duration-500 delay-400",
                 contentVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
               )}>
                 <Link to="/signup">
                   <Button 
                     variant="outline" 
-                    className="border-primary/40 hover:bg-primary/10 hover:scale-105 transition-all duration-300" 
+                    className="border-gray-300 hover:bg-gray-100 transition-all duration-150" 
                     icon={<UserPlus className="w-4 h-4" />}
                   >
                     Sign up for free
