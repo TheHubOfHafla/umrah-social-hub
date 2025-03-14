@@ -6,7 +6,7 @@ import { User, EventAttendee } from "@/types";
 interface UserAvatarProps {
   user: User | EventAttendee;
   className?: string;
-  size?: 'sm' | 'md' | 'lg' | 'xl';
+  size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
   showName?: boolean;
   namePosition?: 'bottom' | 'right';
 }
@@ -19,6 +19,7 @@ const UserAvatar = ({
   namePosition = 'bottom'
 }: UserAvatarProps) => {
   const sizeClasses = {
+    xs: 'h-6 w-6',
     sm: 'h-8 w-8',
     md: 'h-10 w-10',
     lg: 'h-14 w-14',
@@ -37,6 +38,7 @@ const UserAvatar = ({
   const nameComponent = showName && (
     <span className={cn(
       "text-sm font-medium",
+      size === 'xs' && "text-xs",
       namePosition === 'right' ? 'ml-2' : 'mt-1'
     )}>
       {user.name}
