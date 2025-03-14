@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -10,6 +9,7 @@ import {
   BrowserRouter,
   Routes,
   Route,
+  Navigate
 } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import ChatbotButton from "./components/ChatbotButton";
@@ -41,9 +41,8 @@ import { User } from "@/types";
 
 const queryClient = new QueryClient();
 
-// Create a mock AuthContext with default values
 export const AuthContext = createContext({
-  isAuthenticated: true, // Always consider users as authenticated
+  isAuthenticated: true,
   currentUser: {
     id: "mock-user-id",
     name: "Guest User",
@@ -57,7 +56,6 @@ export const AuthContext = createContext({
 });
 
 const App = () => {
-  // Provide mock context values to enable features without actual authentication
   const contextValue = {
     isAuthenticated: true,
     currentUser: {
