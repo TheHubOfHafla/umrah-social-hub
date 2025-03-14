@@ -20,6 +20,7 @@ import EventsPage from "./pages/EventsPage";
 import EventDetailPage from "./pages/EventDetailPage";
 import RegisterPage from "./pages/RegisterPage";
 import OrganizersPage from "./pages/OrganizersPage";
+import OrganizerProfilePage from "./pages/OrganizerProfilePage";
 import CreateEventPage from "./pages/CreateEventPage";
 import NotFound from "./pages/NotFound";
 import Login from "./pages/Login";
@@ -99,9 +100,10 @@ const App = () => {
                 </PageWrapper>
               } />
               <Route path="/organizers" element={
-                <PageWrapper>
-                  <OrganizersPage />
-                </PageWrapper>
+                <OrganizersPage />
+              } />
+              <Route path="/organizer/:id" element={
+                <OrganizerProfilePage />
               } />
               <Route path="/legal" element={
                 <PageWrapper>
