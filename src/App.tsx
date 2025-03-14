@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -9,7 +10,6 @@ import {
   BrowserRouter,
   Routes,
   Route,
-  Navigate,
 } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import ChatbotButton from "./components/ChatbotButton";
@@ -36,139 +36,45 @@ import HelpCenter from "./pages/HelpCenter";
 import ContactUs from "./pages/ContactUs";
 import LegalPage from "./pages/LegalPage";
 import VerifyTicketPage from "./pages/VerifyTicketPage";
-import { useState, useEffect, createContext } from "react";
-import { supabase } from "./integrations/supabase/client";
+import { createContext } from "react";
 import { User } from "@/types";
-import { fetchCurrentUser } from "@/lib/data/users"; 
 
 const queryClient = new QueryClient();
 
+// Create a mock AuthContext with default values
 export const AuthContext = createContext({
-  isAuthenticated: false,
-  currentUser: null as User | null,
+  isAuthenticated: true, // Always consider users as authenticated
+  currentUser: {
+    id: "mock-user-id",
+    name: "Guest User",
+    email: "guest@example.com",
+    role: "attendee",
+    eventsAttending: []
+  } as User,
   userEventsAttending: [] as string[],
   onRegisterForEvent: (eventId: string) => {},
   onSignOut: () => {}
 });
 
 const App = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [currentUser, setCurrentUser] = useState<User | null>(null);
-  const [userEventsAttending, setUserEventsAttending] = useState<string[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  
-  useEffect(() => {
-    const checkAuth = async () => {
-      setIsLoading(true);
-      
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      if (session) {
-        setIsAuthenticated(true);
-        
-        try {
-          const userData = await fetchCurrentUser();
-          if (userData) {
-            setCurrentUser(userData);
-            setUserEventsAttending(userData.eventsAttending || []);
-            console.log("User data loaded:", userData);
-          }
-        } catch (error) {
-          console.error("Error fetching user data:", error);
-        }
-      } else {
-        console.log("No active session found");
-      }
-      
-      setIsLoading(false);
-    };
-    
-    checkAuth();
-    
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log("Auth state changed:", event);
-      
-      if (event === 'SIGNED_IN' && session) {
-        setIsAuthenticated(true);
-        try {
-          const userData = await fetchCurrentUser();
-          if (userData) {
-            setCurrentUser(userData);
-            setUserEventsAttending(userData.eventsAttending || []);
-            console.log("User data loaded after sign in:", userData);
-          }
-        } catch (error) {
-          console.error("Error fetching user data after sign in:", error);
-        }
-      } else if (event === 'SIGNED_OUT') {
-        setIsAuthenticated(false);
-        setCurrentUser(null);
-        setUserEventsAttending([]);
-        console.log("User signed out");
-      }
-    });
-    
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, []);
-
-  const handleRegisterForEvent = async (eventId: string) => {
-    if (!currentUser) {
-      console.log("Cannot register: user not authenticated");
-      return;
-    }
-    
-    const updatedEvents = [...userEventsAttending, eventId];
-    setUserEventsAttending(updatedEvents);
-    
-    try {
-      const { error } = await supabase
-        .from('profiles')
-        .update({ events_attending: updatedEvents })
-        .eq('id', currentUser.id);
-        
-      if (error) {
-        console.error("Error updating user events:", error);
-      } else {
-        console.log("Successfully registered for event:", eventId);
-      }
-    } catch (error) {
-      console.error("Failed to update profile:", error);
-    }
-  };
-  
-  const handleSignOut = async () => {
-    try {
-      const { error } = await supabase.auth.signOut();
-      if (error) {
-        console.error("Error signing out:", error);
-      } else {
-        setIsAuthenticated(false);
-        setCurrentUser(null);
-        setUserEventsAttending([]);
-        console.log("User successfully signed out");
-      }
-    } catch (error) {
-      console.error("Failed to sign out:", error);
-    }
-  };
-
+  // Provide mock context values to enable features without actual authentication
   const contextValue = {
-    isAuthenticated,
-    currentUser,
-    userEventsAttending,
-    onRegisterForEvent: handleRegisterForEvent,
-    onSignOut: handleSignOut
+    isAuthenticated: true,
+    currentUser: {
+      id: "mock-user-id",
+      name: "Guest User",
+      email: "guest@example.com",
+      role: "attendee",
+      eventsAttending: []
+    } as User,
+    userEventsAttending: [],
+    onRegisterForEvent: (eventId: string) => {
+      console.log("Register for event:", eventId);
+    },
+    onSignOut: () => {
+      console.log("Sign out clicked");
+    }
   };
-
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full"></div>
-      </div>
-    );
-  }
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -181,7 +87,7 @@ const App = () => {
             <Routes>
               <Route path="/dashboard/organizer/signup" element={
                 <PageWrapper>
-                  {isAuthenticated ? <OrganizerSignup /> : <Navigate to="/login" />}
+                  <OrganizerSignup />
                 </PageWrapper>
               } />
               <Route path="/" element={<Index />} />
@@ -197,12 +103,12 @@ const App = () => {
               } />
               <Route path="/events/create" element={
                 <PageWrapper>
-                  {isAuthenticated ? <CreateEventPage /> : <Navigate to="/login" />}
+                  <CreateEventPage />
                 </PageWrapper>
               } />
               <Route path="/events/:eventId/register" element={
                 <PageWrapper>
-                  {isAuthenticated ? <RegisterPage /> : <Navigate to="/login" />}
+                  <RegisterPage />
                 </PageWrapper>
               } />
               <Route path="/organizers" element={
@@ -215,41 +121,27 @@ const App = () => {
                   <LegalPage />
                 </PageWrapper>
               } />
-              <Route path="/login" element={
-                <PageWrapper>
-                  {isAuthenticated ? <Navigate to="/dashboard" /> : <Login />}
-                </PageWrapper>
-              } />
-              <Route path="/signup" element={
-                <PageWrapper>
-                  {isAuthenticated ? <Navigate to="/dashboard" /> : <Signup />}
-                </PageWrapper>
-              } />
-              <Route path="/auth/callback" element={<AuthCallback />} />
+              <Route path="/login" element={<Navigate to="/" />} />
+              <Route path="/signup" element={<Navigate to="/" />} />
+              <Route path="/auth/callback" element={<Navigate to="/" />} />
               <Route path="/profile" element={
                 <PageWrapper>
-                  {isAuthenticated ? <UserProfile /> : <Navigate to="/login" />}
+                  <UserProfile />
                 </PageWrapper>
               } />
               <Route path="/dashboard" element={
                 <PageWrapper>
-                  {isAuthenticated ? 
-                    (currentUser?.role === 'organizer' ? <OrganizerDashboard /> : <Dashboard />) : 
-                    <Navigate to="/login" />}
+                  <Dashboard />
                 </PageWrapper>
               } />
               <Route path="/dashboard/events" element={
                 <PageWrapper>
-                  {isAuthenticated ? 
-                    (currentUser?.role === 'organizer' ? <OrganizerEvents /> : <UserEvents />) : 
-                    <Navigate to="/login" />}
+                  <UserEvents />
                 </PageWrapper>
               } />
               <Route path="/dashboard/profile" element={
                 <PageWrapper>
-                  {isAuthenticated ? 
-                    (currentUser?.role === 'organizer' ? <OrganizerProfile /> : <UserProfile />) : 
-                    <Navigate to="/login" />}
+                  <UserProfile />
                 </PageWrapper>
               } />
               <Route path="/organizer" element={<Navigate to="/dashboard" replace />} />

@@ -1,7 +1,6 @@
 
-import { useContext } from "react";
 import { useNavigate } from "react-router-dom";
-import { User, UserRound, Calendar, Settings, LogOut, Building, ChevronDown } from "lucide-react";
+import { User, UserRound, Calendar, Settings, Building, ChevronDown } from "lucide-react";
 import { 
   DropdownMenu, 
   DropdownMenuContent, 
@@ -14,6 +13,7 @@ import { cn } from "@/lib/utils";
 import UserAvatar from "../UserAvatar";
 import { AuthContext } from "@/App";
 import { currentUser } from "@/lib/data/users";
+import { useContext } from "react";
 
 interface UserMenuProps {
   className?: string;
@@ -43,7 +43,7 @@ const UserMenu = ({ className }: UserMenuProps) => {
           <div className="flex items-center gap-2 p-2 border-b">
             <UserAvatar user={auth.currentUser || currentUser} size="sm" />
             <div className="flex flex-col">
-              <span className="font-medium text-sm">{auth.currentUser?.name || currentUser.name}</span>
+              <span className="font-medium text-sm">Guest User</span>
               <span className="text-xs text-muted-foreground">
                 {isOrganizer ? (
                   <span className="flex items-center gap-1">
@@ -61,14 +61,14 @@ const UserMenu = ({ className }: UserMenuProps) => {
           </div>
 
           <DropdownMenuItem className="hover:bg-primary/10 hover:text-primary" onClick={() => 
-            handleNavigation(isOrganizer ? "/organizer" : "/dashboard")
+            handleNavigation(isOrganizer ? "/dashboard" : "/dashboard")
           }>
             <User className="mr-2 h-4 w-4" />
             Dashboard
           </DropdownMenuItem>
 
           <DropdownMenuItem className="hover:bg-primary/10 hover:text-primary" onClick={() => 
-            handleNavigation(isOrganizer ? "/organizer/events" : "/dashboard/events")
+            handleNavigation(isOrganizer ? "/dashboard/events" : "/dashboard/events")
           }>
             <Calendar className="mr-2 h-4 w-4" />
             {isOrganizer ? "My Events" : "Events I'm Attending"}
@@ -76,7 +76,7 @@ const UserMenu = ({ className }: UserMenuProps) => {
 
           {!isOrganizer && (
             <DropdownMenuItem className="hover:bg-primary/10 hover:text-primary" onClick={() => 
-              handleNavigation("/organizer/signup")
+              handleNavigation("/dashboard/organizer/signup")
             }>
               <Building className="mr-2 h-4 w-4" />
               Become an Organizer
@@ -84,20 +84,10 @@ const UserMenu = ({ className }: UserMenuProps) => {
           )}
 
           <DropdownMenuItem className="hover:bg-primary/10 hover:text-primary" onClick={() => 
-            handleNavigation(isOrganizer ? "/organizer/profile" : "/dashboard/profile")
+            handleNavigation(isOrganizer ? "/dashboard/profile" : "/dashboard/profile")
           }>
             <Settings className="mr-2 h-4 w-4" />
             Settings
-          </DropdownMenuItem>
-
-          <DropdownMenuSeparator />
-          
-          <DropdownMenuItem 
-            className="hover:bg-red-50 hover:text-red-600 focus:bg-red-50 focus:text-red-600" 
-            onClick={auth.onSignOut}
-          >
-            <LogOut className="mr-2 h-4 w-4" />
-            Sign Out
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
