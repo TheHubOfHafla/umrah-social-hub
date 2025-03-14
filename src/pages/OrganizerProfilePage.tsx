@@ -22,7 +22,9 @@ import {
   Star,
   MessageSquare,
   ChevronDown,
-  Users
+  Users,
+  ThumbsUp,  // Added the ThumbsUp icon import
+  ThumbsDown  // Also added ThumbsDown for consistency since we have thumbs up
 } from "lucide-react";
 import { organizers } from "@/lib/data/organizers";
 import { mockEvents } from "@/lib/data/events";
