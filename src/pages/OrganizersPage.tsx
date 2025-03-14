@@ -184,7 +184,7 @@ const OrganizersPage = () => {
       <CategoryRow 
         key={category}
         title={category}
-        itemWidth="lg:w-[320px]"
+        itemWidth="w-[320px]"
       >
         {organizerGroups[category].map((organizer) => renderOrganizerCard(organizer))}
       </CategoryRow>

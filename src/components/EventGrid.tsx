@@ -25,9 +25,9 @@ const EventGrid = ({
 }: EventGridProps) => {
   const gridCols = {
     1: "grid-cols-1",
-    2: "grid-cols-2 md:grid-cols-3 lg:grid-cols-4",
-    3: "grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5",
-    4: "grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6",
+    2: "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4",
+    3: "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4",
+    4: "grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5",
   };
 
   if (events.length === 0 && showEmpty) {
@@ -60,7 +60,8 @@ const EventGrid = ({
             key={category}
             title={`${category} Events`}
             description={`Browse ${category} events in your area`}
-            itemWidth="lg:w-[280px]"
+            // Using a consistent width without screen size modifiers
+            itemWidth="w-[280px]"
           >
             {categoryGroups[category].map(event => (
               <EventCard key={event.id} event={event} />
@@ -75,7 +76,8 @@ const EventGrid = ({
     return (
       <CategoryRow
         title="Events"
-        itemWidth="lg:w-[280px]"
+        // Using a consistent width without screen size modifiers
+        itemWidth="w-[280px]"
         className={className}
       >
         {events.map(event => (
