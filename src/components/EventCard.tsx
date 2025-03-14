@@ -46,7 +46,7 @@ const EventCard = ({ event, className, variant = "default" }: EventCardProps) =>
   const isEventSaved = isAuthenticated && currentUser?.savedEvents?.includes(event.id);
 
   return (
-    <Link to={`/events/${event.id}`}>
+    <Link to={`/events/${event.id}`} className="block w-full h-full">
       <Card 
         className={cn(
           "overflow-hidden transition-all duration-300 group relative h-full",

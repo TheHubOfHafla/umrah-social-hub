@@ -25,7 +25,7 @@ const CategoryRow = ({
   description,
   children,
   className,
-  itemWidth = "w-[280px]", // Fixed width for all cards regardless of category
+  itemWidth = "w-[320px]", // Increased width for more substantial cards
   showControls = true,
 }: CategoryRowProps) => {
   return (
@@ -52,8 +52,8 @@ const CategoryRow = ({
                     key={index}
                     className={cn(
                       "pl-2 md:pl-4", 
-                      // Fixed basis sizes for consistent card widths
-                      "basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/4 xl:basis-1/5",
+                      // Simplified responsive sizing with larger base size
+                      "basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/4 xl:basis-1/4",
                       itemWidth
                     )}
                   >
