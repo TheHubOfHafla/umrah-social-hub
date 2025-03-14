@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Search, Filter, ChevronUp, ChevronDown } from "lucide-react";
@@ -6,7 +7,8 @@ import { mockEvents } from "@/lib/data/events";
 import { currentUser } from "@/lib/data/users";
 import { Event, EventCategory, AttendeeType } from "@/types";
 import CategoryChips from "@/components/CategoryChips";
-import EventGrid from "@/components/EventGrid";
+import EventCard from "@/components/EventCard";
+import CategoryRow from "@/components/CategoryRow";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -28,7 +30,6 @@ import {
 } from "@/components/ui/sheet";
 import AttendeeTypeFilter from "@/components/AttendeeTypeFilter";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Container } from "@/components/ui/container";
 
 const EventsPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -38,6 +39,7 @@ const EventsPage = () => {
   const [sortBy, setSortBy] = useState<string>("date-asc");
   const [filteredEvents, setFilteredEvents] = useState<Event[]>(mockEvents);
   const [compactFilters, setCompactFilters] = useState<boolean>(false);
+  const [categoryGroups, setCategoryGroups] = useState<Record<string, Event[]>>({});
 
   useEffect(() => {
     const categoryParam = searchParams.get("category");
@@ -73,8 +75,26 @@ const EventsPage = () => {
     }
 
     filtered = sortEvents(filtered, sortBy);
-
     setFilteredEvents(filtered);
+
+    // Group events by category for carousel rows
+    const groups: Record<string, Event[]> = {};
+    
+    if (selectedCategory === "all") {
+      // When showing all events, group them by their first category
+      filtered.forEach(event => {
+        const primaryCategory = event.categories[0];
+        if (!groups[primaryCategory]) {
+          groups[primaryCategory] = [];
+        }
+        groups[primaryCategory].push(event);
+      });
+    } else {
+      // When a category is selected, just show that category
+      groups[selectedCategory] = filtered;
+    }
+    
+    setCategoryGroups(groups);
   }, [searchQuery, selectedCategory, selectedAttendeeType, sortBy]);
 
   const sortEvents = (events: Event[], sortOption: string): Event[] => {
@@ -131,6 +151,31 @@ const EventsPage = () => {
     setCompactFilters(!compactFilters);
   };
 
+  const renderCategoryRows = () => {
+    const categories = Object.keys(categoryGroups);
+    
+    if (categories.length === 0) {
+      return (
+        <div className="flex items-center justify-center py-16 text-muted-foreground">
+          No events found matching your filters. Try adjusting your search criteria.
+        </div>
+      );
+    }
+    
+    return categories.map((category) => (
+      <CategoryRow 
+        key={category}
+        title={`${category} Events`}
+        description={`Browse ${category} events in your area`}
+        itemWidth="lg:w-[280px]"
+      >
+        {categoryGroups[category].map((event) => (
+          <EventCard key={event.id} event={event} />
+        ))}
+      </CategoryRow>
+    ));
+  };
+
   return (
     <div className="container mx-auto px-4 pt-24 pb-8">
       <div className="mb-8">
@@ -142,7 +187,7 @@ const EventsPage = () => {
 
       <div className="w-full mb-8 relative">
         <form onSubmit={handleSearch} className="bg-gradient-to-r from-[#F2FBFE] to-[#E6E9FF] dark:from-[#21214B] dark:to-[#171733] p-1.5 rounded-xl shadow-soft">
-          <div className="relative flex items-center overflow-hidden rounded-lg bg-white dark:bg-[#171727] transition-all duration-300 focus-within:ring-2 focus-within:ring-[#8B5CF6]">
+          <div className="relative flex items-center overflow-hidden rounded-lg bg-white dark:bg-[#171727] transition-all duration-300 focus-within:ring-2 focus-within:ring-[#4A90E2]">
             <Search className="absolute left-3 h-5 w-5 text-muted-foreground" />
             <Input
               type="text"
@@ -153,7 +198,7 @@ const EventsPage = () => {
             />
             <Button 
               type="submit" 
-              className="absolute right-0 h-full px-4 rounded-l-none bg-[#8B5CF6] hover:bg-[#7C5AE2] text-white"
+              className="absolute right-0 h-full px-4 rounded-l-none bg-[#4A90E2] hover:bg-[#3A7BC8] text-white"
             >
               Search
             </Button>
@@ -303,7 +348,7 @@ const EventsPage = () => {
           <Button 
             variant="ghost" 
             onClick={toggleCompactFilters}
-            className="ml-auto text-[#8B5CF6] hover:text-[#7C5AE2] hover:bg-[#8B5CF6]/10"
+            className="ml-auto text-[#4A90E2] hover:text-[#3A7BC8] hover:bg-[#4A90E2]/10"
           >
             {compactFilters ? <ChevronDown className="h-4 w-4 mr-1" /> : <ChevronUp className="h-4 w-4 mr-1" />}
             {compactFilters ? "Show filters" : "Hide filters"}
@@ -313,29 +358,25 @@ const EventsPage = () => {
         <div className={`${compactFilters ? 'w-full' : 'flex-1'}`}>
           <div className="mb-6 flex items-center justify-between">
             <div>
-              {selectedCategory !== "all" ? (
-                <h2 className="text-xl font-semibold mb-4 capitalize">
-                  {selectedCategory} Events ({filteredEvents.length})
-                </h2>
-              ) : (
-                <div>
-                  <h2 className="text-xl font-semibold mb-4">
-                    All Events ({filteredEvents.length})
-                  </h2>
-                  <ScrollArea className="w-full whitespace-nowrap mb-6">
-                    <CategoryChips
-                      selectedCategories={[selectedCategory !== "all" ? selectedCategory as EventCategory : null].filter(Boolean) as EventCategory[]}
-                      onChange={(categories) => {
-                        if (categories.length > 0) {
-                          handleCategorySelect(categories[0]);
-                        } else {
-                          handleCategorySelect("all");
-                        }
-                      }}
-                      singleSelect={true}
-                    />
-                  </ScrollArea>
-                </div>
+              <h2 className="text-xl font-semibold mb-4">
+                {selectedCategory !== "all" 
+                  ? `${selectedCategory} Events (${filteredEvents.length})` 
+                  : `All Events (${filteredEvents.length})`}
+              </h2>
+              {selectedCategory === "all" && (
+                <ScrollArea className="w-full whitespace-nowrap mb-6">
+                  <CategoryChips
+                    selectedCategories={[selectedCategory !== "all" ? selectedCategory as EventCategory : null].filter(Boolean) as EventCategory[]}
+                    onChange={(categories) => {
+                      if (categories.length > 0) {
+                        handleCategorySelect(categories[0]);
+                      } else {
+                        handleCategorySelect("all");
+                      }
+                    }}
+                    singleSelect={true}
+                  />
+                </ScrollArea>
               )}
             </div>
             
@@ -344,7 +385,7 @@ const EventsPage = () => {
                 <Button 
                   variant="ghost" 
                   onClick={toggleCompactFilters}
-                  className="text-[#8B5CF6] hover:text-[#7C5AE2] hover:bg-[#8B5CF6]/10"
+                  className="text-[#4A90E2] hover:text-[#3A7BC8] hover:bg-[#4A90E2]/10"
                 >
                   <ChevronUp className="h-4 w-4 mr-1" />
                   Hide filters
@@ -356,7 +397,7 @@ const EventsPage = () => {
               <Button 
                 variant="ghost" 
                 onClick={toggleCompactFilters}
-                className="text-[#8B5CF6] hover:text-[#7C5AE2] hover:bg-[#8B5CF6]/10"
+                className="text-[#4A90E2] hover:text-[#3A7BC8] hover:bg-[#4A90E2]/10"
               >
                 <ChevronDown className="h-4 w-4 mr-1" />
                 Show filters
@@ -364,13 +405,9 @@ const EventsPage = () => {
             )}
           </div>
 
-          <EventGrid 
-            events={filteredEvents} 
-            columns={3}
-            showEmpty={true}
-            emptyMessage="No events found matching your filters. Try adjusting your search criteria."
-            className="w-full" 
-          />
+          <div className="space-y-12 w-full">
+            {renderCategoryRows()}
+          </div>
         </div>
       </div>
     </div>

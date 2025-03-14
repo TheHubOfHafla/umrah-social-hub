@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Link, useNavigate } from "react-router-dom";
-import { Search, Filter, UserRound, Building, LandmarkIcon, HeartHandshake, Users, ExternalLink, ChevronDown, Eye } from "lucide-react";
+import { Search, UserRound, Building, LandmarkIcon, HeartHandshake, Users, Eye } from "lucide-react";
 
 import { organizers } from "@/lib/data/organizers";
 import { EventOrganizer } from "@/types";
@@ -12,12 +12,14 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
+import CategoryRow from "@/components/CategoryRow";
 
 const OrganizersPage = () => {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedType, setSelectedType] = useState<string | null>(null);
   const [isSearchFocused, setIsSearchFocused] = useState(false);
+  const [organizerGroups, setOrganizerGroups] = useState<Record<string, EventOrganizer[]>>({});
 
   const { data: organizersData, isLoading } = useQuery({
     queryKey: ["organizers"],
@@ -25,14 +27,44 @@ const OrganizersPage = () => {
     initialData: organizers,
   });
 
-  const filteredOrganizers = organizersData.filter((organizer) => {
-    const matchesSearch = organizer.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+  useEffect(() => {
+    const filteredOrganizers = organizersData.filter((organizer) => {
+      const matchesSearch = organizer.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
                           (organizer.bio && organizer.bio.toLowerCase().includes(searchQuery.toLowerCase()));
+      
+      const matchesType = selectedType ? organizer.organizationType === selectedType : true;
+      
+      return matchesSearch && matchesType;
+    });
+
+    const groups: Record<string, EventOrganizer[]> = {};
     
-    const matchesType = selectedType ? organizer.organizationType === selectedType : true;
+    if (selectedType) {
+      const typeLabel = getTypeLabel(selectedType);
+      groups[typeLabel] = filteredOrganizers;
+    } else {
+      filteredOrganizers.forEach(organizer => {
+        const typeLabel = getTypeLabel(organizer.organizationType);
+        if (!groups[typeLabel]) {
+          groups[typeLabel] = [];
+        }
+        groups[typeLabel].push(organizer);
+      });
+    }
     
-    return matchesSearch && matchesType;
-  });
+    setOrganizerGroups(groups);
+  }, [organizersData, searchQuery, selectedType]);
+
+  const getTypeLabel = (type: string): string => {
+    switch (type) {
+      case 'individual': return 'Individual Organizers';
+      case 'mosque': return 'Mosques';
+      case 'charity': return 'Charities';
+      case 'company': return 'Companies';
+      case 'scholar': return 'Scholars & Speakers';
+      default: return 'Other Organizers';
+    }
+  };
 
   const getOrganizerTypeIcon = (type: string) => {
     switch (type) {
@@ -51,34 +83,11 @@ const OrganizersPage = () => {
     }
   };
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.08
-      }
-    }
-  };
-
-  const itemVariants = {
-    hidden: { y: 20, opacity: 0 },
-    visible: {
-      y: 0,
-      opacity: 1,
-      transition: {
-        type: "spring",
-        stiffness: 100,
-        damping: 12
-      }
-    }
-  };
-
   const handleViewProfile = (organizerId: string) => {
     navigate(`/organizer/${organizerId}`);
   };
 
-  const renderOrganizerCard = (organizer: EventOrganizer, index: number) => {
+  const renderOrganizerCard = (organizer: EventOrganizer) => {
     const initials = organizer.name
       .split(' ')
       .map(n => n[0])
@@ -90,78 +99,97 @@ const OrganizersPage = () => {
                       organizer.organizationType.slice(1);
     
     return (
-      <motion.div
+      <Card 
         key={organizer.id}
-        variants={itemVariants}
-        initial="hidden"
-        animate="visible"
-        transition={{ delay: index * 0.05 }}
-        whileHover={{ y: -8, scale: 1.02 }}
+        className="overflow-hidden transition-all duration-300 hover:shadow-xl hover:border-primary/50 group h-full flex flex-col cursor-pointer"
         onClick={() => handleViewProfile(organizer.id)}
-        className="cursor-pointer"
       >
-        <Card className="overflow-hidden transition-all duration-300 hover:shadow-xl hover:border-primary/50 group h-full flex flex-col">
-          <CardHeader className="pb-0">
-            <div className="flex items-center gap-4">
-              <Avatar className="h-16 w-16 border-2 border-primary/10 transition-transform duration-300 group-hover:scale-105 group-hover:border-primary/30">
-                <AvatarImage src={organizer.avatar} alt={organizer.name} />
-                <AvatarFallback className="bg-primary/10 text-primary text-xl">
-                  {initials}
-                </AvatarFallback>
-              </Avatar>
-              <div>
-                <h3 className="text-xl font-semibold transition-colors duration-300 group-hover:text-primary">{organizer.name}</h3>
-                <Badge variant="outline" className="flex items-center gap-1 mt-1 transition-colors duration-300 group-hover:bg-primary/10 group-hover:border-primary/30">
-                  {getOrganizerTypeIcon(organizer.organizationType)}
-                  {typeLabel}
-                </Badge>
-              </div>
+        <CardHeader className="pb-0">
+          <div className="flex items-center gap-4">
+            <Avatar className="h-16 w-16 border-2 border-primary/10 transition-transform duration-300 group-hover:scale-105 group-hover:border-primary/30">
+              <AvatarImage src={organizer.avatar} alt={organizer.name} />
+              <AvatarFallback className="bg-primary/10 text-primary text-xl">
+                {initials}
+              </AvatarFallback>
+            </Avatar>
+            <div>
+              <h3 className="text-xl font-semibold transition-colors duration-300 group-hover:text-primary">{organizer.name}</h3>
+              <Badge variant="outline" className="flex items-center gap-1 mt-1 transition-colors duration-300 group-hover:bg-primary/10 group-hover:border-primary/30">
+                {getOrganizerTypeIcon(organizer.organizationType)}
+                {typeLabel}
+              </Badge>
             </div>
-          </CardHeader>
-          <CardContent className="pt-4 transition-colors duration-300 group-hover:bg-primary/5 flex-grow">
-            <p className="text-muted-foreground transition-colors duration-300 group-hover:text-foreground/90">{organizer.bio}</p>
-          </CardContent>
-          <CardFooter className="border-t pt-4 transition-colors duration-300 group-hover:bg-primary/5">
-            <Button 
-              variant="outline" 
-              size="sm" 
-              className="gap-1.5 w-full transition-all duration-300 hover:border-purple-400/50 hover:text-purple-600 relative overflow-hidden" 
-              onClick={(e) => {
-                e.stopPropagation();
-                handleViewProfile(organizer.id);
-              }}
-            >
-              <span className="relative z-10 flex items-center gap-1.5">
-                View Profile 
-                <Eye className="h-3.5 w-3.5 transition-transform duration-300 group-hover:translate-x-0.5" />
-              </span>
-              <span className="absolute inset-0 bg-purple-50 transform scale-x-0 transition-transform duration-500 origin-left group-hover:scale-x-100"></span>
-              <span className="absolute bottom-0 left-0 w-full h-0.5 bg-purple-400 transform scale-x-0 transition-transform duration-500 origin-left group-hover:scale-x-100"></span>
-            </Button>
-          </CardFooter>
-        </Card>
-      </motion.div>
+          </div>
+        </CardHeader>
+        <CardContent className="pt-4 transition-colors duration-300 group-hover:bg-primary/5 flex-grow">
+          <p className="text-muted-foreground transition-colors duration-300 group-hover:text-foreground/90 line-clamp-2">{organizer.bio}</p>
+        </CardContent>
+        <CardFooter className="border-t pt-4 transition-colors duration-300 group-hover:bg-primary/5">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="gap-1.5 w-full transition-all duration-300 hover:border-[#4A90E2]/50 hover:text-[#4A90E2] relative overflow-hidden" 
+            onClick={(e) => {
+              e.stopPropagation();
+              handleViewProfile(organizer.id);
+            }}
+          >
+            <span className="relative z-10 flex items-center gap-1.5">
+              View Profile 
+              <Eye className="h-3.5 w-3.5 transition-transform duration-300 group-hover:translate-x-0.5" />
+            </span>
+            <span className="absolute inset-0 bg-[#4A90E2]/5 transform scale-x-0 transition-transform duration-500 origin-left group-hover:scale-x-100"></span>
+            <span className="absolute bottom-0 left-0 w-full h-0.5 bg-[#4A90E2]/40 transform scale-x-0 transition-transform duration-500 origin-left group-hover:scale-x-100"></span>
+          </Button>
+        </CardFooter>
+      </Card>
     );
   };
 
-  useEffect(() => {
-    const handleScroll = () => {
-      const cards = document.querySelectorAll('.organizer-card');
-      cards.forEach((card) => {
-        const rect = card.getBoundingClientRect();
-        const isVisible = rect.top < window.innerHeight - 100;
-        
-        if (isVisible) {
-          card.classList.add('animate-fade-in');
-        }
-      });
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    setTimeout(handleScroll, 300);
+  const renderCategoryRows = () => {
+    const categories = Object.keys(organizerGroups);
     
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+    if (categories.length === 0) {
+      return (
+        <motion.div 
+          className="text-center py-12 bg-white rounded-lg shadow-sm border border-gray-100"
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ type: "spring", stiffness: 100, damping: 15 }}
+        >
+          <div className="flex flex-col items-center justify-center space-y-4">
+            <Search className="h-12 w-12 text-primary/30" />
+            <h3 className="text-lg font-medium mb-2">No organizers found</h3>
+            <p className="text-muted-foreground max-w-md">
+              We couldn't find any organizers matching your search or filter criteria.
+            </p>
+            {searchQuery || selectedType ? (
+              <Button 
+                variant="outline" 
+                className="mt-4"
+                onClick={() => {
+                  setSearchQuery("");
+                  setSelectedType(null);
+                }}
+              >
+                Clear all filters
+              </Button>
+            ) : null}
+          </div>
+        </motion.div>
+      );
+    }
+    
+    return categories.map((category) => (
+      <CategoryRow 
+        key={category}
+        title={category}
+        itemWidth="lg:w-[320px]"
+      >
+        {organizerGroups[category].map((organizer) => renderOrganizerCard(organizer))}
+      </CategoryRow>
+    ));
+  };
 
   return (
     <div className="min-h-screen bg-slate-50 pt-24 pb-12">
@@ -302,42 +330,10 @@ const OrganizersPage = () => {
               </Card>
             ))}
           </motion.div>
-        ) : filteredOrganizers.length > 0 ? (
-          <motion.div 
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-          >
-            {filteredOrganizers.map((organizer, index) => renderOrganizerCard(organizer, index))}
-          </motion.div>
         ) : (
-          <motion.div 
-            className="text-center py-12 bg-white rounded-lg shadow-sm border border-gray-100"
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ type: "spring", stiffness: 100, damping: 15 }}
-          >
-            <div className="flex flex-col items-center justify-center space-y-4">
-              <Search className="h-12 w-12 text-primary/30" />
-              <h3 className="text-lg font-medium mb-2">No organizers found</h3>
-              <p className="text-muted-foreground max-w-md">
-                We couldn't find any organizers matching your search or filter criteria.
-              </p>
-              {searchQuery || selectedType ? (
-                <Button 
-                  variant="outline" 
-                  className="mt-4"
-                  onClick={() => {
-                    setSearchQuery("");
-                    setSelectedType(null);
-                  }}
-                >
-                  Clear all filters
-                </Button>
-              ) : null}
-            </div>
-          </motion.div>
+          <div className="space-y-12">
+            {renderCategoryRows()}
+          </div>
         )}
       </div>
     </div>
