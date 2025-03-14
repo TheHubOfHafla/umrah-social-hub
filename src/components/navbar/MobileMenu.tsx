@@ -1,7 +1,7 @@
 
 import { useContext } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { UserRound, User, Calendar, LogIn, UserPlus, LogOut, Building } from "lucide-react";
+import { UserRound, Calendar, LogIn, UserPlus, LogOut } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { AuthContext } from "@/App";
 import UserAvatar from "../UserAvatar";
@@ -34,8 +34,6 @@ const MobileMenu = ({ isOpen, isAuthenticated }: MobileMenuProps) => {
   const location = useLocation();
   const navigate = useNavigate();
   const auth = useContext(AuthContext);
-  const userRole = auth.currentUser?.role || 'attendee';
-  const isOrganizer = userRole === 'organizer';
 
   const navigation = navItems.map(item => ({
     ...item,
@@ -61,17 +59,8 @@ const MobileMenu = ({ isOpen, isAuthenticated }: MobileMenuProps) => {
             <div className="flex flex-col">
               <span className="font-medium">{auth.currentUser?.name || currentUser.name}</span>
               <span className="text-xs text-muted-foreground flex items-center gap-1">
-                {isOrganizer ? (
-                  <>
-                    <Building className="h-3 w-3" />
-                    Organizer Account
-                  </>
-                ) : (
-                  <>
-                    <UserRound className="h-3 w-3" />
-                    Attendee Account
-                  </>
-                )}
+                <UserRound className="h-3 w-3" />
+                Attendee Account
               </span>
             </div>
           </div>
@@ -100,18 +89,18 @@ const MobileMenu = ({ isOpen, isAuthenticated }: MobileMenuProps) => {
           {isAuthenticated ? (
             <>
               <button 
-                onClick={() => handleNavigation(isOrganizer ? "/dashboard/profile" : "/dashboard/profile")} 
+                onClick={() => handleNavigation("/dashboard/profile")} 
                 className="px-4 py-2.5 text-base rounded-md hover:bg-primary/10 hover:text-primary transition-all duration-200 flex items-center w-full text-left"
               >
                 <UserRound className="mr-2 h-4 w-4" />
                 My Profile
               </button>
               <button 
-                onClick={() => handleNavigation(isOrganizer ? "/dashboard/events" : "/dashboard/events")} 
+                onClick={() => handleNavigation("/dashboard/events")} 
                 className="px-4 py-2.5 text-base rounded-md hover:bg-primary/10 hover:text-primary transition-all duration-200 flex items-center w-full text-left"
               >
                 <Calendar className="mr-2 h-4 w-4" />
-                {isOrganizer ? "My Events" : "Events I'm Attending"}
+                My Events
               </button>
               <button 
                 onClick={auth.onSignOut} 

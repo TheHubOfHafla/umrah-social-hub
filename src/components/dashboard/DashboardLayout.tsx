@@ -9,7 +9,6 @@ import {
   ChevronLeft, 
   Settings, 
   User, 
-  Users, 
   Menu, 
   X,
   LogOut
@@ -24,7 +23,6 @@ import { useToast } from "@/hooks/use-toast";
 interface DashboardLayoutProps {
   children: React.ReactNode;
   user: UserType;
-  type: "user" | "organizer";
 }
 
 interface NavItem {
@@ -33,40 +31,24 @@ interface NavItem {
   icon: React.FC<{ className?: string }>;
 }
 
-const DashboardLayout = ({ children, user, type }: DashboardLayoutProps) => {
+const DashboardLayout = ({ children, user }: DashboardLayoutProps) => {
   const location = useLocation();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [sidebarOpen, setSidebarOpen] = React.useState(false);
 
-  const baseRoute = type === "user" ? "/dashboard" : "/organizer";
-  
   const navItems: NavItem[] = [
     {
       label: "Events",
-      href: `${baseRoute}/events`,
+      href: "/dashboard/events",
       icon: Calendar,
     },
     {
       label: "Profile",
-      href: `${baseRoute}/profile`,
+      href: "/dashboard/profile",
       icon: User,
     },
   ];
-
-  // Add organizer-specific items
-  if (type === "organizer") {
-    navItems.push({
-      label: "Attendees",
-      href: `${baseRoute}/attendees`,
-      icon: Users,
-    });
-    navItems.push({
-      label: "Settings",
-      href: `${baseRoute}/settings`,
-      icon: Settings,
-    });
-  }
 
   const handleSignOut = async () => {
     try {
@@ -125,7 +107,7 @@ const DashboardLayout = ({ children, user, type }: DashboardLayoutProps) => {
                 <div>
                   <p className="font-medium">{user.name}</p>
                   <p className="text-xs text-muted-foreground">
-                    {type === "user" ? "User Dashboard" : "Organizer Dashboard"}
+                    User Dashboard
                   </p>
                 </div>
               </div>

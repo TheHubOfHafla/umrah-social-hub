@@ -3,11 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { UserRound } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-interface ProfileButtonProps {
-  isOrganizer: boolean;
-}
-
-const ProfileButton = ({ isOrganizer }: ProfileButtonProps) => {
+const ProfileButton = () => {
   const navigate = useNavigate();
 
   const handleNavigation = (path: string) => {
@@ -16,7 +12,7 @@ const ProfileButton = ({ isOrganizer }: ProfileButtonProps) => {
   };
 
   return (
-    <button onClick={() => handleNavigation(isOrganizer ? "/organizer/profile" : "/dashboard/profile")}>
+    <button onClick={() => handleNavigation("/dashboard/profile")}>
       <Button variant="outline" size="sm" className="flex items-center gap-1 hover:bg-primary/10 hover:text-primary transition-all duration-200 hidden lg:flex">
         <UserRound className="h-3 w-3 md:h-4 md:w-4" />
         <span className="text-xs md:text-sm">Profile</span>

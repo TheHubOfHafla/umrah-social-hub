@@ -3,7 +3,6 @@ import { useState, useEffect, useContext } from "react";
 import { useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { AuthContext } from "@/App";
-import { ChevronDown } from "lucide-react";
 import { 
   Logo,
   NavLinks,
@@ -21,9 +20,6 @@ const Navbar = ({ isAuthenticated = true }: { isAuthenticated?: boolean }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
   const auth = useContext(AuthContext);
-  
-  const userRole = auth.currentUser?.role || 'attendee';
-  const isOrganizer = userRole === 'organizer';
 
   useEffect(() => {
     const handleScroll = () => {
@@ -73,7 +69,7 @@ const Navbar = ({ isAuthenticated = true }: { isAuthenticated?: boolean }) => {
                 <NotificationsButton />
                 
                 {/* Profile Quick Access */}
-                <ProfileButton isOrganizer={isOrganizer} />
+                <ProfileButton />
                 
                 {/* User Menu */}
                 <UserMenu />

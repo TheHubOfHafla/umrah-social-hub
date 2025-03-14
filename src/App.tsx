@@ -22,12 +22,8 @@ import RegisterPage from "./pages/RegisterPage";
 import OrganizersPage from "./pages/OrganizersPage";
 import CreateEventPage from "./pages/CreateEventPage";
 import NotFound from "./pages/NotFound";
-import OrganizerDashboard from "./pages/dashboard/OrganizerDashboard";
 import UserEvents from "./pages/dashboard/UserEvents";
-import OrganizerEvents from "./pages/dashboard/OrganizerEvents";
 import UserProfile from "./pages/dashboard/UserProfile";
-import OrganizerProfile from "./pages/dashboard/OrganizerProfile";
-import OrganizerSignup from "./pages/dashboard/OrganizerSignup";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import AuthCallback from "./pages/AuthCallback";
@@ -83,11 +79,6 @@ const App = () => {
           <BrowserRouter>
             <Navbar />
             <Routes>
-              <Route path="/dashboard/organizer/signup" element={
-                <PageWrapper>
-                  <OrganizerSignup />
-                </PageWrapper>
-              } />
               <Route path="/" element={<Index />} />
               <Route path="/events" element={
                 <PageWrapper>
@@ -141,7 +132,6 @@ const App = () => {
               <Route path="/organizer" element={<Navigate to="/dashboard/events" replace />} />
               <Route path="/organizer/events" element={<Navigate to="/dashboard/events" replace />} />
               <Route path="/organizer/profile" element={<Navigate to="/dashboard/profile" replace />} />
-              <Route path="/organizer/signup" element={<Navigate to="/dashboard/organizer/signup" replace />} />
               <Route path="/about" element={
                 <PageWrapper>
                   <AboutUs />
