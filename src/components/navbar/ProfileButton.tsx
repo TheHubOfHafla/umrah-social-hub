@@ -12,10 +12,10 @@ const ProfileButton = () => {
   };
 
   return (
-    <button onClick={() => handleNavigation("/dashboard/profile")}>
+    <button onClick={() => handleNavigation("/")}>
       <Button variant="outline" size="sm" className="flex items-center gap-1 hover:bg-primary/10 hover:text-primary transition-all duration-200 hidden lg:flex">
         <UserRound className="h-3 w-3 md:h-4 md:w-4" />
-        <span className="text-xs md:text-sm">Profile</span>
+        <span className="text-xs md:text-sm">Home</span>
       </Button>
     </button>
   );

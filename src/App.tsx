@@ -22,8 +22,6 @@ import RegisterPage from "./pages/RegisterPage";
 import OrganizersPage from "./pages/OrganizersPage";
 import CreateEventPage from "./pages/CreateEventPage";
 import NotFound from "./pages/NotFound";
-import UserEvents from "./pages/dashboard/UserEvents";
-import UserProfile from "./pages/dashboard/UserProfile";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import AuthCallback from "./pages/AuthCallback";
@@ -113,25 +111,9 @@ const App = () => {
               <Route path="/login" element={<Navigate to="/" />} />
               <Route path="/signup" element={<Navigate to="/" />} />
               <Route path="/auth/callback" element={<Navigate to="/" />} />
-              <Route path="/profile" element={
-                <PageWrapper>
-                  <UserProfile />
-                </PageWrapper>
-              } />
-              <Route path="/dashboard" element={<Navigate to="/dashboard/events" replace />} />
-              <Route path="/dashboard/events" element={
-                <PageWrapper>
-                  <UserEvents />
-                </PageWrapper>
-              } />
-              <Route path="/dashboard/profile" element={
-                <PageWrapper>
-                  <UserProfile />
-                </PageWrapper>
-              } />
-              <Route path="/organizer" element={<Navigate to="/dashboard/events" replace />} />
-              <Route path="/organizer/events" element={<Navigate to="/dashboard/events" replace />} />
-              <Route path="/organizer/profile" element={<Navigate to="/dashboard/profile" replace />} />
+              {/* Removed: /profile, /dashboard/profile, /dashboard/events routes */}
+              <Route path="/dashboard/*" element={<Navigate to="/" replace />} />
+              <Route path="/profile" element={<Navigate to="/" replace />} />
               <Route path="/about" element={
                 <PageWrapper>
                   <AboutUs />

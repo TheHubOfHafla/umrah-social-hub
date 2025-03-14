@@ -1,6 +1,6 @@
 
 import { useNavigate } from "react-router-dom";
-import { Calendar, Settings, ChevronDown } from "lucide-react";
+import { Settings, ChevronDown } from "lucide-react";
 import { 
   DropdownMenu, 
   DropdownMenuContent, 
@@ -46,14 +46,7 @@ const UserMenu = ({ className }: UserMenuProps) => {
           </div>
 
           <DropdownMenuItem className="hover:bg-primary/10 hover:text-primary" onClick={() => 
-            handleNavigation("/dashboard/events")
-          }>
-            <Calendar className="mr-2 h-4 w-4" />
-            My Events
-          </DropdownMenuItem>
-
-          <DropdownMenuItem className="hover:bg-primary/10 hover:text-primary" onClick={() => 
-            handleNavigation("/dashboard/profile")
+            handleNavigation("/")
           }>
             <Settings className="mr-2 h-4 w-4" />
             Settings
