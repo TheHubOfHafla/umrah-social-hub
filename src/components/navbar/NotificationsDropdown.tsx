@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Bell, Clock, Calendar, User, Info, X } from "lucide-react";
@@ -12,6 +11,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 import { motion } from "framer-motion";
+import { useToast } from "@/hooks/use-toast";
 
 // Mock notification data - in a real app, this would come from your backend
 const mockNotifications = [
@@ -22,7 +22,8 @@ const mockNotifications = [
     message: "Tech Conference starts in 3 hours",
     read: false,
     timestamp: new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString(),
-    eventId: "event-1"
+    eventId: "event-1",
+    clickCount: 0
   },
   {
     id: "2",
@@ -30,7 +31,8 @@ const mockNotifications = [
     title: "Welcome!",
     message: "Welcome to Events Hub! Discover and join amazing events.",
     read: true,
-    timestamp: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString()
+    timestamp: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+    clickCount: 0
   },
   {
     id: "3",
@@ -39,7 +41,8 @@ const mockNotifications = [
     message: "You have a new message in the Tech Conference chat",
     read: false,
     timestamp: new Date(Date.now() - 30 * 60 * 1000).toISOString(),
-    eventId: "event-1"
+    eventId: "event-1",
+    clickCount: 0
   }
 ];
 
@@ -47,6 +50,7 @@ const NotificationsDropdown = () => {
   const navigate = useNavigate();
   const [notifications, setNotifications] = useState(mockNotifications);
   const [isOpen, setIsOpen] = useState(false);
+  const { toast } = useToast();
   
   const unreadCount = notifications.filter(n => !n.read).length;
 
@@ -56,7 +60,20 @@ const NotificationsDropdown = () => {
 
   const handleMarkAsRead = (id: string) => {
     setNotifications(prev => 
-      prev.map(n => n.id === id ? { ...n, read: true } : n)
+      prev.map(n => {
+        if (n.id === id) {
+          // Increment click count when marking as read
+          const updatedClickCount = n.clickCount + 1;
+          
+          // If clicked more than once and already read, remove the notification
+          if (updatedClickCount > 1 && n.read) {
+            return null;
+          }
+          
+          return { ...n, read: true, clickCount: updatedClickCount };
+        }
+        return n;
+      }).filter(Boolean) // Remove null entries (deleted notifications)
     );
   };
 
@@ -70,6 +87,35 @@ const NotificationsDropdown = () => {
     }
     
     setIsOpen(false);
+  };
+
+  const handleRemoveNotification = (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    
+    setNotifications(prev => {
+      const notification = prev.find(n => n.id === id);
+      
+      if (notification) {
+        const updatedClickCount = notification.clickCount + 1;
+        
+        // Remove notification if clicked more than once
+        if (updatedClickCount > 1) {
+          toast({
+            description: "Notification removed",
+            duration: 3000,
+          });
+          
+          return prev.filter(n => n.id !== id);
+        }
+        
+        // Otherwise just increment the click count
+        return prev.map(n => 
+          n.id === id ? { ...n, clickCount: updatedClickCount } : n
+        );
+      }
+      
+      return prev;
+    });
   };
 
   const getNotificationIcon = (type: string) => {
@@ -148,17 +194,13 @@ const NotificationsDropdown = () => {
                       {formatDistanceToNow(new Date(notification.timestamp), { addSuffix: true })}
                     </div>
                   </div>
-                  {!notification.read && (
-                    <button 
-                      className="self-start p-1 hover:bg-muted rounded-full"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleMarkAsRead(notification.id);
-                      }}
-                    >
-                      <X className="h-3 w-3" />
-                    </button>
-                  )}
+                  <button 
+                    className="self-start p-1 hover:bg-muted rounded-full"
+                    onClick={(e) => handleRemoveNotification(notification.id, e)}
+                    title={notification.clickCount === 0 ? "Click again to remove" : "Remove notification"}
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
                 </div>
               ))}
             </div>
