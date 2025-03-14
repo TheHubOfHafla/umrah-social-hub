@@ -35,7 +35,7 @@ const UserEvents = () => {
   );
 
   return (
-    <DashboardLayout user={user} type="user">
+    <DashboardLayout user={user}>
       <div className="space-y-8">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">My Events</h1>

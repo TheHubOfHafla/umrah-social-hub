@@ -29,7 +29,6 @@ import {
 import AttendeeTypeFilter from "@/components/AttendeeTypeFilter";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Container } from "@/components/ui/container";
-import EventsFilter from "@/components/dashboard/organizer/EventsFilter";
 
 const EventsPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();

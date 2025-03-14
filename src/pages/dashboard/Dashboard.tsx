@@ -5,7 +5,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import DashboardStats from "@/components/dashboard/DashboardStats";
 import UserTickets from "@/components/dashboard/UserTickets";
 import UserAnalyticsCard from "@/components/dashboard/UserAnalyticsCard";
-import OrganizerPromotionCard from "@/components/dashboard/OrganizerPromotionCard";
 import { Ticket, Calendar, Clock, Bell } from "lucide-react";
 import { currentUser } from "@/lib/data/users";
 import { useAuth } from "@/hooks/use-auth";
@@ -51,7 +50,7 @@ const Dashboard = () => {
   }, []);
 
   return (
-    <DashboardLayout user={user || currentUser} type="user">
+    <DashboardLayout user={user || currentUser}>
       <div className="space-y-8">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
@@ -78,7 +77,19 @@ const Dashboard = () => {
           </div>
           
           <div>
-            <OrganizerPromotionCard />
+            <Card>
+              <CardHeader>
+                <CardTitle>Quick Links</CardTitle>
+                <CardDescription>
+                  Access important features
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <p>Find upcoming Islamic events in your area and connect with your community.</p>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </div>
 
