@@ -197,12 +197,12 @@ const App = () => {
               } />
               <Route path="/events/create" element={
                 <PageWrapper>
-                  <CreateEventPage />
+                  {isAuthenticated ? <CreateEventPage /> : <Navigate to="/login" />}
                 </PageWrapper>
               } />
               <Route path="/events/:eventId/register" element={
                 <PageWrapper>
-                  <RegisterPage />
+                  {isAuthenticated ? <RegisterPage /> : <Navigate to="/login" />}
                 </PageWrapper>
               } />
               <Route path="/organizers" element={
