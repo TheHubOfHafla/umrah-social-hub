@@ -125,7 +125,7 @@ const OrganizersPage = () => {
             <Button 
               variant="outline" 
               size="sm" 
-              className="gap-1.5 w-full transition-all duration-300 hover:border-sky-400/50 hover:text-sky-600 relative overflow-hidden" 
+              className="gap-1.5 w-full transition-all duration-300 hover:border-purple-400/50 hover:text-purple-600 relative overflow-hidden" 
               onClick={(e) => {
                 e.stopPropagation();
                 handleViewProfile(organizer.id);
@@ -135,8 +135,8 @@ const OrganizersPage = () => {
                 View Profile 
                 <Eye className="h-3.5 w-3.5 transition-transform duration-300 group-hover:translate-x-0.5" />
               </span>
-              <span className="absolute inset-0 bg-sky-50 transform scale-x-0 transition-transform duration-500 origin-left group-hover:scale-x-100"></span>
-              <span className="absolute bottom-0 left-0 w-full h-0.5 bg-sky-400 transform scale-x-0 transition-transform duration-500 origin-left group-hover:scale-x-100"></span>
+              <span className="absolute inset-0 bg-purple-50 transform scale-x-0 transition-transform duration-500 origin-left group-hover:scale-x-100"></span>
+              <span className="absolute bottom-0 left-0 w-full h-0.5 bg-purple-400 transform scale-x-0 transition-transform duration-500 origin-left group-hover:scale-x-100"></span>
             </Button>
           </CardFooter>
         </Card>
