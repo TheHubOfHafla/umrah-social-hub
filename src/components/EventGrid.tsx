@@ -20,9 +20,9 @@ const EventGrid = ({
 }: EventGridProps) => {
   const gridCols = {
     1: "grid-cols-1",
-    2: "grid-cols-1 md:grid-cols-2",
-    3: "grid-cols-1 md:grid-cols-2 lg:grid-cols-3",
-    4: "grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4",
+    2: "grid-cols-2 md:grid-cols-3 lg:grid-cols-4",
+    3: "grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5",
+    4: "grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6",
   };
 
   if (events.length === 0 && showEmpty) {
@@ -36,7 +36,7 @@ const EventGrid = ({
   return (
     <div
       className={cn(
-        "grid gap-6",
+        "grid gap-3",
         gridCols[columns],
         className
       )}

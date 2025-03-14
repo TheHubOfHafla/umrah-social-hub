@@ -30,7 +30,7 @@ const FeaturedEvent = ({ event }: FeaturedEventProps) => {
         "hover:shadow-lg border-gray-100",
         isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
       )}>
-        <div className="relative aspect-[16/9] md:aspect-[21/9]">
+        <div className="relative aspect-[21/9]">
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent z-10" />
           <img
             src={imageSrc}
@@ -44,10 +44,10 @@ const FeaturedEvent = ({ event }: FeaturedEventProps) => {
                 <TicketAlert type="selling-fast" className="bg-opacity-80 backdrop-blur-sm" />
               )}
             </div>
-            <h2 className="text-xl md:text-3xl font-bold mb-1 md:mb-2 group-hover:text-white transition-colors duration-150 line-clamp-2 md:line-clamp-none">
+            <h2 className="text-xl md:text-2xl font-bold mb-1 md:mb-2 group-hover:text-white transition-colors duration-150 line-clamp-2">
               {event.title}
             </h2>
-            <p className="text-sm md:text-lg text-white/90 mb-2 md:mb-4 max-w-2xl transition-opacity duration-150 group-hover:text-white line-clamp-2 md:line-clamp-3">
+            <p className="text-sm md:text-base text-white/90 mb-2 md:mb-4 max-w-2xl transition-opacity duration-150 group-hover:text-white line-clamp-2">
               {event.shortDescription}
             </p>
             <div className="flex flex-wrap gap-2 md:gap-4 text-xs md:text-sm text-white/80 transition-all duration-150 group-hover:text-white/95">
@@ -72,14 +72,14 @@ const FeaturedEvent = ({ event }: FeaturedEventProps) => {
               <img
                 src={event.organizer.avatar}
                 alt={event.organizer.name}
-                className="w-8 h-8 md:w-10 md:h-10 rounded-full"
+                className="w-6 h-6 md:w-8 md:h-8 rounded-full"
               />
               <div>
-                <p className="font-medium text-sm md:text-base">{event.organizer.name}</p>
-                <p className="text-xs md:text-sm text-muted-foreground">Event Organizer</p>
+                <p className="font-medium text-xs md:text-sm">{event.organizer.name}</p>
+                <p className="text-xs text-muted-foreground">Event Organizer</p>
               </div>
             </div>
-            <Button variant="secondary" className="text-xs md:text-sm px-2 py-1 md:px-4 md:py-2 transition-all duration-150">
+            <Button variant="secondary" className="text-xs px-2 py-1 transition-all duration-150">
               Learn More
             </Button>
           </div>

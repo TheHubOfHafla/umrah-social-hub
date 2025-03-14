@@ -49,18 +49,18 @@ const EventCard = ({ event, className, variant = "default" }: EventCardProps) =>
     <Link to={`/events/${event.id}`}>
       <Card 
         className={cn(
-          "overflow-hidden transition-all duration-300 group relative h-full",
-          "hover:shadow-xl hover:border-primary/50 hover:translate-y-[-6px]",
+          "overflow-hidden transition-all duration-300 group relative",
+          "hover:shadow-md hover:border-primary/30 hover:translate-y-[-3px]",
           isFeatured ? "border-0 shadow-none" : "shadow-sm",
           className
         )}
       >
         <div className="relative">
-          <AspectRatio ratio={isFeatured ? 16/9 : 4/3}>
+          <AspectRatio ratio={16/9}>
             <img
               src={imageSrc}
               alt={event.title}
-              className="object-cover w-full h-full z-10 transition-transform duration-500 group-hover:scale-105"
+              className="object-cover w-full h-full z-10 transition-transform duration-500 group-hover:scale-102"
               onLoad={() => setImageLoaded(true)}
             />
             {!imageLoaded && <div className="absolute inset-0 bg-muted animate-pulse" />}
@@ -68,35 +68,35 @@ const EventCard = ({ event, className, variant = "default" }: EventCardProps) =>
           
           {isFeatured && (
             <Badge 
-              className="absolute top-3 left-3 z-20 bg-primary/90 hover:bg-primary/90 backdrop-blur-sm"
+              className="absolute top-2 left-2 z-20 bg-primary/90 hover:bg-primary/90 backdrop-blur-sm text-xs"
             >
               Featured
             </Badge>
           )}
 
-          <div className="absolute top-3 right-3 z-20">
+          <div className="absolute top-2 right-2 z-20">
             <SaveEventButton 
               eventId={event.id} 
               isSaved={isEventSaved} 
               variant="icon" 
-              className="bg-white/80 hover:bg-white/90 backdrop-blur-sm"
+              className="bg-white/80 hover:bg-white/90 backdrop-blur-sm scale-75"
             />
           </div>
 
           {/* Ticket Activity Alerts */}
           {event.ticketActivity && (
-            <div className="absolute bottom-3 left-3 right-3 z-20">
+            <div className="absolute bottom-2 left-2 right-2 z-20">
               {event.ticketActivity.isSellingFast && (
                 <TicketAlert 
                   type="selling-fast" 
-                  className="mb-1 backdrop-blur-sm"
+                  className="mb-1 backdrop-blur-sm text-xs"
                 />
               )}
               {event.ticketActivity.lastPurchaseTime && (
                 <TicketAlert 
                   type="recent-purchase" 
                   timeAgo={getTimeAgo()} 
-                  className="backdrop-blur-sm"
+                  className="backdrop-blur-sm text-xs"
                 />
               )}
             </div>
@@ -104,10 +104,10 @@ const EventCard = ({ event, className, variant = "default" }: EventCardProps) =>
         </div>
 
         <CardContent className={cn(
-          "p-4 transition-all duration-300 group-hover:bg-primary/5",
-          isFeatured && "px-0 pt-3"
+          "p-3 transition-all duration-300 group-hover:bg-primary/5",
+          isFeatured && "px-0 pt-2"
         )}>
-          <div className="space-y-2">
+          <div className="space-y-1.5">
             <div className="flex items-center gap-2">
               <Badge variant="outline" className="bg-primary/10 border-0 text-xs group-hover:bg-primary/20 transition-colors duration-300">
                 {event.categories[0]}
@@ -117,30 +117,30 @@ const EventCard = ({ event, className, variant = "default" }: EventCardProps) =>
                   Free
                 </Badge>
               ) : (
-                <span className="text-sm font-medium">
+                <span className="text-xs font-medium">
                   {event.price ? `From £${event.price}` : ''}
                 </span>
               )}
             </div>
 
             <h3 className={cn(
-              "font-semibold leading-tight transition-colors duration-300 group-hover:text-primary",
-              isFeatured ? "text-2xl" : "text-lg"
+              "font-semibold leading-tight transition-colors duration-300 group-hover:text-primary text-base",
+              isFeatured ? "text-xl" : "text-base"
             )}>
               {event.title}
             </h3>
 
-            <p className="text-muted-foreground text-sm line-clamp-2 transition-colors duration-300 group-hover:text-foreground/90">
+            <p className="text-muted-foreground text-xs line-clamp-1 transition-colors duration-300 group-hover:text-foreground/90">
               {event.shortDescription}
             </p>
 
-            <div className="flex flex-col gap-2 pt-2">
-              <div className="flex items-center text-sm text-muted-foreground transition-colors duration-300 group-hover:text-foreground/70">
-                <CalendarIcon className="mr-1 h-4 w-4 transition-colors duration-300 group-hover:text-primary/70" />
+            <div className="flex flex-col gap-1 pt-1">
+              <div className="flex items-center text-xs text-muted-foreground transition-colors duration-300 group-hover:text-foreground/70">
+                <CalendarIcon className="mr-1 h-3 w-3 transition-colors duration-300 group-hover:text-primary/70" />
                 {displayDate}
               </div>
-              <div className="flex items-center text-sm text-muted-foreground transition-colors duration-300 group-hover:text-foreground/70">
-                <MapPin className="mr-1 h-4 w-4 transition-colors duration-300 group-hover:text-primary/70" />
+              <div className="flex items-center text-xs text-muted-foreground transition-colors duration-300 group-hover:text-foreground/70">
+                <MapPin className="mr-1 h-3 w-3 transition-colors duration-300 group-hover:text-primary/70" />
                 {displayLocation}
               </div>
             </div>
@@ -148,28 +148,28 @@ const EventCard = ({ event, className, variant = "default" }: EventCardProps) =>
         </CardContent>
 
         <CardFooter className={cn(
-          "p-4 pt-0 flex items-center justify-between transition-colors duration-300 group-hover:bg-primary/5",
+          "p-3 pt-0 flex items-center justify-between transition-colors duration-300 group-hover:bg-primary/5",
           isFeatured && "px-0"
         )}>
           <UserAvatar 
             user={event.organizer} 
-            size="sm" 
+            size="xs" 
             showName 
             namePosition="right" 
           />
           
           {event.attendees && event.attendees.length > 0 && (
-            <div className="flex -space-x-2">
+            <div className="flex -space-x-1">
               {event.attendees.slice(0, 3).map((attendee) => (
                 <UserAvatar
                   key={attendee.userId}
                   user={attendee}
-                  size="sm"
-                  className="ring-2 ring-background transition-transform duration-300 group-hover:translate-y-[-2px]"
+                  size="xs"
+                  className="ring-1 ring-background transition-transform duration-300 group-hover:translate-y-[-1px]"
                 />
               ))}
               {event.attendees.length > 3 && (
-                <div className="flex items-center justify-center rounded-full bg-secondary h-8 w-8 ring-2 ring-background text-xs font-medium transition-transform duration-300 group-hover:translate-y-[-2px] group-hover:bg-primary/20">
+                <div className="flex items-center justify-center rounded-full bg-secondary h-6 w-6 ring-1 ring-background text-xs font-medium transition-transform duration-300 group-hover:translate-y-[-1px] group-hover:bg-primary/20">
                   +{event.attendees.length - 3}
                 </div>
               )}
