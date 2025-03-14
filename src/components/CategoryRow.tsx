@@ -25,7 +25,7 @@ const CategoryRow = ({
   description,
   children,
   className,
-  itemWidth = "w-[320px]", // Increased width for more substantial cards
+  itemWidth = "w-[360px]", // Increased width for more substantial desktop display
   showControls = true,
 }: CategoryRowProps) => {
   return (
@@ -52,12 +52,14 @@ const CategoryRow = ({
                     key={index}
                     className={cn(
                       "pl-2 md:pl-4", 
-                      // Simplified responsive sizing with larger base size
-                      "basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/4 xl:basis-1/4",
+                      // Fixed responsive sizing for consistent width
+                      "basis-full sm:basis-1/2 md:basis-2/5 lg:basis-1/3 xl:basis-1/4",
                       itemWidth
                     )}
                   >
-                    {child}
+                    <div className="h-full">
+                      {child}
+                    </div>
                   </CarouselItem>
                 ))
               : children}
