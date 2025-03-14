@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -21,7 +22,6 @@ import RegisterPage from "./pages/RegisterPage";
 import OrganizersPage from "./pages/OrganizersPage";
 import CreateEventPage from "./pages/CreateEventPage";
 import NotFound from "./pages/NotFound";
-import Dashboard from "./pages/dashboard/Dashboard";
 import OrganizerDashboard from "./pages/dashboard/OrganizerDashboard";
 import UserEvents from "./pages/dashboard/UserEvents";
 import OrganizerEvents from "./pages/dashboard/OrganizerEvents";
@@ -127,11 +127,7 @@ const App = () => {
                   <UserProfile />
                 </PageWrapper>
               } />
-              <Route path="/dashboard" element={
-                <PageWrapper>
-                  <Dashboard />
-                </PageWrapper>
-              } />
+              <Route path="/dashboard" element={<Navigate to="/dashboard/events" replace />} />
               <Route path="/dashboard/events" element={
                 <PageWrapper>
                   <UserEvents />
@@ -142,7 +138,7 @@ const App = () => {
                   <UserProfile />
                 </PageWrapper>
               } />
-              <Route path="/organizer" element={<Navigate to="/dashboard" replace />} />
+              <Route path="/organizer" element={<Navigate to="/dashboard/events" replace />} />
               <Route path="/organizer/events" element={<Navigate to="/dashboard/events" replace />} />
               <Route path="/organizer/profile" element={<Navigate to="/dashboard/profile" replace />} />
               <Route path="/organizer/signup" element={<Navigate to="/dashboard/organizer/signup" replace />} />

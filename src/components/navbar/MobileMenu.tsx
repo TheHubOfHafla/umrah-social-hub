@@ -100,21 +100,14 @@ const MobileMenu = ({ isOpen, isAuthenticated }: MobileMenuProps) => {
           {isAuthenticated ? (
             <>
               <button 
-                onClick={() => handleNavigation(isOrganizer ? "/organizer/profile" : "/dashboard/profile")} 
+                onClick={() => handleNavigation(isOrganizer ? "/dashboard/profile" : "/dashboard/profile")} 
                 className="px-4 py-2.5 text-base rounded-md hover:bg-primary/10 hover:text-primary transition-all duration-200 flex items-center w-full text-left"
               >
                 <UserRound className="mr-2 h-4 w-4" />
                 My Profile
               </button>
               <button 
-                onClick={() => handleNavigation(isOrganizer ? "/organizer" : "/dashboard")} 
-                className="px-4 py-2.5 text-base rounded-md hover:bg-primary/10 hover:text-primary transition-all duration-200 flex items-center w-full text-left"
-              >
-                <User className="mr-2 h-4 w-4" />
-                Dashboard
-              </button>
-              <button 
-                onClick={() => handleNavigation(isOrganizer ? "/organizer/events" : "/dashboard/events")} 
+                onClick={() => handleNavigation(isOrganizer ? "/dashboard/events" : "/dashboard/events")} 
                 className="px-4 py-2.5 text-base rounded-md hover:bg-primary/10 hover:text-primary transition-all duration-200 flex items-center w-full text-left"
               >
                 <Calendar className="mr-2 h-4 w-4" />

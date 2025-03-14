@@ -61,13 +61,6 @@ const UserMenu = ({ className }: UserMenuProps) => {
           </div>
 
           <DropdownMenuItem className="hover:bg-primary/10 hover:text-primary" onClick={() => 
-            handleNavigation(isOrganizer ? "/dashboard" : "/dashboard")
-          }>
-            <User className="mr-2 h-4 w-4" />
-            Dashboard
-          </DropdownMenuItem>
-
-          <DropdownMenuItem className="hover:bg-primary/10 hover:text-primary" onClick={() => 
             handleNavigation(isOrganizer ? "/dashboard/events" : "/dashboard/events")
           }>
             <Calendar className="mr-2 h-4 w-4" />

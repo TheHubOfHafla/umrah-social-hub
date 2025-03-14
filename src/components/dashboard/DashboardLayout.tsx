@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import { 
   Calendar, 
   ChevronLeft, 
-  Home, 
   Settings, 
   User, 
   Users, 
@@ -43,11 +42,6 @@ const DashboardLayout = ({ children, user, type }: DashboardLayoutProps) => {
   const baseRoute = type === "user" ? "/dashboard" : "/organizer";
   
   const navItems: NavItem[] = [
-    {
-      label: "Overview",
-      href: baseRoute,
-      icon: Home,
-    },
     {
       label: "Events",
       href: `${baseRoute}/events`,
