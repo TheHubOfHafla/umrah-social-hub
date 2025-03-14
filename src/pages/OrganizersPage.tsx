@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Search, Filter, UserRound, Building, LandmarkIcon, HeartHandshake, Users, ExternalLink, ChevronDown } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { Search, Filter, UserRound, Building, LandmarkIcon, HeartHandshake, Users, ExternalLink, ChevronDown, Eye } from "lucide-react";
 
 import { organizers } from "@/lib/data/organizers";
 import { EventOrganizer } from "@/types";
@@ -13,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 
 const OrganizersPage = () => {
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedType, setSelectedType] = useState<string | null>(null);
   const [isSearchFocused, setIsSearchFocused] = useState(false);
@@ -72,6 +74,10 @@ const OrganizersPage = () => {
     }
   };
 
+  const handleViewProfile = (organizerId: string) => {
+    navigate(`/organizer/${organizerId}`);
+  };
+
   const renderOrganizerCard = (organizer: EventOrganizer, index: number) => {
     const initials = organizer.name
       .split(' ')
@@ -91,8 +97,10 @@ const OrganizersPage = () => {
         animate="visible"
         transition={{ delay: index * 0.05 }}
         whileHover={{ y: -8, scale: 1.02 }}
+        onClick={() => handleViewProfile(organizer.id)}
+        className="cursor-pointer"
       >
-        <Card className="overflow-hidden transition-all duration-300 hover:shadow-xl hover:border-primary/50 group">
+        <Card className="overflow-hidden transition-all duration-300 hover:shadow-xl hover:border-primary/50 group h-full flex flex-col">
           <CardHeader className="pb-0">
             <div className="flex items-center gap-4">
               <Avatar className="h-16 w-16 border-2 border-primary/10 transition-transform duration-300 group-hover:scale-105 group-hover:border-primary/30">
@@ -110,31 +118,24 @@ const OrganizersPage = () => {
               </div>
             </div>
           </CardHeader>
-          <CardContent className="pt-4 transition-colors duration-300 group-hover:bg-primary/5">
+          <CardContent className="pt-4 transition-colors duration-300 group-hover:bg-primary/5 flex-grow">
             <p className="text-muted-foreground transition-colors duration-300 group-hover:text-foreground/90">{organizer.bio}</p>
           </CardContent>
-          {organizer.website && (
-            <CardFooter className="border-t pt-4 transition-colors duration-300 group-hover:bg-primary/5">
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="gap-1.5 w-full transition-all duration-300 group-hover:border-primary/30 group-hover:text-primary relative overflow-hidden" 
-                asChild
-              >
-                <a 
-                  href={organizer.website} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="relative z-10"
-                >
-                  Visit Website 
-                  <ExternalLink className="h-3.5 w-3.5 transition-transform duration-300 group-hover:translate-x-0.5" />
-                  
-                  <span className="absolute inset-0 bg-primary/5 transform scale-x-0 transition-transform duration-300 origin-left group-hover:scale-x-100 -z-10"></span>
-                </a>
-              </Button>
-            </CardFooter>
-          )}
+          <CardFooter className="border-t pt-4 transition-colors duration-300 group-hover:bg-primary/5">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="gap-1.5 w-full transition-all duration-300 group-hover:border-primary/30 group-hover:text-primary relative overflow-hidden" 
+              onClick={(e) => {
+                e.stopPropagation();
+                handleViewProfile(organizer.id);
+              }}
+            >
+              View Profile 
+              <Eye className="h-3.5 w-3.5 transition-transform duration-300 group-hover:translate-x-0.5" />
+              <span className="absolute inset-0 bg-primary/5 transform scale-x-0 transition-transform duration-300 origin-left group-hover:scale-x-100 -z-10"></span>
+            </Button>
+          </CardFooter>
         </Card>
       </motion.div>
     );
