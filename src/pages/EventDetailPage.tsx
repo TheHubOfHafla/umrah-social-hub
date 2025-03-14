@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
@@ -5,8 +6,6 @@ import { useQuery } from "@tanstack/react-query";
 import { getEventById, getRelatedEvents } from "@/lib/data/queries";
 import { currentUser } from "@/lib/data/users";
 import { Event } from "@/types";
-import Button from "@/components/Button";
-import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Container } from "@/components/ui/container";
 
@@ -16,8 +15,10 @@ import EventImage from "@/components/event-detail/EventImage";
 import EventTicketCard from "@/components/event-detail/EventTicketCard";
 import EventDetailTabs from "@/components/event-detail/EventDetailTabs";
 import RelatedEvents from "@/components/event-detail/RelatedEvents";
-import ChatInterface from "@/components/chat/ChatInterface";
 import ChatNotifications from "@/components/chat/ChatNotifications";
+import EventDetailSkeleton from "@/components/event-detail/EventDetailSkeleton";
+import EventErrorState from "@/components/event-detail/EventErrorState";
+import EventChatTab from "@/components/event-detail/EventChatTab";
 
 const EventDetailPage = () => {
   const { eventId } = useParams<{ eventId: string }>();
@@ -66,17 +67,7 @@ const EventDetailPage = () => {
   };
 
   if (error) {
-    return (
-      <Container size="md" className="py-16 text-center">
-        <h1 className="text-2xl font-bold mb-4">Event not found</h1>
-        <p className="text-muted-foreground mb-8">
-          The event you're looking for doesn't exist or has been removed.
-        </p>
-        <Button onClick={() => navigate("/events")}>
-          Browse all events
-        </Button>
-      </Container>
-    );
+    return <EventErrorState />;
   }
 
   if (isEventLoading || !event) {
@@ -147,28 +138,11 @@ const EventDetailPage = () => {
             </TabsContent>
             
             <TabsContent value="chat" className="py-4">
-              {isAttending || isOrganizer ? (
-                <div className="rounded-xl overflow-hidden border-2 border-primary/20 shadow-md">
-                  <div className="border-b border-primary/10 bg-primary/5 px-4 py-3">
-                    <h2 className="text-xl font-bold text-primary">Live Event Chat</h2>
-                    <p className="text-sm text-muted-foreground">
-                      Connect with attendees and organizers in real-time
-                    </p>
-                  </div>
-                  <ChatInterface event={event} isOrganizer={isOrganizer} />
-                </div>
-              ) : (
-                <div className="border-2 border-dashed rounded-lg p-8 text-center bg-muted/10">
-                  <h3 className="text-xl font-semibold mb-3">Join the conversation</h3>
-                  <p className="text-muted-foreground mb-6 max-w-lg mx-auto">
-                    Register for this event to access the chat and connect with other attendees.
-                    Stay updated with announcements and ask questions directly to the organizers.
-                  </p>
-                  <Button onClick={() => navigate(`/events/${event.id}/register`)} size="lg">
-                    Register Now
-                  </Button>
-                </div>
-              )}
+              <EventChatTab 
+                event={event} 
+                isAttending={isAttending} 
+                isOrganizer={isOrganizer} 
+              />
             </TabsContent>
           </Tabs>
         </div>
@@ -178,31 +152,6 @@ const EventDetailPage = () => {
         <RelatedEvents events={relatedEvents} />
       </Container>
     </>
-  );
-};
-
-const EventDetailSkeleton = () => {
-  return (
-    <Container className="py-8">
-      <div className="flex flex-col lg:flex-row gap-8">
-        <div className="w-full lg:w-2/3">
-          <Skeleton className="h-8 w-32 mb-4" />
-          <Skeleton className="h-12 w-full mb-4" />
-          <Skeleton className="h-6 w-48 mb-4" />
-          <Skeleton className="h-6 w-56 mb-4" />
-          <Skeleton className="h-6 w-64 mb-8" />
-          <Skeleton className="w-full aspect-video rounded-lg mb-8" />
-          <Skeleton className="h-8 w-48 mb-4" />
-          <Skeleton className="h-24 w-full mb-4" />
-          <Skeleton className="h-24 w-full mb-4" />
-        </div>
-        <div className="w-full lg:w-1/3">
-          <div className="rounded-xl overflow-hidden">
-            <Skeleton className="h-[400px] w-full" />
-          </div>
-        </div>
-      </div>
-    </Container>
   );
 };
 
