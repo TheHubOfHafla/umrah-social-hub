@@ -2,11 +2,9 @@
 import { useNavigate } from "react-router-dom";
 import { UserRound } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useAuth } from "@/hooks/use-auth";
 
 const ProfileButton = () => {
   const navigate = useNavigate();
-  const { profile } = useAuth();
 
   const handleNavigation = (path: string) => {
     navigate(path);
@@ -14,10 +12,10 @@ const ProfileButton = () => {
   };
 
   return (
-    <button onClick={() => handleNavigation("/profile")}>
+    <button onClick={() => handleNavigation("/")}>
       <Button variant="outline" size="sm" className="flex items-center gap-1 hover:bg-primary/10 hover:text-primary transition-all duration-200 hidden lg:flex">
         <UserRound className="h-3 w-3 md:h-4 md:w-4" />
-        <span className="text-xs md:text-sm">Profile</span>
+        <span className="text-xs md:text-sm">Home</span>
       </Button>
     </button>
   );
