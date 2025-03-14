@@ -25,7 +25,6 @@ import CreateEventPage from "./pages/CreateEventPage";
 import NotFound from "./pages/NotFound";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
-import AuthCallback from "./pages/AuthCallback";
 import AboutUs from "./pages/AboutUs";
 import HelpCenter from "./pages/HelpCenter";
 import ContactUs from "./pages/ContactUs";
@@ -110,12 +109,6 @@ const App = () => {
                   <LegalPage />
                 </PageWrapper>
               } />
-              <Route path="/login" element={<Navigate to="/" />} />
-              <Route path="/signup" element={<Navigate to="/" />} />
-              <Route path="/auth/callback" element={<Navigate to="/" />} />
-              {/* Removed: /profile, /dashboard/profile, /dashboard/events routes */}
-              <Route path="/dashboard/*" element={<Navigate to="/" replace />} />
-              <Route path="/profile" element={<Navigate to="/" replace />} />
               <Route path="/about" element={
                 <PageWrapper>
                   <AboutUs />
