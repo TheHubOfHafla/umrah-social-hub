@@ -97,8 +97,8 @@ const OrganizerSignup = () => {
         description: "Your organizer account has been created.",
       });
 
-      // Redirect to the organizer dashboard
-      navigate("/organizer");
+      // Redirect to the dashboard
+      navigate("/dashboard");
       
       // Refresh the page to update auth context
       window.location.reload();

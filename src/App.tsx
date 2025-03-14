@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -180,7 +179,7 @@ const App = () => {
           <BrowserRouter>
             <Navbar />
             <Routes>
-              <Route path="/organizer/signup" element={
+              <Route path="/dashboard/organizer/signup" element={
                 <PageWrapper>
                   {isAuthenticated ? <OrganizerSignup /> : <Navigate to="/login" />}
                 </PageWrapper>
@@ -235,39 +234,28 @@ const App = () => {
               <Route path="/dashboard" element={
                 <PageWrapper>
                   {isAuthenticated ? 
-                    (currentUser?.role === 'organizer' ? <Navigate to="/organizer" /> : <Dashboard />) : 
+                    (currentUser?.role === 'organizer' ? <OrganizerDashboard /> : <Dashboard />) : 
                     <Navigate to="/login" />}
                 </PageWrapper>
               } />
               <Route path="/dashboard/events" element={
                 <PageWrapper>
                   {isAuthenticated ? 
-                    (currentUser?.role === 'organizer' ? <Navigate to="/organizer/events" /> : <UserEvents />) : 
+                    (currentUser?.role === 'organizer' ? <OrganizerEvents /> : <UserEvents />) : 
                     <Navigate to="/login" />}
                 </PageWrapper>
               } />
               <Route path="/dashboard/profile" element={
                 <PageWrapper>
                   {isAuthenticated ? 
-                    (currentUser?.role === 'organizer' ? <Navigate to="/organizer/profile" /> : <UserProfile />) : 
+                    (currentUser?.role === 'organizer' ? <OrganizerProfile /> : <UserProfile />) : 
                     <Navigate to="/login" />}
                 </PageWrapper>
               } />
-              <Route path="/organizer" element={
-                <PageWrapper>
-                  {isAuthenticated && currentUser?.role === 'organizer' ? <OrganizerDashboard /> : <Navigate to="/login" />}
-                </PageWrapper>
-              } />
-              <Route path="/organizer/events" element={
-                <PageWrapper>
-                  {isAuthenticated && currentUser?.role === 'organizer' ? <OrganizerEvents /> : <Navigate to="/login" />}
-                </PageWrapper>
-              } />
-              <Route path="/organizer/profile" element={
-                <PageWrapper>
-                  {isAuthenticated && currentUser?.role === 'organizer' ? <OrganizerProfile /> : <Navigate to="/login" />}
-                </PageWrapper>
-              } />
+              <Route path="/organizer" element={<Navigate to="/dashboard" replace />} />
+              <Route path="/organizer/events" element={<Navigate to="/dashboard/events" replace />} />
+              <Route path="/organizer/profile" element={<Navigate to="/dashboard/profile" replace />} />
+              <Route path="/organizer/signup" element={<Navigate to="/dashboard/organizer/signup" replace />} />
               <Route path="/about" element={
                 <PageWrapper>
                   <AboutUs />
