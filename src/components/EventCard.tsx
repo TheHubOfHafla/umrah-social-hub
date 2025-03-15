@@ -49,7 +49,7 @@ const EventCard = ({ event, className, variant = "default" }: EventCardProps) =>
     <Link to={`/events/${event.id}`} className="block w-full h-full">
       <Card 
         className={cn(
-          "overflow-hidden transition-all duration-300 group relative h-full",
+          "overflow-hidden transition-all duration-300 group relative h-full w-full",
           "hover:shadow-md hover:border-primary/30 hover:translate-y-[-3px]",
           isFeatured ? "border-0 shadow-none" : "shadow-sm",
           className
