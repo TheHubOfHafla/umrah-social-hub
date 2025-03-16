@@ -1,7 +1,7 @@
-
 import { createContext, useContext, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "./use-toast";
+import { organizers } from "@/lib/data/organizers";
 
 // Define the auth context type
 type AuthContextType = {
@@ -61,12 +61,42 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (error.code !== "PGRST116") {
           console.error("Error fetching organizer:", error);
         }
+        
+        // If in development environment or for demo purposes, return a dummy organizer
+        if (import.meta.env.DEV || userId === 'mock-user-id') {
+          const dummyOrganizer = organizers.find(org => org.id === 'mock-user-id') || organizers[0];
+          return {
+            id: dummyOrganizer.id,
+            name: dummyOrganizer.name,
+            avatar: dummyOrganizer.avatar,
+            bio: dummyOrganizer.bio,
+            website: dummyOrganizer.website,
+            organization_type: dummyOrganizer.organizationType,
+            user_id: userId
+          };
+        }
+        
         return null;
       }
 
       return data;
     } catch (error) {
       console.error("Error in fetchOrganizer:", error);
+      
+      // Fallback to dummy organizer
+      if (import.meta.env.DEV || userId === 'mock-user-id') {
+        const dummyOrganizer = organizers.find(org => org.id === 'mock-user-id') || organizers[0];
+        return {
+          id: dummyOrganizer.id,
+          name: dummyOrganizer.name,
+          avatar: dummyOrganizer.avatar,
+          bio: dummyOrganizer.bio,
+          website: dummyOrganizer.website,
+          organization_type: dummyOrganizer.organizationType,
+          user_id: userId
+        };
+      }
+      
       return null;
     }
   };
@@ -166,6 +196,34 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           
           const organizerData = await fetchOrganizer(session.user.id);
           setOrganizer(organizerData);
+        } else {
+          // For development/demo purposes, set a mock user
+          if (import.meta.env.DEV) {
+            const mockUser = {
+              id: 'mock-user-id',
+              email: 'demo@example.com',
+              role: 'organizer'
+            };
+            setUser(mockUser);
+            
+            // Use dummy profile and organizer
+            setProfile({
+              id: 'mock-user-id',
+              name: 'Demo User',
+              email: 'demo@example.com'
+            });
+            
+            const dummyOrganizer = organizers.find(org => org.id === 'mock-user-id') || organizers[0];
+            setOrganizer({
+              id: dummyOrganizer.id,
+              name: dummyOrganizer.name,
+              avatar: dummyOrganizer.avatar,
+              bio: dummyOrganizer.bio,
+              website: dummyOrganizer.website,
+              organization_type: dummyOrganizer.organizationType,
+              user_id: 'mock-user-id'
+            });
+          }
         }
       } catch (error) {
         console.error("Error fetching session:", error);
@@ -190,9 +248,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           const organizerData = await fetchOrganizer(session.user.id);
           setOrganizer(organizerData);
         } else {
-          setUser(null);
-          setProfile(null);
-          setOrganizer(null);
+          // For development/demo purposes, maintain a mock user
+          if (import.meta.env.DEV) {
+            // Keep the mock user and data
+          } else {
+            setUser(null);
+            setProfile(null);
+            setOrganizer(null);
+          }
         }
         
         setLoading(false);

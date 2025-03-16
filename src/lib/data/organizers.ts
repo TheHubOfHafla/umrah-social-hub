@@ -74,4 +74,13 @@ export const organizers: EventOrganizer[] = [
     website: 'https://example.com/muslim-aid',
     organizationType: 'charity',
   },
+  // Add a mock organizer with ID 'mock-user-id' for testing dashboard views
+  {
+    id: 'mock-user-id',
+    name: 'Demo Organizer',
+    avatar: '/placeholder.svg',
+    bio: 'This is a demo organizer account for testing purposes. It showcases all the features available to event organizers on our platform.',
+    website: 'https://example.com/demo',
+    organizationType: 'company',
+  }
 ];

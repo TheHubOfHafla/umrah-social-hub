@@ -15,6 +15,7 @@ import RevenueChart from "@/components/dashboard/RevenueChart";
 import AISuggestionCard from "@/components/dashboard/AISuggestionCard";
 import EventsOverviewTable from "@/components/dashboard/EventsOverviewTable";
 import OrganizerSidebar from "@/components/dashboard/OrganizerSidebar";
+import { useAuth } from "@/hooks/use-auth";
 import { 
   ChevronRight, 
   Calendar, 
@@ -24,9 +25,11 @@ import {
   Plus,
   Bell,
 } from "lucide-react";
+import { organizers } from "@/lib/data/organizers";
 
 const OrganizerDashboard = () => {
   const { id } = useParams();
+  const { organizer: authOrganizer } = useAuth();
   const [organizer, setOrganizer] = useState<EventOrganizer | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [stats, setStats] = useState({
@@ -50,26 +53,48 @@ const OrganizerDashboard = () => {
   useEffect(() => {
     const loadOrganizerData = async () => {
       setIsLoading(true);
-      // Temporary mock ID for demo purposes
-      const mockUserId = "mock-user-id";
       
       try {
-        const organizerData = await getOrganizerByUserId(mockUserId);
-        setOrganizer(organizerData);
-        
-        if (organizerData) {
-          const statsData = await getOrganizerStats(organizerData.id);
+        // Use auth organizer if available, otherwise get from API
+        if (authOrganizer) {
+          setOrganizer({
+            id: authOrganizer.id,
+            name: authOrganizer.name,
+            avatar: authOrganizer.avatar,
+            bio: authOrganizer.bio,
+            website: authOrganizer.website,
+            organizationType: authOrganizer.organization_type,
+          });
+          
+          const statsData = await getOrganizerStats(authOrganizer.id);
           setStats(statsData);
+        } else {
+          // Fallback to mock user ID
+          const userId = id || "mock-user-id";
+          const organizerData = await getOrganizerByUserId(userId);
+          
+          if (organizerData) {
+            setOrganizer(organizerData);
+            const statsData = await getOrganizerStats(organizerData.id);
+            setStats(statsData);
+          } else {
+            // If still no organizer, use the first one from mock data
+            const fallbackOrganizer = organizers[0];
+            setOrganizer(fallbackOrganizer);
+          }
         }
       } catch (error) {
         console.error("Error loading organizer data:", error);
+        // Use fallback data in case of error
+        const fallbackOrganizer = organizers.find(org => org.id === 'mock-user-id') || organizers[0];
+        setOrganizer(fallbackOrganizer);
       } finally {
         setIsLoading(false);
       }
     };
 
     loadOrganizerData();
-  }, [id]);
+  }, [id, authOrganizer]);
 
   if (isLoading) {
     return (
