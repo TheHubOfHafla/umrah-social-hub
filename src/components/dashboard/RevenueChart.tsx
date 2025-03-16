@@ -12,7 +12,11 @@ import {
   CartesianGrid, 
   Tooltip, 
   Legend,
-  ResponsiveContainer 
+  ResponsiveContainer,
+  Area,
+  AreaChart,
+  ComposedChart,
+  ReferenceLine
 } from "recharts";
 
 const revenueData = [
@@ -37,34 +41,59 @@ const RevenueChart = () => {
     },
   };
 
+  const currentMonth = new Date().toLocaleString('default', { month: 'short' });
+
   return (
     <div className="w-full h-[300px]">
       <ChartContainer 
         config={chartConfig}
         className="h-full"
       >
-        <LineChart data={revenueData}>
-          <CartesianGrid strokeDasharray="3 3" vertical={false} />
+        <ComposedChart data={revenueData}>
+          <defs>
+            <linearGradient id="revenueGradient" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3}/>
+              <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0}/>
+            </linearGradient>
+          </defs>
+          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
           <XAxis 
             dataKey="month" 
             tickLine={false} 
             axisLine={false}
             fontSize={12}
+            tick={{ fill: 'hsl(var(--muted-foreground))' }}
           />
           <YAxis 
             tickLine={false} 
             axisLine={false} 
             fontSize={12}
+            tick={{ fill: 'hsl(var(--muted-foreground))' }}
             tickFormatter={(value) => `$${value}`}
           />
           <Tooltip content={<ChartTooltipContent />} />
-          <Legend />
-          <Line 
+          <Legend 
+            wrapperStyle={{ paddingTop: '10px' }}
+            iconType="circle"
+          />
+          <ReferenceLine 
+            x="May" 
+            stroke="hsl(var(--primary)/50)" 
+            strokeDasharray="3 3" 
+            label={{ 
+              value: "Current", 
+              position: "insideTopRight", 
+              fill: "hsl(var(--primary))",
+              fontSize: 12 
+            }} 
+          />
+          <Area 
             type="monotone" 
             dataKey="revenue" 
             stroke="hsl(var(--primary))" 
-            activeDot={{ r: 6 }} 
-            strokeWidth={2} 
+            strokeWidth={2}
+            fillOpacity={1}
+            fill="url(#revenueGradient)"
             name="Actual"
           />
           <Line 
@@ -74,8 +103,9 @@ const RevenueChart = () => {
             strokeDasharray="5 5" 
             strokeWidth={2} 
             name="Projected"
+            dot={{ stroke: 'hsl(var(--muted-foreground))', strokeWidth: 2, r: 4 }}
           />
-        </LineChart>
+        </ComposedChart>
       </ChartContainer>
     </div>
   );

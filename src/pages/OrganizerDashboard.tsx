@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import PageWrapper from "@/components/PageWrapper";
 import { Container } from "@/components/ui/container";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -17,7 +17,20 @@ import UserAnalyticsCard from "@/components/dashboard/UserAnalyticsCard";
 import RevenueChart from "@/components/dashboard/RevenueChart";
 import AISuggestionCard from "@/components/dashboard/AISuggestionCard";
 import EventsOverviewTable from "@/components/dashboard/EventsOverviewTable";
-import { ChevronRight, Calendar, Users, DollarSign, Activity } from "lucide-react";
+import { 
+  ChevronRight, 
+  Calendar, 
+  Users, 
+  DollarSign, 
+  Activity, 
+  Plus,
+  Bell,
+  BarChart3,
+  LayoutDashboard,
+  CreditCard,
+  Settings,
+  Ticket
+} from "lucide-react";
 
 const OrganizerDashboard = () => {
   const { id } = useParams();
@@ -68,39 +81,141 @@ const OrganizerDashboard = () => {
   if (isLoading) {
     return (
       <PageWrapper>
-        <Container>
-          <div className="py-10">Loading dashboard...</div>
-        </Container>
+        <div className="flex min-h-screen bg-gradient-to-br from-background to-secondary/30">
+          <div className="flex-1">
+            <div className="py-10 px-6">Loading dashboard...</div>
+          </div>
+        </div>
       </PageWrapper>
     );
   }
 
   return (
-    <PageWrapper>
-      <Container>
-        <div className="py-6">
-          <div className="flex justify-between items-center mb-6">
-            <div>
-              <h1 className="text-2xl font-bold tracking-tight">Dashboard</h1>
-              <p className="text-muted-foreground">
-                Welcome back, {organizer?.name || "Organizer"}
-              </p>
-            </div>
-            <Button>
-              Create New Event <ChevronRight className="h-4 w-4 ml-1" />
-            </Button>
+    <PageWrapper withFooter={false}>
+      <div className="flex min-h-screen bg-gradient-to-br from-background to-secondary/30">
+        {/* Sidebar */}
+        <div className="hidden md:flex w-64 flex-col bg-card shadow-md border-r z-10">
+          <div className="p-4 border-b">
+            <h3 className="font-bold text-xl">Organizer Hub</h3>
+            <p className="text-sm text-muted-foreground mt-1">
+              {organizer?.name || "Organizer"}
+            </p>
           </div>
+          
+          <nav className="flex-1 py-6 px-3 space-y-1">
+            <Button variant="ghost" className="w-full justify-start gap-3 h-11" asChild>
+              <a href="#" className="font-medium">
+                <LayoutDashboard className="h-5 w-5 text-primary" />
+                Dashboard
+              </a>
+            </Button>
+            
+            <Button variant="ghost" className="w-full justify-start gap-3 h-11" asChild>
+              <a href="#" className="text-muted-foreground">
+                <Calendar className="h-5 w-5" />
+                Events
+              </a>
+            </Button>
+            
+            <Button variant="ghost" className="w-full justify-start gap-3 h-11" asChild>
+              <a href="#" className="text-muted-foreground">
+                <BarChart3 className="h-5 w-5" />
+                Analytics
+              </a>
+            </Button>
+            
+            <Button variant="ghost" className="w-full justify-start gap-3 h-11" asChild>
+              <a href="#" className="text-muted-foreground">
+                <CreditCard className="h-5 w-5" />
+                Financials
+              </a>
+            </Button>
+            
+            <Button variant="ghost" className="w-full justify-start gap-3 h-11" asChild>
+              <a href="#" className="text-muted-foreground">
+                <Ticket className="h-5 w-5" />
+                Tickets
+              </a>
+            </Button>
+            
+            <Button variant="ghost" className="w-full justify-start gap-3 h-11" asChild>
+              <a href="#" className="text-muted-foreground">
+                <Settings className="h-5 w-5" />
+                Settings
+              </a>
+            </Button>
+          </nav>
+          
+          <div className="p-4 border-t mt-auto">
+            <Card className="bg-primary/10 border-none">
+              <CardContent className="p-4">
+                <h4 className="font-semibold mb-1 flex items-center gap-2">
+                  <BarChart3 className="h-4 w-4 text-primary" />
+                  Premium Analytics
+                </h4>
+                <p className="text-xs text-muted-foreground mb-3">
+                  Unlock advanced insights with our premium plan
+                </p>
+                <Button size="sm" className="w-full">
+                  Upgrade Now
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+        
+        {/* Main content */}
+        <div className="flex-1 overflow-auto">
+          <header className="bg-card border-b sticky top-0 z-10 shadow-sm">
+            <div className="px-6 py-4 flex justify-between items-center">
+              <div>
+                <h1 className="text-2xl font-bold tracking-tight">Dashboard</h1>
+                <p className="text-sm text-muted-foreground">
+                  Welcome back, {organizer?.name || "Organizer"}
+                </p>
+              </div>
+              
+              <div className="flex items-center gap-3">
+                <Button variant="outline" size="sm" className="gap-1">
+                  <Bell className="h-4 w-4" />
+                  <span className="sr-only md:not-sr-only">Notifications</span>
+                </Button>
+                
+                <Button className="gap-1">
+                  <Plus className="h-4 w-4" />
+                  <span className="sr-only md:not-sr-only">Create Event</span>
+                </Button>
+              </div>
+            </div>
+          </header>
+          
+          <main className="p-6">
+            <div className="mb-8">
+              <Card className="bg-gradient-to-r from-primary/10 to-primary/5 border-none shadow-md overflow-hidden">
+                <CardContent className="p-6 flex flex-col md:flex-row gap-6 items-center">
+                  <div className="flex-1">
+                    <h2 className="text-xl font-bold mb-2">Boost Your Event Reach</h2>
+                    <p className="text-sm text-muted-foreground mb-4">
+                      Use our AI-powered tools to maximize ticket sales and attendee engagement.
+                    </p>
+                    <Button size="sm">
+                      Explore Premium Features
+                      <ChevronRight className="h-4 w-4 ml-1" />
+                    </Button>
+                  </div>
+                  <div className="hidden md:block w-1/3 max-w-[300px]">
+                    <img 
+                      src="/placeholder.svg" 
+                      alt="Dashboard illustration" 
+                      className="rounded-md shadow-sm"
+                    />
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
 
-          <Tabs defaultValue="overview" className="space-y-4">
-            <TabsList>
-              <TabsTrigger value="overview">Overview</TabsTrigger>
-              <TabsTrigger value="events">Events</TabsTrigger>
-              <TabsTrigger value="analytics">Detailed Analytics</TabsTrigger>
-              <TabsTrigger value="financials">Financials</TabsTrigger>
-              <TabsTrigger value="profile">Profile</TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="overview" className="space-y-6">
+            <div className="mb-8">
+              <h3 className="text-lg font-semibold mb-4">Performance Overview</h3>
               <DashboardStats
                 stats={[
                   {
@@ -145,48 +260,70 @@ const OrganizerDashboard = () => {
                   },
                 ]}
               />
+            </div>
 
-              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-7">
-                <Card className="lg:col-span-4">
-                  <CardHeader>
-                    <CardTitle className="text-base font-medium">Sales Overview</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <SalesOverviewChart />
-                  </CardContent>
-                </Card>
-                
-                <Card className="lg:col-span-3">
-                  <CardHeader>
-                    <CardTitle className="text-base font-medium">Ticket Analytics</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <TicketAnalyticsCard totalTickets={500} soldTickets={328} timeUntilSellOut={14} sellRate={11} />
-                  </CardContent>
-                </Card>
-              </div>
+            <div className="grid gap-6 grid-cols-1 lg:grid-cols-7 mb-8">
+              <Card className="lg:col-span-4 bg-card shadow-sm">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-base font-medium">Ticket Sales Trend</CardTitle>
+                  <CardDescription>Weekly ticket sales over time</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <SalesOverviewChart />
+                </CardContent>
+              </Card>
+              
+              <Card className="lg:col-span-3 bg-card shadow-sm">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-base font-medium">Current Ticket Status</CardTitle>
+                  <CardDescription>Overview of ticket sales and projections</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <TicketAnalyticsCard totalTickets={500} soldTickets={328} timeUntilSellOut={14} sellRate={11} />
+                </CardContent>
+              </Card>
+            </div>
 
-              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-7">
-                <UserAnalyticsCard
-                  totalUsers={3780}
-                  newUsersThisMonth={153}
-                  topCity="London"
-                  topInterest="Social Events"
-                />
-                
-                <Card className="lg:col-span-4">
-                  <CardHeader>
-                    <CardTitle className="text-base font-medium">Revenue Trends</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <RevenueChart />
-                  </CardContent>
-                </Card>
-              </div>
+            <div className="grid gap-6 grid-cols-1 lg:grid-cols-7 mb-8">
+              <Card className="lg:col-span-3 bg-card shadow-sm">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-base font-medium">Audience Analytics</CardTitle>
+                  <CardDescription>Insights about your event attendees</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <UserAnalyticsCard
+                    totalUsers={3780}
+                    newUsersThisMonth={153}
+                    topCity="London"
+                    topInterest="Social Events"
+                  />
+                </CardContent>
+              </Card>
+              
+              <Card className="lg:col-span-4 bg-card shadow-sm">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-base font-medium">Revenue Forecast</CardTitle>
+                  <CardDescription>Actual vs. projected revenue</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <RevenueChart />
+                </CardContent>
+              </Card>
+            </div>
 
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-base font-medium">AI Suggestions</CardTitle>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+              <Card className="bg-card shadow-sm">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-base font-medium flex items-center gap-2">
+                    <span className="relative">
+                      AI Recommendations
+                      <span className="absolute top-0 right-0 -mt-1 -mr-1 flex h-2 w-2">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+                      </span>
+                    </span>
+                  </CardTitle>
+                  <CardDescription>AI-powered insights to grow your events</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <AISuggestionCard 
@@ -200,58 +337,19 @@ const OrganizerDashboard = () => {
                 </CardContent>
               </Card>
               
-              <Card>
-                <CardHeader>
+              <Card className="bg-card shadow-sm">
+                <CardHeader className="pb-2">
                   <CardTitle className="text-base font-medium">Upcoming Events</CardTitle>
+                  <CardDescription>Your next scheduled events</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <EventsOverviewTable />
                 </CardContent>
               </Card>
-            </TabsContent>
-
-            <TabsContent value="events" className="space-y-4">
-              <h2 className="text-xl font-semibold">Event Management</h2>
-              <p className="text-muted-foreground">Manage all your events in one place</p>
-              <Card>
-                <CardContent className="pt-6">
-                  <p className="text-muted-foreground text-sm">Event management content will appear here</p>
-                </CardContent>
-              </Card>
-            </TabsContent>
-            
-            <TabsContent value="analytics" className="space-y-4">
-              <h2 className="text-xl font-semibold">Detailed Analytics</h2>
-              <p className="text-muted-foreground">Deep insights into your events and audience</p>
-              <Card>
-                <CardContent className="pt-6">
-                  <p className="text-muted-foreground text-sm">Detailed analytics content will appear here</p>
-                </CardContent>
-              </Card>
-            </TabsContent>
-            
-            <TabsContent value="financials" className="space-y-4">
-              <h2 className="text-xl font-semibold">Financial Dashboard</h2>
-              <p className="text-muted-foreground">Track your earnings and payouts</p>
-              <Card>
-                <CardContent className="pt-6">
-                  <p className="text-muted-foreground text-sm">Financial dashboard content will appear here</p>
-                </CardContent>
-              </Card>
-            </TabsContent>
-            
-            <TabsContent value="profile" className="space-y-4">
-              <h2 className="text-xl font-semibold">Profile Management</h2>
-              <p className="text-muted-foreground">Update your profile information</p>
-              <Card>
-                <CardContent className="pt-6">
-                  <p className="text-muted-foreground text-sm">Profile management content will appear here</p>
-                </CardContent>
-              </Card>
-            </TabsContent>
-          </Tabs>
+            </div>
+          </main>
         </div>
-      </Container>
+      </div>
     </PageWrapper>
   );
 };

@@ -8,21 +8,25 @@ import {
 import { Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, BarChart, ResponsiveContainer } from "recharts";
 
 const salesData = [
-  { name: "Mon", tickets: 20 },
-  { name: "Tue", tickets: 15 },
-  { name: "Wed", tickets: 30 },
-  { name: "Thu", tickets: 45 },
-  { name: "Fri", tickets: 65 },
-  { name: "Sat", tickets: 45 },
-  { name: "Sun", tickets: 25 },
+  { name: "Mon", tickets: 20, lastWeek: 15 },
+  { name: "Tue", tickets: 15, lastWeek: 12 },
+  { name: "Wed", tickets: 30, lastWeek: 22 },
+  { name: "Thu", tickets: 45, lastWeek: 25 },
+  { name: "Fri", tickets: 65, lastWeek: 40 },
+  { name: "Sat", tickets: 45, lastWeek: 38 },
+  { name: "Sun", tickets: 25, lastWeek: 20 },
 ];
 
 const SalesOverviewChart = () => {
   const chartConfig = {
     tickets: {
-      label: "Tickets Sold",
+      label: "This Week",
       color: "hsl(var(--primary))",
     },
+    lastWeek: {
+      label: "Last Week",
+      color: "hsl(var(--muted-foreground))",
+    }
   };
 
   return (
@@ -32,27 +36,40 @@ const SalesOverviewChart = () => {
         className="h-full"
       >
         <BarChart data={salesData}>
-          <CartesianGrid strokeDasharray="3 3" vertical={false} />
+          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
           <XAxis 
             dataKey="name" 
             tickLine={false} 
             axisLine={false}
             fontSize={12}
+            tick={{ fill: 'hsl(var(--muted-foreground))' }}
           />
           <YAxis 
             tickLine={false} 
             axisLine={false} 
             fontSize={12}
+            tick={{ fill: 'hsl(var(--muted-foreground))' }}
             tickFormatter={(value) => `${value}`}
           />
           <Tooltip content={<ChartTooltipContent />} />
-          <Legend />
+          <Legend 
+            wrapperStyle={{ paddingTop: '10px' }}
+            iconType="circle"
+          />
           <Bar 
             dataKey="tickets" 
             fill="hsl(var(--primary))" 
             radius={[4, 4, 0, 0]} 
             className="fill-primary" 
-            name="Tickets"
+            name="This Week"
+            barSize={20}
+          />
+          <Bar 
+            dataKey="lastWeek" 
+            fill="hsl(var(--muted-foreground)/30)" 
+            radius={[4, 4, 0, 0]} 
+            name="Last Week"
+            barSize={20}
           />
         </BarChart>
       </ChartContainer>
