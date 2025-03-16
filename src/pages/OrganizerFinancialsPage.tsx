@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import PageWrapper from "@/components/PageWrapper";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
@@ -14,7 +13,6 @@ import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
-// Mock data for charts
 const revenueData = [
   { month: "Jan", revenue: 1200, expenses: 300 },
   { month: "Feb", revenue: 1800, expenses: 450 },
@@ -107,6 +105,7 @@ const OrganizerFinancialsPage = () => {
                       change="+24%"
                       changeType="positive"
                       icon={<DollarSign className="h-5 w-5" />}
+                      description=""
                     />
                     <FinancialCard
                       title="Net Profit"
@@ -114,6 +113,7 @@ const OrganizerFinancialsPage = () => {
                       change="+18%"
                       changeType="positive"
                       icon={<ArrowUpRight className="h-5 w-5" />}
+                      description=""
                     />
                     <FinancialCard
                       title="Expenses"
@@ -121,12 +121,15 @@ const OrganizerFinancialsPage = () => {
                       change="+8%"
                       changeType="negative"
                       icon={<ArrowDownRight className="h-5 w-5" />}
+                      description=""
                     />
                     <FinancialCard
                       title="Available Balance"
                       value="$8,750"
                       description="Ready to withdraw"
                       icon={<Wallet className="h-5 w-5" />}
+                      change=""
+                      changeType=""
                     />
                   </div>
                   
@@ -571,8 +574,23 @@ const OrganizerFinancialsPage = () => {
   );
 };
 
-// Financial Card Component
-const FinancialCard = ({ title, value, change, changeType, description, icon }) => {
+interface FinancialCardProps {
+  title: string;
+  value: string;
+  icon: React.ReactNode;
+  description?: string;
+  change?: string;
+  changeType?: string;
+}
+
+const FinancialCard = ({ 
+  title, 
+  value, 
+  change, 
+  changeType, 
+  description, 
+  icon 
+}: FinancialCardProps) => {
   return (
     <Card>
       <CardContent className="p-6">
@@ -588,7 +606,7 @@ const FinancialCard = ({ title, value, change, changeType, description, icon }) 
             {icon}
           </div>
         </div>
-        {change && (
+        {change && changeType && (
           <div className="mt-4 flex items-center text-xs">
             <span
               className={`rounded-full px-2 py-0.5 ${

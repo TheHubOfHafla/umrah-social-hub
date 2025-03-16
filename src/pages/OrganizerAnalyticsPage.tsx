@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import PageWrapper from "@/components/PageWrapper";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
@@ -6,12 +5,12 @@ import OrganizerSidebar from "@/components/dashboard/OrganizerSidebar";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Calendar, Download, BarChart2, TrendingUp, Users, Clock, Eye, MousePointerClick, ArrowRight } from "lucide-react";
 import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from "recharts";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
-// Mock data for charts
 const attendanceData = [
   { date: "Jan", attendees: 120, target: 150 },
   { date: "Feb", attendees: 180, target: 170 },
@@ -401,7 +400,6 @@ const OrganizerAnalyticsPage = () => {
   );
 };
 
-// Metric Card Component
 const MetricCard = ({ title, value, change, changeType, icon }) => {
   return (
     <Card>
@@ -434,7 +432,6 @@ const MetricCard = ({ title, value, change, changeType, icon }) => {
   );
 };
 
-// Premium Analytics Teaser
 const PremiumAnalyticsTeaser = ({ title, description, icon }) => {
   return (
     <Card className="overflow-hidden">
