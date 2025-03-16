@@ -21,6 +21,7 @@ import EventDetailPage from "./pages/EventDetailPage";
 import RegisterPage from "./pages/RegisterPage";
 import OrganizersPage from "./pages/OrganizersPage";
 import OrganizerProfilePage from "./pages/OrganizerProfilePage";
+import OrganizerDashboard from "./pages/OrganizerDashboard";
 import CreateEventPage from "./pages/CreateEventPage";
 import NotFound from "./pages/NotFound";
 import Login from "./pages/Login";
@@ -103,6 +104,9 @@ const App = () => {
               } />
               <Route path="/organizer/:id" element={
                 <OrganizerProfilePage />
+              } />
+              <Route path="/organizer/dashboard" element={
+                <OrganizerDashboard />
               } />
               <Route path="/legal" element={
                 <PageWrapper>
