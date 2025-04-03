@@ -63,6 +63,7 @@ const EventGrid = ({
             description={`Browse ${category} events in your area`}
             // Fixed consistent width for all cards across categories
             itemWidth="w-full md:w-[300px]"
+            categorySlug={category}
           >
             {categoryGroups[category].map(event => (
               <EventCard key={event.id} event={event} className="h-full" />

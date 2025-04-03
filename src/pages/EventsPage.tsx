@@ -1,6 +1,7 @@
+
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
-import { Search, Filter, ChevronUp, ChevronDown } from "lucide-react";
+import { Search, Filter, ChevronUp, ChevronDown, Grid2X2, LayoutList } from "lucide-react";
 import { categories } from "@/lib/data/categories";
 import { mockEvents } from "@/lib/data/events";
 import { Event, EventCategory, AttendeeType } from "@/types";
@@ -38,6 +39,7 @@ const EventsPage = () => {
   const [filteredEvents, setFilteredEvents] = useState<Event[]>(mockEvents);
   const [compactFilters, setCompactFilters] = useState<boolean>(false);
   const [categoryGroups, setCategoryGroups] = useState<Record<string, Event[]>>({});
+  const [viewMode, setViewMode] = useState<"grid" | "carousel">("carousel");
 
   useEffect(() => {
     const categoryParam = searchParams.get("category");
@@ -145,7 +147,7 @@ const EventsPage = () => {
     setCompactFilters(!compactFilters);
   };
 
-  const renderCategoryRows = () => {
+  const renderEvents = () => {
     const categories = Object.keys(categoryGroups);
     
     if (categories.length === 0) {
@@ -155,19 +157,40 @@ const EventsPage = () => {
         </div>
       );
     }
-    
-    return categories.map((category) => (
-      <CategoryRow 
-        key={category}
-        title={`${category} Events`}
-        description={`Browse ${category} events in your area`}
-        itemWidth="lg:w-[280px]"
-      >
-        {categoryGroups[category].map((event) => (
-          <EventCard key={event.id} event={event} />
-        ))}
-      </CategoryRow>
-    ));
+
+    if (viewMode === "carousel") {
+      return categories.map((category) => (
+        <CategoryRow 
+          key={category}
+          title={`${category} Events`}
+          description={`Browse ${category} events in your area`}
+          itemWidth="lg:w-[280px]"
+          categorySlug={category}
+        >
+          {categoryGroups[category].map((event) => (
+            <EventCard key={event.id} event={event} />
+          ))}
+        </CategoryRow>
+      ));
+    } else {
+      // Grid mode - show all events in a unified grid
+      return categories.map((category) => (
+        <div key={category} className="mb-12">
+          <div className="mb-6">
+            <h2 className="text-xl font-bold tracking-tight capitalize">{category} Events</h2>
+            <p className="text-muted-foreground text-sm mt-1">
+              Browse {category} events in your area
+            </p>
+          </div>
+          
+          <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {categoryGroups[category].map((event) => (
+              <EventCard key={event.id} event={event} className="h-full" />
+            ))}
+          </div>
+        </div>
+      ));
+    }
   };
 
   return (
@@ -374,33 +397,57 @@ const EventsPage = () => {
               )}
             </div>
             
-            {!compactFilters && (
-              <div className="hidden lg:block">
+            <div className="flex items-center gap-3">
+              {/* View mode toggle - only visible on desktop */}
+              <div className="hidden md:flex items-center p-1 bg-secondary/50 rounded-lg">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className={`rounded-md ${viewMode === 'carousel' ? 'bg-white shadow-sm' : ''}`}
+                  onClick={() => setViewMode('carousel')}
+                >
+                  <LayoutList className="h-4 w-4 mr-1" />
+                  Rows
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className={`rounded-md ${viewMode === 'grid' ? 'bg-white shadow-sm' : ''}`}
+                  onClick={() => setViewMode('grid')}
+                >
+                  <Grid2X2 className="h-4 w-4 mr-1" />
+                  Grid
+                </Button>
+              </div>
+            
+              {!compactFilters && (
+                <div className="hidden lg:block">
+                  <Button 
+                    variant="ghost" 
+                    onClick={toggleCompactFilters}
+                    className="text-[#4A90E2] hover:text-[#3A7BC8] hover:bg-[#4A90E2]/10"
+                  >
+                    <ChevronUp className="h-4 w-4 mr-1" />
+                    Hide filters
+                  </Button>
+                </div>
+              )}
+              
+              {compactFilters && (
                 <Button 
                   variant="ghost" 
                   onClick={toggleCompactFilters}
                   className="text-[#4A90E2] hover:text-[#3A7BC8] hover:bg-[#4A90E2]/10"
                 >
-                  <ChevronUp className="h-4 w-4 mr-1" />
-                  Hide filters
+                  <ChevronDown className="h-4 w-4 mr-1" />
+                  Show filters
                 </Button>
-              </div>
-            )}
-            
-            {compactFilters && (
-              <Button 
-                variant="ghost" 
-                onClick={toggleCompactFilters}
-                className="text-[#4A90E2] hover:text-[#3A7BC8] hover:bg-[#4A90E2]/10"
-              >
-                <ChevronDown className="h-4 w-4 mr-1" />
-                Show filters
-              </Button>
-            )}
+              )}
+            </div>
           </div>
 
           <div className="space-y-12 w-full">
-            {renderCategoryRows()}
+            {renderEvents()}
           </div>
         </div>
       </div>
