@@ -130,7 +130,7 @@ const EventCard = ({ event, className, variant = "default" }: EventCardProps) =>
               {event.title}
             </h3>
 
-            <p className="text-muted-foreground text-xs line-clamp-2 transition-colors duration-300 group-hover:text-foreground/90 h-[2.5rem]">
+            <p className="text-muted-foreground text-xs line-clamp-2 transition-colors duration-300 group-hover:text-foreground/90 h-10">
               {event.shortDescription}
             </p>
 

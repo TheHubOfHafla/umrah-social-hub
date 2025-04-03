@@ -25,7 +25,7 @@ const CategoryRow = ({
   description,
   children,
   className,
-  itemWidth = "w-full md:w-[300px]", // Updated fixed width for consistency
+  itemWidth = "w-full md:w-[300px]", // Fixed width for consistency
   showControls = true,
 }: CategoryRowProps) => {
   return (
@@ -51,9 +51,9 @@ const CategoryRow = ({
                   <CarouselItem
                     key={index}
                     className={cn(
-                      "pl-2 md:pl-4", 
-                      // Fixed breakpoints for consistent sizing
-                      "basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/4",
+                      "pl-2 md:pl-4",
+                      // Consistent sizing with fixed widths at each breakpoint
+                      "basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/4 xl:basis-1/5",
                       itemWidth
                     )}
                   >

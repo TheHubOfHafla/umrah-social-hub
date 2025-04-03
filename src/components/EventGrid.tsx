@@ -65,7 +65,7 @@ const EventGrid = ({
             itemWidth="w-full md:w-[300px]"
           >
             {categoryGroups[category].map(event => (
-              <EventCard key={event.id} event={event} />
+              <EventCard key={event.id} event={event} className="h-full" />
             ))}
           </CategoryRow>
         ))}
@@ -82,7 +82,7 @@ const EventGrid = ({
         className={className}
       >
         {events.map(event => (
-          <EventCard key={event.id} event={event} />
+          <EventCard key={event.id} event={event} className="h-full" />
         ))}
       </CategoryRow>
     );
@@ -97,7 +97,7 @@ const EventGrid = ({
       )}
     >
       {events.map((event) => (
-        <div key={event.id} className="h-full">
+        <div key={event.id} className="h-full w-full">
           <EventCard event={event} className="h-full" />
         </div>
       ))}
