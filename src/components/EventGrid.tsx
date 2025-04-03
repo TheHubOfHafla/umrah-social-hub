@@ -23,6 +23,7 @@ const EventGrid = ({
   useCarousel = false,
   groupByCategory = false,
 }: EventGridProps) => {
+  // Fixed grid template columns for consistency
   const gridCols = {
     1: "grid-cols-1",
     2: "grid-cols-1 sm:grid-cols-2",
@@ -60,8 +61,8 @@ const EventGrid = ({
             key={category}
             title={`${category} Events`}
             description={`Browse ${category} events in your area`}
-            // Set consistent width for all cards across categories
-            itemWidth="w-full md:w-[280px] lg:w-[320px]"
+            // Fixed consistent width for all cards across categories
+            itemWidth="w-full md:w-[300px]"
           >
             {categoryGroups[category].map(event => (
               <EventCard key={event.id} event={event} />
@@ -77,7 +78,7 @@ const EventGrid = ({
       <CategoryRow
         title="Events"
         // Consistent width for all cards
-        itemWidth="w-full md:w-[280px] lg:w-[320px]"
+        itemWidth="w-full md:w-[300px]"
         className={className}
       >
         {events.map(event => (
@@ -90,7 +91,7 @@ const EventGrid = ({
   return (
     <div
       className={cn(
-        "grid gap-4",
+        "grid gap-6", // Increased gap for better spacing
         gridCols[columns],
         className
       )}

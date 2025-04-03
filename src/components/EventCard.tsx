@@ -49,7 +49,7 @@ const EventCard = ({ event, className, variant = "default" }: EventCardProps) =>
     <Link to={`/events/${event.id}`} className="block w-full h-full">
       <Card 
         className={cn(
-          "overflow-hidden transition-all duration-300 group relative h-full w-full",
+          "overflow-hidden transition-all duration-300 group relative h-full w-full flex flex-col",
           "hover:shadow-md hover:border-primary/30 hover:translate-y-[-3px]",
           isFeatured ? "border-0 shadow-none" : "shadow-sm",
           className
@@ -104,7 +104,7 @@ const EventCard = ({ event, className, variant = "default" }: EventCardProps) =>
         </div>
 
         <CardContent className={cn(
-          "p-3 transition-all duration-300 group-hover:bg-primary/5",
+          "p-3 transition-all duration-300 group-hover:bg-primary/5 flex-grow",
           isFeatured && "px-0 pt-2"
         )}>
           <div className="space-y-1.5">
@@ -124,13 +124,13 @@ const EventCard = ({ event, className, variant = "default" }: EventCardProps) =>
             </div>
 
             <h3 className={cn(
-              "font-semibold leading-tight transition-colors duration-300 group-hover:text-primary text-base",
+              "font-semibold leading-tight transition-colors duration-300 group-hover:text-primary line-clamp-1",
               isFeatured ? "text-xl" : "text-base"
             )}>
               {event.title}
             </h3>
 
-            <p className="text-muted-foreground text-xs line-clamp-1 transition-colors duration-300 group-hover:text-foreground/90">
+            <p className="text-muted-foreground text-xs line-clamp-2 transition-colors duration-300 group-hover:text-foreground/90 h-[2.5rem]">
               {event.shortDescription}
             </p>
 
@@ -148,7 +148,7 @@ const EventCard = ({ event, className, variant = "default" }: EventCardProps) =>
         </CardContent>
 
         <CardFooter className={cn(
-          "p-3 pt-0 flex items-center justify-between transition-colors duration-300 group-hover:bg-primary/5",
+          "p-3 pt-0 flex items-center justify-between transition-colors duration-300 group-hover:bg-primary/5 mt-auto",
           isFeatured && "px-0"
         )}>
           <UserAvatar 

@@ -25,7 +25,7 @@ const CategoryRow = ({
   description,
   children,
   className,
-  itemWidth = "w-full md:w-[280px] lg:w-[320px]", // Updated default width for consistency
+  itemWidth = "w-full md:w-[300px]", // Updated fixed width for consistency
   showControls = true,
 }: CategoryRowProps) => {
   return (
@@ -52,7 +52,7 @@ const CategoryRow = ({
                     key={index}
                     className={cn(
                       "pl-2 md:pl-4", 
-                      // Simplified breakpoints for more consistent sizing
+                      // Fixed breakpoints for consistent sizing
                       "basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/4",
                       itemWidth
                     )}
@@ -68,8 +68,8 @@ const CategoryRow = ({
 
         {showControls && (
           <div className="flex justify-end gap-2 mt-4">
-            <CarouselPrevious className="static transform-none shadow-md" />
-            <CarouselNext className="static transform-none shadow-md" />
+            <CarouselPrevious className="static transform-none shadow-md h-9 w-9 rounded-full" />
+            <CarouselNext className="static transform-none shadow-md h-9 w-9 rounded-full" />
           </div>
         )}
       </Carousel>
