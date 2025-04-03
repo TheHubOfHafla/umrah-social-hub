@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Search, Filter, ChevronUp, ChevronDown, Grid2X2, LayoutList } from "lucide-react";
@@ -27,6 +26,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import AttendeeTypeFilter from "@/components/AttendeeTypeFilter";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
@@ -40,6 +40,7 @@ const EventsPage = () => {
   const [compactFilters, setCompactFilters] = useState<boolean>(false);
   const [categoryGroups, setCategoryGroups] = useState<Record<string, Event[]>>({});
   const [viewMode, setViewMode] = useState<"grid" | "carousel">("carousel");
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
 
   useEffect(() => {
     const categoryParam = searchParams.get("category");
@@ -193,6 +194,91 @@ const EventsPage = () => {
     }
   };
 
+  const FilterPopover = () => {
+    return (
+      <Popover open={isFilterOpen} onOpenChange={setIsFilterOpen}>
+        <PopoverTrigger asChild>
+          <Button 
+            variant="outline" 
+            className="flex items-center gap-2 mt-4 w-full md:w-auto border-[#4A90E2]/30 text-[#4A90E2] hover:bg-[#4A90E2]/5 hover:text-[#3A7BC8] hover:border-[#4A90E2]"
+          >
+            <Filter className="h-4 w-4" />
+            Filters
+            {isFilterOpen ? (
+              <ChevronUp className="h-4 w-4 ml-1" />
+            ) : (
+              <ChevronDown className="h-4 w-4 ml-1" />
+            )}
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-80 p-4 bg-white shadow-lg rounded-md border-[#4A90E2]/20" sideOffset={8}>
+          <div className="space-y-6">
+            <div>
+              <h3 className="font-medium mb-3 text-sm">Categories</h3>
+              <div className="space-y-2 max-h-48 overflow-y-auto pr-2">
+                <div 
+                  className={`cursor-pointer px-3 py-1.5 rounded-md hover:bg-secondary ${
+                    selectedCategory === "all" ? "bg-secondary" : ""
+                  }`}
+                  onClick={() => handleCategorySelect("all")}
+                >
+                  All Categories
+                </div>
+                {categories.map((category) => (
+                  <div
+                    key={category.value}
+                    className={`cursor-pointer px-3 py-1.5 rounded-md hover:bg-secondary ${
+                      selectedCategory === category.value ? "bg-secondary" : ""
+                    }`}
+                    onClick={() => handleCategorySelect(category.value)}
+                  >
+                    {category.label}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <h3 className="font-medium mb-3 text-sm">Attendee Type</h3>
+              <AttendeeTypeFilter
+                selectedType={selectedAttendeeType as any}
+                onChange={(type) => setSelectedAttendeeType(type || "all")}
+                className="w-full"
+              />
+            </div>
+
+            <div>
+              <h3 className="font-medium mb-3 text-sm">Sort By</h3>
+              <Select value={sortBy} onValueChange={setSortBy}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Sort by" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="date-asc">Date (Soonest first)</SelectItem>
+                  <SelectItem value="date-desc">Date (Latest first)</SelectItem>
+                  <SelectItem value="price-asc">Price (Low to High)</SelectItem>
+                  <SelectItem value="price-desc">Price (High to Low)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="flex gap-2 pt-4 border-t">
+              <Button variant="outline" onClick={clearFilters} className="flex-1">
+                Clear All
+              </Button>
+              <Button 
+                onClick={() => setIsFilterOpen(false)} 
+                className="flex-1"
+              >
+                Apply
+              </Button>
+            </div>
+          </div>
+        </PopoverContent>
+      </Popover>
+    );
+  };
+
   return (
     <div className="container mx-auto px-4 pt-24 pb-8">
       <div className="mb-8">
@@ -202,7 +288,7 @@ const EventsPage = () => {
         </p>
       </div>
 
-      <div className="w-full mb-8 relative">
+      <div className="w-full mb-4 relative">
         <form onSubmit={handleSearch} className="bg-gradient-to-r from-[#F2FBFE] to-[#E6E9FF] dark:from-[#21214B] dark:to-[#171733] p-1.5 rounded-xl shadow-soft">
           <div className="relative flex items-center overflow-hidden rounded-lg bg-white dark:bg-[#171727] transition-all duration-300 focus-within:ring-2 focus-within:ring-[#4A90E2]">
             <Search className="absolute left-3 h-5 w-5 text-muted-foreground" />
@@ -222,233 +308,139 @@ const EventsPage = () => {
           </div>
         </form>
       </div>
+      
+      <div className="flex items-center justify-between gap-4 mb-8">
+        <FilterPopover />
+        
+        <div className="hidden md:flex items-center p-1 bg-secondary/50 rounded-lg ml-auto">
+          <Button
+            variant="ghost"
+            size="sm"
+            className={`rounded-md ${viewMode === 'carousel' ? 'bg-white shadow-sm' : ''}`}
+            onClick={() => setViewMode('carousel')}
+          >
+            <LayoutList className="h-4 w-4 mr-1" />
+            Rows
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            className={`rounded-md ${viewMode === 'grid' ? 'bg-white shadow-sm' : ''}`}
+            onClick={() => setViewMode('grid')}
+          >
+            <Grid2X2 className="h-4 w-4 mr-1" />
+            Grid
+          </Button>
+        </div>
+      </div>
 
-      <div className={`flex flex-col ${!compactFilters ? 'lg:flex-row' : ''} gap-6`}>
-        {!compactFilters && (
-          <div className="hidden lg:block w-64 space-y-6 transition-all duration-300">
-            <>
-              <div>
-                <div className="flex items-center justify-between">
+      <div className="md:hidden mb-4">
+        <Sheet>
+          <SheetTrigger asChild>
+            <Button variant="outline" size="sm" className="w-full">
+              <Filter className="h-4 w-4 mr-2" />
+              Filter Events
+            </Button>
+          </SheetTrigger>
+          <SheetContent side="right">
+            <SheetHeader>
+              <SheetTitle>Filters</SheetTitle>
+              <SheetDescription>
+                Refine your event search with filters
+              </SheetDescription>
+            </SheetHeader>
+            <ScrollArea className="h-[calc(100vh-180px)] py-4">
+              <div className="space-y-6 pr-6">
+                <div>
                   <h3 className="font-medium mb-3">Categories</h3>
-                </div>
-                <div className="space-y-2">
-                  <div 
-                    className={`cursor-pointer px-3 py-1.5 rounded-md hover:bg-secondary ${
-                      selectedCategory === "all" ? "bg-secondary" : ""
-                    }`}
-                    onClick={() => handleCategorySelect("all")}
-                  >
-                    All Categories
-                  </div>
-                  {categories.map((category) => (
-                    <div
-                      key={category.value}
+                  <div className="space-y-2">
+                    <div 
                       className={`cursor-pointer px-3 py-1.5 rounded-md hover:bg-secondary ${
-                        selectedCategory === category.value ? "bg-secondary" : ""
+                        selectedCategory === "all" ? "bg-secondary" : ""
                       }`}
-                      onClick={() => handleCategorySelect(category.value)}
+                      onClick={() => handleCategorySelect("all")}
                     >
-                      {category.label}
+                      All Categories
                     </div>
-                  ))}
+                    {categories.map((category) => (
+                      <div
+                        key={category.value}
+                        className={`cursor-pointer px-3 py-1.5 rounded-md hover:bg-secondary ${
+                          selectedCategory === category.value ? "bg-secondary" : ""
+                        }`}
+                        onClick={() => handleCategorySelect(category.value)}
+                      >
+                        {category.label}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <h3 className="font-medium mb-3">Attendee Type</h3>
+                  <AttendeeTypeFilter
+                    selectedType={selectedAttendeeType as any}
+                    onChange={(type) => setSelectedAttendeeType(type || "all")}
+                    className="w-full"
+                  />
+                </div>
+
+                <div>
+                  <h3 className="font-medium mb-3">Sort By</h3>
+                  <Select value={sortBy} onValueChange={setSortBy}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Sort by" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="date-asc">Date (Soonest first)</SelectItem>
+                      <SelectItem value="date-desc">Date (Latest first)</SelectItem>
+                      <SelectItem value="price-asc">Price (Low to High)</SelectItem>
+                      <SelectItem value="price-desc">Price (High to Low)</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
-
-              <div>
-                <h3 className="font-medium mb-3">Attendee Type</h3>
-                <AttendeeTypeFilter
-                  selectedType={selectedAttendeeType as any}
-                  onChange={(type) => setSelectedAttendeeType(type || "all")}
-                  className="w-full"
-                />
-              </div>
-
-              <div>
-                <h3 className="font-medium mb-3">Sort By</h3>
-                <Select value={sortBy} onValueChange={setSortBy}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Sort by" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="date-asc">Date (Soonest first)</SelectItem>
-                    <SelectItem value="date-desc">Date (Latest first)</SelectItem>
-                    <SelectItem value="price-asc">Price (Low to High)</SelectItem>
-                    <SelectItem value="price-desc">Price (High to Low)</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
+            </ScrollArea>
+            <SheetFooter className="pt-4">
               <Button variant="outline" onClick={clearFilters} className="w-full">
                 Clear Filters
               </Button>
-            </>
-          </div>
-        )}
-        
-        <div className="lg:hidden flex justify-between items-center gap-3 mb-4">
-          <Sheet>
-            <SheetTrigger asChild>
-              <Button variant="outline" size="icon">
-                <Filter className="h-4 w-4" />
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="right">
-              <SheetHeader>
-                <SheetTitle>Filters</SheetTitle>
-                <SheetDescription>
-                  Refine your event search with filters
-                </SheetDescription>
-              </SheetHeader>
-              <ScrollArea className="h-[calc(100vh-180px)] py-4">
-                <div className="space-y-6 pr-6">
-                  <div>
-                    <h3 className="font-medium mb-3">Categories</h3>
-                    <div className="space-y-2">
-                      <div 
-                        className={`cursor-pointer px-3 py-1.5 rounded-md hover:bg-secondary ${
-                          selectedCategory === "all" ? "bg-secondary" : ""
-                        }`}
-                        onClick={() => handleCategorySelect("all")}
-                      >
-                        All Categories
-                      </div>
-                      {categories.map((category) => (
-                        <div
-                          key={category.value}
-                          className={`cursor-pointer px-3 py-1.5 rounded-md hover:bg-secondary ${
-                            selectedCategory === category.value ? "bg-secondary" : ""
-                          }`}
-                          onClick={() => handleCategorySelect(category.value)}
-                        >
-                          {category.label}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
+              <SheetClose asChild>
+                <Button className="w-full">Apply Filters</Button>
+              </SheetClose>
+            </SheetFooter>
+          </SheetContent>
+        </Sheet>
+      </div>
 
-                  <div>
-                    <h3 className="font-medium mb-3">Attendee Type</h3>
-                    <AttendeeTypeFilter
-                      selectedType={selectedAttendeeType as any}
-                      onChange={(type) => setSelectedAttendeeType(type || "all")}
-                      className="w-full"
-                    />
-                  </div>
-
-                  <div>
-                    <h3 className="font-medium mb-3">Sort By</h3>
-                    <Select value={sortBy} onValueChange={setSortBy}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Sort by" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="date-asc">Date (Soonest first)</SelectItem>
-                        <SelectItem value="date-desc">Date (Latest first)</SelectItem>
-                        <SelectItem value="price-asc">Price (Low to High)</SelectItem>
-                        <SelectItem value="price-desc">Price (High to Low)</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
+      <div className="w-full">
+        <div className="mb-6 flex items-center justify-between">
+          <div>
+            <h2 className="text-xl font-semibold mb-4">
+              {selectedCategory !== "all" 
+                ? `${selectedCategory} Events (${filteredEvents.length})` 
+                : `All Events (${filteredEvents.length})`}
+            </h2>
+            {selectedCategory === "all" && (
+              <ScrollArea className="w-full whitespace-nowrap mb-6">
+                <CategoryChips
+                  selectedCategories={[selectedCategory !== "all" ? selectedCategory as EventCategory : null].filter(Boolean) as EventCategory[]}
+                  onChange={(categories) => {
+                    if (categories.length > 0) {
+                      handleCategorySelect(categories[0]);
+                    } else {
+                      handleCategorySelect("all");
+                    }
+                  }}
+                  singleSelect={true}
+                />
               </ScrollArea>
-              <SheetFooter className="pt-4">
-                <Button variant="outline" onClick={clearFilters} className="w-full">
-                  Clear Filters
-                </Button>
-                <SheetClose asChild>
-                  <Button className="w-full">Apply Filters</Button>
-                </SheetClose>
-              </SheetFooter>
-            </SheetContent>
-          </Sheet>
-          
-          <Button 
-            variant="ghost" 
-            onClick={toggleCompactFilters}
-            className="ml-auto text-[#4A90E2] hover:text-[#3A7BC8] hover:bg-[#4A90E2]/10"
-          >
-            {compactFilters ? <ChevronDown className="h-4 w-4 mr-1" /> : <ChevronUp className="h-4 w-4 mr-1" />}
-            {compactFilters ? "Show filters" : "Hide filters"}
-          </Button>
+            )}
+          </div>
         </div>
 
-        <div className={`${compactFilters ? 'w-full' : 'flex-1'}`}>
-          <div className="mb-6 flex items-center justify-between">
-            <div>
-              <h2 className="text-xl font-semibold mb-4">
-                {selectedCategory !== "all" 
-                  ? `${selectedCategory} Events (${filteredEvents.length})` 
-                  : `All Events (${filteredEvents.length})`}
-              </h2>
-              {selectedCategory === "all" && (
-                <ScrollArea className="w-full whitespace-nowrap mb-6">
-                  <CategoryChips
-                    selectedCategories={[selectedCategory !== "all" ? selectedCategory as EventCategory : null].filter(Boolean) as EventCategory[]}
-                    onChange={(categories) => {
-                      if (categories.length > 0) {
-                        handleCategorySelect(categories[0]);
-                      } else {
-                        handleCategorySelect("all");
-                      }
-                    }}
-                    singleSelect={true}
-                  />
-                </ScrollArea>
-              )}
-            </div>
-            
-            <div className="flex items-center gap-3">
-              {/* View mode toggle - only visible on desktop */}
-              <div className="hidden md:flex items-center p-1 bg-secondary/50 rounded-lg">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className={`rounded-md ${viewMode === 'carousel' ? 'bg-white shadow-sm' : ''}`}
-                  onClick={() => setViewMode('carousel')}
-                >
-                  <LayoutList className="h-4 w-4 mr-1" />
-                  Rows
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className={`rounded-md ${viewMode === 'grid' ? 'bg-white shadow-sm' : ''}`}
-                  onClick={() => setViewMode('grid')}
-                >
-                  <Grid2X2 className="h-4 w-4 mr-1" />
-                  Grid
-                </Button>
-              </div>
-            
-              {!compactFilters && (
-                <div className="hidden lg:block">
-                  <Button 
-                    variant="ghost" 
-                    onClick={toggleCompactFilters}
-                    className="text-[#4A90E2] hover:text-[#3A7BC8] hover:bg-[#4A90E2]/10"
-                  >
-                    <ChevronUp className="h-4 w-4 mr-1" />
-                    Hide filters
-                  </Button>
-                </div>
-              )}
-              
-              {compactFilters && (
-                <Button 
-                  variant="ghost" 
-                  onClick={toggleCompactFilters}
-                  className="text-[#4A90E2] hover:text-[#3A7BC8] hover:bg-[#4A90E2]/10"
-                >
-                  <ChevronDown className="h-4 w-4 mr-1" />
-                  Show filters
-                </Button>
-              )}
-            </div>
-          </div>
-
-          <div className="space-y-12 w-full">
-            {renderEvents()}
-          </div>
+        <div className="space-y-12 w-full">
+          {renderEvents()}
         </div>
       </div>
     </div>
