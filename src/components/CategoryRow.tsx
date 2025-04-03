@@ -25,15 +25,15 @@ const CategoryRow = ({
   description,
   children,
   className,
-  itemWidth = "w-[450px]", // Increased width for more substantial desktop display
+  itemWidth = "w-full md:w-[280px] lg:w-[320px]", // Updated default width for consistency
   showControls = true,
 }: CategoryRowProps) => {
   return (
-    <div className={cn("mb-8", className)}>
-      <div className="mb-4">
+    <div className={cn("mb-12", className)}>
+      <div className="mb-6">
         <h2 className="text-xl font-bold tracking-tight capitalize">{title}</h2>
         {description && (
-          <p className="text-muted-foreground text-sm">{description}</p>
+          <p className="text-muted-foreground text-sm mt-1">{description}</p>
         )}
       </div>
 
@@ -52,8 +52,8 @@ const CategoryRow = ({
                     key={index}
                     className={cn(
                       "pl-2 md:pl-4", 
-                      // Fixed sizing with fewer breakpoints for consistency
-                      "basis-full sm:basis-3/4 md:basis-1/2 lg:basis-2/5 xl:basis-1/3",
+                      // Simplified breakpoints for more consistent sizing
+                      "basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/4",
                       itemWidth
                     )}
                   >
@@ -67,10 +67,10 @@ const CategoryRow = ({
         </div>
 
         {showControls && (
-          <>
-            <CarouselPrevious className="hidden md:flex absolute left-2 shadow-md" />
-            <CarouselNext className="hidden md:flex absolute right-2 shadow-md" />
-          </>
+          <div className="flex justify-end gap-2 mt-4">
+            <CarouselPrevious className="static transform-none shadow-md" />
+            <CarouselNext className="static transform-none shadow-md" />
+          </div>
         )}
       </Carousel>
     </div>

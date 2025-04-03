@@ -25,9 +25,9 @@ const EventGrid = ({
 }: EventGridProps) => {
   const gridCols = {
     1: "grid-cols-1",
-    2: "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4",
-    3: "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4",
-    4: "grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5",
+    2: "grid-cols-1 sm:grid-cols-2",
+    3: "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3",
+    4: "grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4",
   };
 
   if (events.length === 0 && showEmpty) {
@@ -60,8 +60,8 @@ const EventGrid = ({
             key={category}
             title={`${category} Events`}
             description={`Browse ${category} events in your area`}
-            // Consistent larger width for all categories
-            itemWidth="w-[450px]"
+            // Set consistent width for all cards across categories
+            itemWidth="w-full md:w-[280px] lg:w-[320px]"
           >
             {categoryGroups[category].map(event => (
               <EventCard key={event.id} event={event} />
@@ -76,8 +76,8 @@ const EventGrid = ({
     return (
       <CategoryRow
         title="Events"
-        // Consistent larger width for all categories
-        itemWidth="w-[450px]"
+        // Consistent width for all cards
+        itemWidth="w-full md:w-[280px] lg:w-[320px]"
         className={className}
       >
         {events.map(event => (
@@ -90,13 +90,15 @@ const EventGrid = ({
   return (
     <div
       className={cn(
-        "grid gap-3",
+        "grid gap-4",
         gridCols[columns],
         className
       )}
     >
       {events.map((event) => (
-        <EventCard key={event.id} event={event} />
+        <div key={event.id} className="h-full">
+          <EventCard event={event} className="h-full" />
+        </div>
       ))}
     </div>
   );
