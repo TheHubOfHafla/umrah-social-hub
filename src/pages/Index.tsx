@@ -7,6 +7,7 @@ import RecommendedEvents from "@/components/RecommendedEvents";
 import CategoryEvents from "@/components/CategoryEvents";
 import MyEventsPromo from "@/components/MyEventsPromo";
 import TopicsAndPicks from "@/components/TopicsAndPicks";
+import LocationFilter from "@/components/LocationFilter";
 import Footer from "@/components/Footer";
 import EventCard from "@/components/EventCard";
 import Button from "@/components/Button";
@@ -25,6 +26,7 @@ const Index = () => {
   const { isAuthenticated, currentUser } = useContext(AuthContext);
   const [selectedCategories, setSelectedCategories] = useState<EventCategory[]>([]);
   const [selectedLocation, setSelectedLocation] = useState("");
+  const [selectedFilter, setSelectedFilter] = useState("all");
   const [featuredEvents, setFeaturedEvents] = useState(getFeaturedEvents());
   const [popularEvents, setPopularEvents] = useState(getPopularEvents());
   const [trendingEvents, setTrendingEvents] = useState(getPopularEvents().slice(3, 9));
@@ -52,6 +54,12 @@ const Index = () => {
 
   const handleLocationSelect = (location: string) => {
     setSelectedLocation(location);
+    // In a real app, you would filter events by location here
+  };
+
+  const handleFilterSelect = (filter: string) => {
+    setSelectedFilter(filter);
+    // In a real app, you would apply the filter to events here
   };
 
   const handleCategoryChange = (categories: EventCategory[]) => {
@@ -72,6 +80,15 @@ const Index = () => {
         
         <div className={`w-full transition-all duration-700 delay-100 ${animateContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
           <TopicsAndPicks />
+        </div>
+        
+        {/* New Location Filter component */}
+        <div className={`transition-all duration-700 delay-150 ${animateContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+          <LocationFilter 
+            onLocationChange={handleLocationSelect}
+            onFilterChange={handleFilterSelect}
+            className="border-b border-t border-border/30"
+          />
         </div>
         
         {featuredEvents.length > 0 && (
