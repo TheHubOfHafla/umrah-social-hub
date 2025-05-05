@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from "react";
-import { MapPin, ChevronDown, Check } from "lucide-react";
+import { MapPin, ChevronDown, Check, Filter } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -42,12 +42,14 @@ interface LocationFilterProps {
   onLocationChange?: (location: string) => void;
   onFilterChange?: (filter: string) => void;
   className?: string;
+  variant?: "default" | "compact";
 }
 
 const LocationFilter = ({
   onLocationChange,
   onFilterChange,
   className,
+  variant = "default",
 }: LocationFilterProps) => {
   const [selectedLocation, setSelectedLocation] = useState("London");
   const [selectedFilter, setSelectedFilter] = useState("all");
@@ -84,6 +86,48 @@ const LocationFilter = ({
       return () => scrollArea.removeEventListener('scroll', handleScroll);
     }
   }, []);
+
+  if (variant === "compact") {
+    return (
+      <div className={cn("w-full", className)}>
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button
+              variant="outline"
+              className="w-full justify-between border-dashed"
+            >
+              <div className="flex items-center gap-2">
+                <MapPin className="h-4 w-4 text-muted-foreground" />
+                <span>{selectedLocation}</span>
+              </div>
+              <ChevronDown className="h-4 w-4 text-muted-foreground" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="p-0 w-full min-w-[240px]" align="start">
+            <ScrollArea className="h-[320px]">
+              <div className="p-2">
+                {popularCities.map((city) => (
+                  <button
+                    key={city}
+                    className={cn(
+                      "w-full text-left flex items-center justify-between px-3 py-2 text-sm rounded-md hover:bg-secondary",
+                      selectedLocation === city && "bg-primary/10 text-primary font-medium"
+                    )}
+                    onClick={() => handleLocationSelect(city)}
+                  >
+                    {city}
+                    {selectedLocation === city && (
+                      <Check className="h-4 w-4 text-primary" />
+                    )}
+                  </button>
+                ))}
+              </div>
+            </ScrollArea>
+          </PopoverContent>
+        </Popover>
+      </div>
+    );
+  }
 
   return (
     <div className={cn("w-full bg-white dark:bg-background shadow-sm", className)}>
@@ -139,7 +183,7 @@ const LocationFilter = ({
                     className={cn(
                       "text-sm px-3.5 py-1 h-8 whitespace-nowrap transition-all duration-200",
                       selectedFilter === filter.id
-                        ? "bg-primary text-white hover:bg-primary/90"
+                        ? "bg-[#4A90E2] text-white hover:bg-[#3A7BC8]"
                         : "text-foreground/80 hover:text-foreground hover:bg-secondary/80"
                     )}
                     onClick={() => handleFilterSelect(filter.id)}
