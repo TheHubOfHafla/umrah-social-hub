@@ -26,7 +26,7 @@ const FeaturedEvent = ({ event }: FeaturedEventProps) => {
   return (
     <Link to={`/events/${event.id}`}>
       <Card className={cn(
-        "overflow-hidden transition-all duration-150 cursor-pointer group relative shadow-md",
+        "overflow-hidden transition-all duration-150 cursor-pointer group relative shadow-md h-full",
         "hover:shadow-lg border-gray-100",
         isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
       )}>

@@ -129,7 +129,7 @@ const LocationFilter = ({
 
           {/* Filters row */}
           <div className="relative">
-            <ScrollArea id="filters-scroll-area" className="pb-2 max-w-full" orientation="horizontal">
+            <ScrollArea id="filters-scroll-area" className="pb-2 max-w-full">
               <div className="flex space-x-1.5 min-w-max pb-1">
                 {eventFilters.map((filter) => (
                   <Button

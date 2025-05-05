@@ -93,7 +93,12 @@ const Index = () => {
         
         {featuredEvents.length > 0 && (
           <section className={`container mx-auto px-3 md:px-4 mt-4 md:mt-8 mb-8 md:mb-16 transition-all duration-700 delay-200 ${animateContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-            <FeaturedEvent event={featuredEvents[0]} />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+              <FeaturedEvent event={featuredEvents[0]} />
+              {featuredEvents.length > 1 && (
+                <FeaturedEvent event={featuredEvents[1]} />
+              )}
+            </div>
           </section>
         )}
         
