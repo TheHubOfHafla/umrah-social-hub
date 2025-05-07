@@ -12,7 +12,7 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   iconPosition?: 'left' | 'right';
   fullWidth?: boolean;
   rounded?: boolean;
-  gradient?: 'warm' | 'cool' | 'earth' | 'sunset' | 'blue';
+  gradient?: 'warm' | 'cool' | 'earth' | 'sunset' | 'blue' | 'purple';
   withShadow?: boolean;
   withHoverEffect?: boolean;
   withPulse?: boolean;
@@ -57,13 +57,14 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         className={cn(
           'font-medium transition-all tracking-tight relative overflow-hidden',
           'active:scale-[0.98]',
-          variant === 'primary' && 'bg-[#4A90E2] text-white hover:bg-[#3A7BC8]',
-          variant === 'subtle' && 'bg-secondary text-secondary-foreground hover:bg-secondary/80',
+          variant === 'primary' && 'bg-purple-600 text-white hover:bg-purple-700',
+          variant === 'subtle' && 'bg-purple-100 text-purple-800 hover:bg-purple-200',
           variant === 'gradient' && {
+            'bg-gradient-to-r from-purple-500 to-purple-600': gradient === 'purple' || !gradient,
             'bg-gradient-cool': gradient === 'cool' && !gradient?.includes('blue'),
             'bg-gradient-earth': gradient === 'earth' && !gradient?.includes('blue'),
             'bg-gradient-sunset': gradient === 'sunset' && !gradient?.includes('blue'),
-            'bg-gradient-to-r from-[#4A90E2] to-[#63B3ED]': gradient === 'blue' || !gradient,
+            'bg-gradient-to-r from-purple-400 to-purple-600': gradient === 'blue',
             'text-white': true,
           },
           rounded ? 'rounded-md' : 'rounded-sm',

@@ -56,7 +56,7 @@ const EventCard = ({ event, className, variant = "default" }: EventCardProps) =>
       <Card 
         className={cn(
           "overflow-hidden transition-all duration-300 group relative h-full w-full flex flex-col",
-          "border-gray-200 hover:border-[#4A90E2]/30 hover:shadow-md hover:translate-y-[-3px]",
+          "border-gray-200 hover:border-purple-300 hover:shadow-md hover:translate-y-[-3px]",
           isFeatured ? "shadow-md" : "shadow-sm",
           className
         )}
@@ -74,7 +74,7 @@ const EventCard = ({ event, className, variant = "default" }: EventCardProps) =>
           
           {/* Date overlay */}
           <div className="absolute top-3 left-3 bg-white dark:bg-gray-800 rounded-lg shadow-md px-2 py-1 text-center z-20">
-            <div className="text-xs font-bold text-[#4A90E2]">{getFormattedDate()}</div>
+            <div className="text-xs font-bold text-purple-600">{getFormattedDate()}</div>
           </div>
           
           {/* Save button */}
@@ -86,7 +86,7 @@ const EventCard = ({ event, className, variant = "default" }: EventCardProps) =>
             >
               <Heart className={cn(
                 "h-4 w-4 transition-colors", 
-                isEventSaved ? "fill-red-500 text-red-500" : "text-gray-500"
+                isEventSaved ? "fill-purple-500 text-purple-500" : "text-gray-500"
               )} />
             </Button>
           </div>
@@ -96,7 +96,7 @@ const EventCard = ({ event, className, variant = "default" }: EventCardProps) =>
             {event.isFree ? (
               <Badge className="bg-green-500 hover:bg-green-600">Free</Badge>
             ) : (
-              event.price && <Badge className="bg-[#4A90E2] hover:bg-[#3A7BC8]">£{event.price}</Badge>
+              event.price && <Badge className="bg-purple-600 hover:bg-purple-700">£{event.price}</Badge>
             )}
           </div>
 
@@ -117,14 +117,14 @@ const EventCard = ({ event, className, variant = "default" }: EventCardProps) =>
               <Badge 
                 key={category} 
                 variant="secondary" 
-                className="bg-[#4A90E2]/10 hover:bg-[#4A90E2]/20 text-[#4A90E2] border-0"
+                className="bg-purple-100 hover:bg-purple-200 text-purple-800 border-0"
               >
                 {category}
               </Badge>
             ))}
           </div>
           
-          <h3 className="font-semibold text-base md:text-lg mb-1.5 line-clamp-2 group-hover:text-[#4A90E2] transition-colors">
+          <h3 className="font-semibold text-base md:text-lg mb-1.5 line-clamp-2 group-hover:text-purple-600 transition-colors">
             {event.title}
           </h3>
           
@@ -134,11 +134,11 @@ const EventCard = ({ event, className, variant = "default" }: EventCardProps) =>
           
           <div className="flex flex-col gap-1.5 mt-auto text-sm text-gray-500 dark:text-gray-400">
             <div className="flex items-center">
-              <Clock className="mr-2 h-3.5 w-3.5 text-[#4A90E2]" />
+              <Clock className="mr-2 h-3.5 w-3.5 text-purple-500" />
               {new Date(event.date.start).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
             </div>
             <div className="flex items-center">
-              <MapPin className="mr-2 h-3.5 w-3.5 text-[#4A90E2]" />
+              <MapPin className="mr-2 h-3.5 w-3.5 text-purple-500" />
               {displayLocation}
             </div>
           </div>

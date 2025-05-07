@@ -97,7 +97,7 @@ const LocationFilter = ({
               className="w-full justify-between border-dashed"
             >
               <div className="flex items-center gap-2">
-                <MapPin className="h-4 w-4 text-muted-foreground" />
+                <MapPin className="h-4 w-4 text-purple-500" />
                 <span>{selectedLocation}</span>
               </div>
               <ChevronDown className="h-4 w-4 text-muted-foreground" />
@@ -110,14 +110,14 @@ const LocationFilter = ({
                   <button
                     key={city}
                     className={cn(
-                      "w-full text-left flex items-center justify-between px-3 py-2 text-sm rounded-md hover:bg-secondary",
-                      selectedLocation === city && "bg-primary/10 text-primary font-medium"
+                      "w-full text-left flex items-center justify-between px-3 py-2 text-sm rounded-md hover:bg-purple-50",
+                      selectedLocation === city && "bg-purple-100 text-purple-800 font-medium"
                     )}
                     onClick={() => handleLocationSelect(city)}
                   >
                     {city}
                     {selectedLocation === city && (
-                      <Check className="h-4 w-4 text-primary" />
+                      <Check className="h-4 w-4 text-purple-600" />
                     )}
                   </button>
                 ))}
@@ -140,11 +140,11 @@ const LocationFilter = ({
               <PopoverTrigger asChild>
                 <Button
                   variant="ghost"
-                  className="flex items-center gap-1 px-1.5 py-1 h-8 rounded-md hover:bg-primary/5 font-medium text-primary hover:text-primary/90"
+                  className="flex items-center gap-1 px-1.5 py-1 h-8 rounded-md hover:bg-purple-50 font-medium text-purple-600 hover:text-purple-700"
                 >
                   <MapPin className="h-4 w-4 mr-1" />
                   {selectedLocation}
-                  <ChevronDown className="h-3.5 w-3.5 text-primary/70 ml-0.5" />
+                  <ChevronDown className="h-3.5 w-3.5 text-purple-500 ml-0.5" />
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="p-0 w-60" align="start">
@@ -154,14 +154,14 @@ const LocationFilter = ({
                       <button
                         key={city}
                         className={cn(
-                          "w-full text-left flex items-center justify-between px-3 py-2 text-sm rounded-md hover:bg-secondary",
-                          selectedLocation === city && "bg-primary/10 text-primary font-medium"
+                          "w-full text-left flex items-center justify-between px-3 py-2 text-sm rounded-md hover:bg-purple-50",
+                          selectedLocation === city && "bg-purple-100 text-purple-600 font-medium"
                         )}
                         onClick={() => handleLocationSelect(city)}
                       >
                         {city}
                         {selectedLocation === city && (
-                          <Check className="h-4 w-4 text-primary" />
+                          <Check className="h-4 w-4 text-purple-600" />
                         )}
                       </button>
                     ))}
@@ -183,8 +183,8 @@ const LocationFilter = ({
                     className={cn(
                       "text-sm px-3.5 py-1 h-8 whitespace-nowrap transition-all duration-200",
                       selectedFilter === filter.id
-                        ? "bg-[#4A90E2] text-white hover:bg-[#3A7BC8]"
-                        : "text-foreground/80 hover:text-foreground hover:bg-secondary/80"
+                        ? "bg-gradient-to-r from-purple-500 to-purple-600 text-white hover:from-purple-600 hover:to-purple-700"
+                        : "text-foreground/80 hover:text-purple-700 hover:border-purple-300"
                     )}
                     onClick={() => handleFilterSelect(filter.id)}
                   >

@@ -27,7 +27,7 @@ const FeaturedEvent = ({ event }: FeaturedEventProps) => {
     <Link to={`/events/${event.id}`}>
       <Card className={cn(
         "overflow-hidden transition-all duration-150 cursor-pointer group relative shadow-md h-full",
-        "hover:shadow-lg border-gray-100",
+        "hover:shadow-lg border-gray-100 hover:border-purple-200",
         isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
       )}>
         <div className="relative aspect-[21/9]">
@@ -40,13 +40,13 @@ const FeaturedEvent = ({ event }: FeaturedEventProps) => {
         
         <CardContent className="p-4 md:p-6">
           <div className="flex items-center gap-2 mb-3">
-            <Badge className="bg-[#4A90E2] hover:bg-[#3A7BC8] transition-all duration-150 text-xs md:text-sm">Featured Event</Badge>
+            <Badge className="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 transition-all duration-150 text-xs md:text-sm">Featured Event</Badge>
             {event.ticketActivity?.isSellingFast && (
               <TicketAlert type="selling-fast" />
             )}
           </div>
           
-          <h2 className="text-xl md:text-2xl font-bold mb-2 group-hover:text-primary transition-colors duration-150 line-clamp-2">
+          <h2 className="text-xl md:text-2xl font-bold mb-2 group-hover:text-purple-600 transition-colors duration-150 line-clamp-2">
             {event.title}
           </h2>
           
@@ -56,15 +56,15 @@ const FeaturedEvent = ({ event }: FeaturedEventProps) => {
           
           <div className="flex flex-wrap gap-2 md:gap-4 text-xs md:text-sm text-muted-foreground mb-4">
             <div className="flex items-center">
-              <CalendarIcon className="mr-1 md:mr-2 h-3 w-3 md:h-4 md:w-4 transition-colors duration-150 group-hover:text-[#4A90E2]" />
+              <CalendarIcon className="mr-1 md:mr-2 h-3 w-3 md:h-4 md:w-4 transition-colors duration-150 text-purple-500 group-hover:text-purple-600" />
               {new Date(event.date.start).toLocaleDateString()}
             </div>
             <div className="flex items-center">
-              <Clock className="mr-1 md:mr-2 h-3 w-3 md:h-4 md:w-4 transition-colors duration-150 group-hover:text-[#4A90E2]" />
+              <Clock className="mr-1 md:mr-2 h-3 w-3 md:h-4 md:w-4 transition-colors duration-150 text-purple-500 group-hover:text-purple-600" />
               {new Date(event.date.start).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
             </div>
             <div className="flex items-center">
-              <MapPin className="mr-1 md:mr-2 h-3 w-3 md:h-4 md:w-4 transition-colors duration-150 group-hover:text-[#4A90E2]" />
+              <MapPin className="mr-1 md:mr-2 h-3 w-3 md:h-4 md:w-4 transition-colors duration-150 text-purple-500 group-hover:text-purple-600" />
               {event.location.city}, {event.location.country}
             </div>
           </div>
