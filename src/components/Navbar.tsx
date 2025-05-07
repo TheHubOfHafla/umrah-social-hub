@@ -43,7 +43,7 @@ const Navbar = ({ isAuthenticated = false }: { isAuthenticated?: boolean }) => {
   return (
     <header 
       className={cn(
-        "fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-white border-b border-gray-100 shadow-sm", 
+        "fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-gray-100/80 backdrop-blur-sm border-b border-gray-100 shadow-sm", 
         isScrolled 
           ? "py-2" 
           : "py-2 md:py-3"
@@ -109,19 +109,7 @@ const Navbar = ({ isAuthenticated = false }: { isAuthenticated?: boolean }) => {
       </div>
 
       {/* Mobile Menu */}
-      <MobileMenu isOpen={mobileMenuOpen} isAuthenticated={isAuthenticated}>
-        {/* Search Input - Mobile */}
-        <div className="px-4 py-3 border-b border-gray-200/50">
-          <div className="relative">
-            <Input 
-              type="search" 
-              placeholder="Search events..." 
-              className="py-2 pl-9 pr-4 w-full text-sm border-gray-200 focus:border-purple-300 rounded-md focus:ring-2 focus:ring-purple-200 focus:outline-none"
-            />
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-          </div>
-        </div>
-      </MobileMenu>
+      <MobileMenu isOpen={mobileMenuOpen} isAuthenticated={isAuthenticated} />
     </header>
   );
 };
