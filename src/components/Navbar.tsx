@@ -49,7 +49,7 @@ const Navbar = ({ isAuthenticated = false }: { isAuthenticated?: boolean }) => {
           : "py-2 md:py-3"
       )}
     >
-      <div className="container flex items-center justify-between h-16">
+      <div className="container flex items-center justify-between h-14">
         {/* Logo */}
         <div className="relative flex items-center z-10">
           <Logo />

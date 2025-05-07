@@ -184,8 +184,8 @@ const EventsPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#FCFCFC] dark:bg-background">
-      {/* Hero Section */}
+    <div className="min-h-screen bg-[#FCFCFC] dark:bg-background pt-14">
+      {/* Hero Section with increased top padding to account for smaller navbar */}
       <div className="relative bg-gradient-to-r from-[#EAF2FD] to-[#E6E9FF] dark:from-[#1F2937]/30 dark:to-[#1F1F3F]/30 py-16 md:py-24">
         <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto text-center">
@@ -712,4 +712,54 @@ const EventsPage = () => {
                                   </div>
                                 </div>
                                 
-                                <
+                                <div className="flex justify-between items-center mt-4 pt-4 border-t border-gray-100 dark:border-gray-700">
+                                  <div className="flex items-center space-x-2">
+                                    <img
+                                      src={event.organizer.avatar}
+                                      alt={event.organizer.name}
+                                      className="w-8 h-8 rounded-full"
+                                    />
+                                    <span className="text-sm font-medium">{event.organizer.name}</span>
+                                  </div>
+                                  <Button 
+                                    variant="outline" 
+                                    className="text-[#4A90E2] border-[#4A90E2]/30 hover:bg-[#4A90E2]/5 hover:text-[#3A7BC8] hover:border-[#4A90E2]"
+                                  >
+                                    View Details
+                                  </Button>
+                                </div>
+                              </div>
+                            </CardContent>
+                          </div>
+                        </Card>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="flex flex-col items-center justify-center py-16 text-center">
+                  <div className="w-24 h-24 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mb-4">
+                    <Calendar className="h-10 w-10 text-gray-400" />
+                  </div>
+                  <h3 className="text-xl font-semibold mb-2">No events found</h3>
+                  <p className="text-gray-500 dark:text-gray-400 max-w-md">
+                    We couldn't find any events matching your search criteria. Try adjusting your filters or search terms.
+                  </p>
+                  <Button 
+                    className="mt-6" 
+                    variant="outline"
+                    onClick={clearFilters}
+                  >
+                    Clear Filters
+                  </Button>
+                </div>
+              )}
+            </TabsContent>
+          </Tabs>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default EventsPage;

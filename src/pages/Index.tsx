@@ -71,7 +71,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen overflow-hidden bg-background">
-      <main className="pb-8 md:pb-16">
+      <main className="pb-8 md:pb-16 pt-10">
         <HeroBanner 
           user={isAuthenticated ? currentUser : undefined} 
           onLocationSelect={handleLocationSelect}

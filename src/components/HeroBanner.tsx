@@ -33,7 +33,7 @@ const HeroBanner = ({ user, onLocationSelect, isAuthenticated = true }: HeroBann
   const navigate = useNavigate();
   
   return (
-    <section className="relative w-full overflow-hidden">
+    <section className="relative w-full overflow-hidden pt-14">
       {/* Hero Carousel */}
       <EventCarousel images={carouselImages} interval={5000} />
       
