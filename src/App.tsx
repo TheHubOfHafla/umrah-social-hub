@@ -37,7 +37,7 @@ import { User } from "@/types";
 const queryClient = new QueryClient();
 
 export const AuthContext = createContext({
-  isAuthenticated: true,
+  isAuthenticated: false,
   currentUser: {
     id: "mock-user-id",
     name: "Guest User",
@@ -52,7 +52,7 @@ export const AuthContext = createContext({
 
 const App = () => {
   const contextValue = {
-    isAuthenticated: true,
+    isAuthenticated: false,
     currentUser: {
       id: "mock-user-id",
       name: "Guest User",
@@ -76,7 +76,7 @@ const App = () => {
           <Toaster />
           <Sonner />
           <BrowserRouter>
-            <Navbar />
+            <Navbar isAuthenticated={false} />
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/events" element={
@@ -128,6 +128,8 @@ const App = () => {
                   <ContactUs />
                 </PageWrapper>
               } />
+              <Route path="/login" element={<Login />} />
+              <Route path="/signup" element={<Signup />} />
               <Route path="/events/:eventId/verify/:confirmationCode" element={<VerifyTicketPage />} />
               <Route path="*" element={
                 <PageWrapper>

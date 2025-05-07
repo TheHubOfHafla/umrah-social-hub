@@ -1,12 +1,13 @@
 
 import { useContext } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { UserRound, Calendar, LogIn, UserPlus, LogOut } from "lucide-react";
+import { UserRound, Calendar, LogIn, UserPlus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { AuthContext } from "@/App";
 import UserAvatar from "../UserAvatar";
 import { currentUser } from "@/lib/data/users";
 import CreateEventButton from "./CreateEventButton";
+import { Button } from "@/components/ui/button";
 
 interface NavItem {
   label: string;
@@ -17,9 +18,6 @@ interface NavItem {
 const navItems: NavItem[] = [{
   label: "Home",
   href: "/"
-}, {
-  label: "Events",
-  href: "/events"
 }, {
   label: "Organizers",
   href: "/organizers"
@@ -48,7 +46,7 @@ const MobileMenu = ({ isOpen, isAuthenticated }: MobileMenuProps) => {
   return (
     <div 
       className={cn(
-        "fixed inset-x-0 top-[57px] z-50 h-[calc(100vh-57px)] bg-background/95 backdrop-blur-md transition-transform duration-300 ease-in-out md:hidden overflow-y-auto", 
+        "fixed inset-x-0 top-[57px] z-50 h-[calc(100vh-57px)] bg-white border-t border-gray-100 transition-transform duration-300 ease-in-out md:hidden overflow-y-auto", 
         isOpen ? "translate-x-0" : "translate-x-full"
       )}
     >
@@ -74,8 +72,8 @@ const MobileMenu = ({ isOpen, isAuthenticated }: MobileMenuProps) => {
               className={cn(
                 "px-4 py-2.5 text-base rounded-md transition-all duration-200 font-medium w-full text-left", 
                 item.active 
-                  ? "bg-primary/10 text-primary font-semibold" 
-                  : "text-foreground/80 hover:bg-primary/10 hover:text-primary"
+                  ? "bg-purple-50 text-purple-600 font-semibold" 
+                  : "text-gray-700 hover:bg-purple-50 hover:text-purple-600"
               )}
             >
               {item.label}
@@ -90,43 +88,37 @@ const MobileMenu = ({ isOpen, isAuthenticated }: MobileMenuProps) => {
             <>
               <button 
                 onClick={() => handleNavigation("/dashboard/profile")} 
-                className="px-4 py-2.5 text-base rounded-md hover:bg-primary/10 hover:text-primary transition-all duration-200 flex items-center w-full text-left"
+                className="px-4 py-2.5 text-base rounded-md hover:bg-purple-50 hover:text-purple-600 transition-all duration-200 flex items-center w-full text-left"
               >
                 <UserRound className="mr-2 h-4 w-4" />
                 My Profile
               </button>
               <button 
                 onClick={() => handleNavigation("/dashboard/events")} 
-                className="px-4 py-2.5 text-base rounded-md hover:bg-primary/10 hover:text-primary transition-all duration-200 flex items-center w-full text-left"
+                className="px-4 py-2.5 text-base rounded-md hover:bg-purple-50 hover:text-purple-600 transition-all duration-200 flex items-center w-full text-left"
               >
                 <Calendar className="mr-2 h-4 w-4" />
                 My Events
               </button>
-              <button 
-                onClick={auth.onSignOut} 
-                className="px-4 py-2.5 text-base rounded-md hover:bg-red-100 text-red-600 transition-all duration-200 flex items-center w-full text-left mt-4"
-              >
-                <LogOut className="mr-2 h-4 w-4" />
-                Sign Out
-              </button>
             </>
           ) : (
-            <>
-              <button 
-                onClick={() => handleNavigation("/login")} 
-                className="px-4 py-2.5 text-base rounded-md hover:bg-primary/10 hover:text-primary transition-all duration-200 flex items-center w-full text-left"
+            <div className="flex flex-col space-y-3 px-4 py-2">
+              <Button
+                variant="outline"
+                className="w-full justify-center text-purple-600 border-purple-200 hover:bg-purple-50"
+                onClick={() => handleNavigation("/login")}
               >
                 <LogIn className="mr-2 h-4 w-4" />
                 Sign In
-              </button>
-              <button 
-                onClick={() => handleNavigation("/signup")} 
-                className="px-4 py-2.5 text-base rounded-md hover:bg-primary/10 hover:text-primary transition-all duration-200 flex items-center w-full text-left"
+              </Button>
+              <Button
+                className="w-full justify-center bg-purple-600 hover:bg-purple-700 text-white"
+                onClick={() => handleNavigation("/signup")}
               >
                 <UserPlus className="mr-2 h-4 w-4" />
                 Sign Up
-              </button>
-            </>
+              </Button>
+            </div>
           )}
         </div>
       </div>

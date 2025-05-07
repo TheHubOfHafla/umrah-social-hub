@@ -17,7 +17,7 @@ import {
   MobileMenuButton
 } from "./navbar";
 
-const Navbar = ({ isAuthenticated = true }: { isAuthenticated?: boolean }) => {
+const Navbar = ({ isAuthenticated = false }: { isAuthenticated?: boolean }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchFocused, setSearchFocused] = useState(false);
@@ -43,13 +43,13 @@ const Navbar = ({ isAuthenticated = true }: { isAuthenticated?: boolean }) => {
   return (
     <header 
       className={cn(
-        "fixed top-0 left-0 right-0 z-50 transition-all duration-300", 
+        "fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-white border-b border-gray-100 shadow-sm", 
         isScrolled 
-          ? "py-2 bg-white/70 dark:bg-background/95 backdrop-blur-md shadow-sm border-b border-gray-200/50" 
-          : "py-2 md:py-3 bg-transparent"
+          ? "py-2" 
+          : "py-2 md:py-3"
       )}
     >
-      <div className="container flex items-center justify-between">
+      <div className="container flex items-center justify-between h-16">
         {/* Logo */}
         <div className="relative flex items-center z-10">
           <Logo />

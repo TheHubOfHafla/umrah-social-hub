@@ -18,9 +18,6 @@ const navItems: NavItem[] = [{
   label: "Home",
   href: "/"
 }, {
-  label: "Events",
-  href: "/events"
-}, {
   label: "Organizers",
   href: "/organizers"
 }];
@@ -48,10 +45,10 @@ const NavLinks = () => {
               asChild 
               className={cn(
                 "px-3 md:px-4 py-2 text-sm md:text-base font-medium tracking-wide transition-all duration-200 rounded-md",
-                "hover:text-primary hover:bg-primary/10 hover:scale-105",
+                "hover:text-purple-600 hover:bg-purple-50",
                 item.active 
-                  ? "text-primary font-semibold border-b-2 border-primary" 
-                  : "text-foreground/80 bg-transparent"
+                  ? "text-purple-600 font-semibold border-b-2 border-purple-600" 
+                  : "text-gray-700 bg-transparent"
               )}
             >
               <button onClick={() => handleNavigation(item.href)}>
