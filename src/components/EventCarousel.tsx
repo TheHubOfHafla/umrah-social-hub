@@ -80,7 +80,7 @@ const EventCarousel = ({
   };
 
   return (
-    <div className={cn("relative w-full overflow-hidden h-[30vh] md:h-[35vh]", className)}>
+    <div className={cn("relative w-full overflow-hidden h-[55vh] md:h-[60vh] aspect-[16/10]", className)}>
       {/* Carousel Images */}
       {images.map((image, index) => (
         <div
