@@ -57,7 +57,7 @@ const Navbar = ({ isAuthenticated = false }: { isAuthenticated?: boolean }) => {
 
         {/* Center Navigation */}
         <div className="hidden md:flex items-center justify-center absolute left-1/2 transform -translate-x-1/2">
-          <NavLinks />
+          <NavLinks isScrolled={isScrolled} />
         </div>
 
         {/* Search Input - Desktop */}
@@ -69,7 +69,8 @@ const Navbar = ({ isAuthenticated = false }: { isAuthenticated?: boolean }) => {
               className={cn(
                 "py-1 pl-8 pr-4 w-[250px] focus:w-[300px] transition-all duration-300 border border-gray-200 focus:border-purple-300 rounded-md",
                 "text-sm placeholder:text-gray-400 focus:ring-2 focus:ring-purple-200 focus:outline-none",
-                searchFocused && "border-purple-300 ring-2 ring-purple-100"
+                searchFocused && "border-purple-300 ring-2 ring-purple-100",
+                !isScrolled && "bg-white/80 backdrop-blur-sm"
               )}
               onFocus={() => setSearchFocused(true)}
               onBlur={() => setSearchFocused(false)}
@@ -85,7 +86,7 @@ const Navbar = ({ isAuthenticated = false }: { isAuthenticated?: boolean }) => {
         <div className="flex items-center ml-auto gap-2 flex-shrink-0">
           <div className="hidden md:flex items-center space-x-1 lg:space-x-2">
             {/* Create Event Button */}
-            <CreateEventButton />
+            <CreateEventButton isScrolled={isScrolled} />
             
             {isAuthenticated ? (
               <>
@@ -99,12 +100,12 @@ const Navbar = ({ isAuthenticated = false }: { isAuthenticated?: boolean }) => {
                 <UserMenu />
               </>
             ) : (
-              <AuthButtons />
+              <AuthButtons isScrolled={isScrolled} />
             )}
           </div>
 
           {/* Mobile Menu Button */}
-          <MobileMenuButton isOpen={mobileMenuOpen} toggleMenu={toggleMobileMenu} />
+          <MobileMenuButton isOpen={mobileMenuOpen} toggleMenu={toggleMobileMenu} isScrolled={isScrolled} />
         </div>
       </div>
 
