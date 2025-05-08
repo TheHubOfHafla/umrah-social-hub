@@ -41,23 +41,38 @@ const HeroBanner = ({
   const navigate = useNavigate();
 
   return (
-    <section className="relative w-full overflow-hidden pt-20 px-0 py-[42px] mx-0 my-0 flex flex-col items-center">
-      <div className="text-center mb-8">
-        <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4 bg-gradient-to-r from-purple-600 to-purple-400 bg-clip-text text-transparent">
+    <section className="relative w-full overflow-hidden pt-14 px-0 pb-10 mx-0 my-0 flex flex-col items-center min-h-[80vh] isolate">
+      {/* Background image banner */}
+      <div className="absolute inset-0 w-full h-full -z-10">
+        <img 
+          src="/lovable-uploads/14ea8c39-648d-4b6f-a11e-1c47271eac8e.png" 
+          alt="Islamic community gathering background" 
+          className="w-full h-full object-cover"
+        />
+        
+        {/* Gradient overlay for text readability */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-black/20"></div>
+        
+        {/* Bottom blur gradient */}
+        <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-white to-transparent"></div>
+      </div>
+
+      <div className="text-center mb-8 z-10 pt-8 md:pt-12">
+        <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-b from-purple-600 to-purple-800 shadow-text">
           Connect with Your Community
         </h1>
-        <p className="text-lg md:text-xl text-gray-700 max-w-2xl mx-auto">
+        <p className="text-lg md:text-xl text-gray-800 max-w-2xl mx-auto font-medium shadow-text">
           Discover Islamic events and gatherings happening in your area
         </p>
       </div>
       
-      {/* Centered smaller carousel */}
-      <div className="w-full max-w-4xl mx-auto">
+      {/* Centered smaller carousel with elevated z-index */}
+      <div className="w-full max-w-3xl mx-auto z-10">
         <EventCarousel images={carouselImages} interval={5000} className="rounded-lg overflow-hidden shadow-xl" />
       </div>
       
       {/* Optional decorative element - purple accent line */}
-      <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-purple-400 to-purple-600 z-20" />
+      <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-purple-400 to-purple-600 z-20"></div>
     </section>
   );
 };

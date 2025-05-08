@@ -43,8 +43,10 @@ const NavLinks = () => {
               asChild 
               className={cn(
                 "px-3 md:px-4 py-1.5 text-sm md:text-base font-medium tracking-wide transition-all duration-200 rounded-md",
-                "hover:text-purple-600 hover:bg-purple-50",
-                item.active ? "text-purple-600 font-semibold border-b-2 border-purple-600" : "text-gray-700 bg-transparent"
+                "hover:text-purple-600 hover:bg-white/40 hover:backdrop-blur-sm",
+                item.active 
+                  ? "text-purple-600 font-semibold border-b-2 border-purple-600 bg-white/30 backdrop-blur-sm" 
+                  : "text-gray-800 bg-transparent"
               )}
               onClick={() => handleNavigation(item.href)}
             >
