@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -69,8 +70,8 @@ const EventCarousel = ({
 
           <img src={image.src} alt={image.alt} className={cn("w-full h-full object-cover transition-transform duration-[8000ms] ease-out", currentIndex === index && "scale-105")} onLoad={() => handleImageLoad(index)} />
 
-          {/* Gradient overlay */}
-          <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-black/20 my-0 py-0" />
+          {/* Gradient overlay with increased height */}
+          <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/15 to-black/40 h-full my-0 py-0" />
         </div>)}
 
       {/* Navigation Controls */}
