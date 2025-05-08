@@ -1,13 +1,8 @@
 
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
 
-interface AuthButtonsProps {
-  isScrolled?: boolean;
-}
-
-const AuthButtons = ({ isScrolled = false }: AuthButtonsProps) => {
+const AuthButtons = () => {
   const navigate = useNavigate();
 
   const handleNavigation = (path: string) => {
@@ -20,22 +15,14 @@ const AuthButtons = ({ isScrolled = false }: AuthButtonsProps) => {
       <Button
         variant="outline"
         size="sm"
-        className={cn(
-          isScrolled
-            ? "text-purple-600 border-purple-200 hover:bg-purple-50 hover:border-purple-300"
-            : "text-white border-white/30 bg-white/10 backdrop-blur-sm hover:bg-white/20 hover:border-white/40"
-        )}
+        className="text-purple-600 border-purple-200 hover:bg-purple-50 hover:border-purple-300"
         onClick={() => handleNavigation("/login")}
       >
         Sign In
       </Button>
       <Button
         size="sm"
-        className={cn(
-          isScrolled
-            ? "bg-purple-600 hover:bg-purple-700 text-white"
-            : "bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white"
-        )}
+        className="bg-purple-600 hover:bg-purple-700 text-white"
         onClick={() => handleNavigation("/signup")}
       >
         Sign Up

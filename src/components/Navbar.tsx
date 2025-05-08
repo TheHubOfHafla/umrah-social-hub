@@ -43,10 +43,10 @@ const Navbar = ({ isAuthenticated = false }: { isAuthenticated?: boolean }) => {
   return (
     <header 
       className={cn(
-        "fixed top-0 left-0 right-0 z-50 transition-all duration-300", 
+        "fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-gray-100/80 backdrop-blur-sm border-b border-gray-100 shadow-sm", 
         isScrolled 
-          ? "bg-white shadow-sm" 
-          : "bg-transparent"
+          ? "py-2" 
+          : "py-2 md:py-3"
       )}
     >
       <div className="container flex items-center justify-between h-14">
@@ -57,7 +57,7 @@ const Navbar = ({ isAuthenticated = false }: { isAuthenticated?: boolean }) => {
 
         {/* Center Navigation */}
         <div className="hidden md:flex items-center justify-center absolute left-1/2 transform -translate-x-1/2">
-          <NavLinks isScrolled={isScrolled} />
+          <NavLinks />
         </div>
 
         {/* Search Input - Desktop */}
@@ -69,8 +69,7 @@ const Navbar = ({ isAuthenticated = false }: { isAuthenticated?: boolean }) => {
               className={cn(
                 "py-1 pl-8 pr-4 w-[250px] focus:w-[300px] transition-all duration-300 border border-gray-200 focus:border-purple-300 rounded-md",
                 "text-sm placeholder:text-gray-400 focus:ring-2 focus:ring-purple-200 focus:outline-none",
-                searchFocused && "border-purple-300 ring-2 ring-purple-100",
-                !isScrolled && "bg-white/80 backdrop-blur-sm"
+                searchFocused && "border-purple-300 ring-2 ring-purple-100"
               )}
               onFocus={() => setSearchFocused(true)}
               onBlur={() => setSearchFocused(false)}
@@ -86,7 +85,7 @@ const Navbar = ({ isAuthenticated = false }: { isAuthenticated?: boolean }) => {
         <div className="flex items-center ml-auto gap-2 flex-shrink-0">
           <div className="hidden md:flex items-center space-x-1 lg:space-x-2">
             {/* Create Event Button */}
-            <CreateEventButton isScrolled={isScrolled} />
+            <CreateEventButton />
             
             {isAuthenticated ? (
               <>
@@ -100,12 +99,12 @@ const Navbar = ({ isAuthenticated = false }: { isAuthenticated?: boolean }) => {
                 <UserMenu />
               </>
             ) : (
-              <AuthButtons isScrolled={isScrolled} />
+              <AuthButtons />
             )}
           </div>
 
           {/* Mobile Menu Button */}
-          <MobileMenuButton isOpen={mobileMenuOpen} toggleMenu={toggleMobileMenu} isScrolled={isScrolled} />
+          <MobileMenuButton isOpen={mobileMenuOpen} toggleMenu={toggleMobileMenu} />
         </div>
       </div>
 

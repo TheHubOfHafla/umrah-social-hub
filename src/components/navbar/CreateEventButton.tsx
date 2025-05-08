@@ -1,27 +1,27 @@
 
 import { useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 interface CreateEventButtonProps {
   mobile?: boolean;
-  isScrolled?: boolean;
+  className?: string;
 }
 
-const CreateEventButton = ({ mobile = false, isScrolled = false }: CreateEventButtonProps) => {
+const CreateEventButton = ({ mobile = false, className }: CreateEventButtonProps) => {
   const navigate = useNavigate();
 
-  const handleClick = () => {
+  const handleNavigation = () => {
     navigate("/events/create");
     window.scrollTo(0, 0);
   };
 
   if (mobile) {
     return (
-      <button
-        onClick={handleClick}
-        className="px-4 py-2.5 text-base rounded-md hover:bg-purple-50 hover:text-purple-600 transition-all duration-200 flex items-center w-full text-left"
+      <button 
+        onClick={handleNavigation} 
+        className={cn("px-4 py-2.5 text-base bg-primary text-white rounded-md hover:bg-primary/90 transition-all duration-200 flex items-center w-full", className)}
       >
         <Plus className="mr-2 h-4 w-4" />
         Create Event
@@ -30,19 +30,16 @@ const CreateEventButton = ({ mobile = false, isScrolled = false }: CreateEventBu
   }
 
   return (
-    <Button
-      size="sm"
-      variant="outline"
-      className={cn(
-        "transition-colors mr-1",
-        isScrolled 
-          ? "text-gray-700 hover:text-purple-600 border-gray-200" 
-          : "text-white border-white/30 bg-white/10 backdrop-blur-sm hover:bg-white/20 hover:border-white/40"
-      )}
-      onClick={handleClick}
+    <button 
+      onClick={handleNavigation}
+      className={cn("transition-all duration-200 hover:scale-105", className)}
     >
-      <Plus className="h-4 w-4 mr-1" /> Create
-    </Button>
+      <Button size="sm" variant="default" className="flex items-center gap-1 text-xs md:text-sm">
+        <Plus className="h-3 w-3 md:h-4 md:w-4" />
+        <span className="hidden sm:inline">Create</span>
+        <span className="hidden md:inline"> Event</span>
+      </Button>
+    </button>
   );
 };
 
