@@ -80,7 +80,7 @@ const EventCarousel = ({
   };
 
   return (
-    <div className={cn("relative w-full overflow-hidden h-[50vh] md:h-[70vh] lg:h-[80vh]", className)}>
+    <div className={cn("relative w-full overflow-hidden h-[40vh] md:h-[50vh]", className)}>
       {/* Carousel Images */}
       {images.map((image, index) => (
         <div
@@ -106,14 +106,14 @@ const EventCarousel = ({
           />
 
           {/* Gradient overlay */}
-          <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/40" />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-black/20" />
         </div>
       ))}
 
       {/* Navigation Controls */}
       <button
         onClick={goToPrevious}
-        className="hidden md:flex absolute left-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-white/30 backdrop-blur-sm hover:bg-white/50 transition-colors duration-200 items-center justify-center"
+        className="absolute left-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-white/30 backdrop-blur-sm hover:bg-white/50 transition-colors duration-200 flex items-center justify-center"
         aria-label="Previous slide"
       >
         <ChevronLeft className="h-6 w-6 text-white" />
@@ -121,7 +121,7 @@ const EventCarousel = ({
 
       <button
         onClick={goToNext}
-        className="hidden md:flex absolute right-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-white/30 backdrop-blur-sm hover:bg-white/50 transition-colors duration-200 items-center justify-center"
+        className="absolute right-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-white/30 backdrop-blur-sm hover:bg-white/50 transition-colors duration-200 flex items-center justify-center"
         aria-label="Next slide"
       >
         <ChevronRight className="h-6 w-6 text-white" />

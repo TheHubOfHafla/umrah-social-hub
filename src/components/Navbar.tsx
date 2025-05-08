@@ -43,10 +43,10 @@ const Navbar = ({ isAuthenticated = false }: { isAuthenticated?: boolean }) => {
   return (
     <header 
       className={cn(
-        "fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-gray-100/80 backdrop-blur-sm border-b border-gray-100 shadow-sm", 
+        "fixed top-0 left-0 right-0 z-50 transition-all duration-300", 
         isScrolled 
-          ? "py-2" 
-          : "py-2 md:py-3"
+          ? "bg-white/80 backdrop-blur-sm shadow-sm border-b border-gray-100" 
+          : "bg-transparent"
       )}
     >
       <div className="container flex items-center justify-between h-14">
